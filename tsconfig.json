@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "ESNext",
+		"outDir": "dist",
+		"lib": [
+			"ESNext",
+		],
+		"rootDir": "src",
+		"strict": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUnusedParameters": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+	},
+}
