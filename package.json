@@ -10,7 +10,7 @@
     "pylon"
   ],
   "scripts": {
-    "build:verbose": "tsc --extendedDiagnostics --traceResolution --generateCpuProfile tsc-output.cpuprofile",
+    "build:verbose": "tsc --diagnostics --traceResolution --generateCpuProfile tsc-output.cpuprofile",
     "build": "tsc"
   },
   "author": "insyri",
