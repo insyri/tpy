@@ -9,6 +9,9 @@
   "keywords": [
     "pylon"
   ],
+  "scripts": {
+    "build": "tsc --extendedDiagnostics --traceResolution --generateCpuProfile tsc-output.cpuprofile"
+  },
   "author": "insyri",
   "license": "MIT",
   "devDependencies": {
