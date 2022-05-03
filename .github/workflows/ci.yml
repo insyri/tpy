@@ -11,11 +11,12 @@ jobs:
       matrix:
         node-version: [16.x, 18.x]
     steps:
-    - uses: actions/checkout@v3
-    - name: Build ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build:verbose
+      - uses: actions/checkout@v3
+      - name: Build ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build:verbose
+      - run: cat tsc-output.cpuprofile
