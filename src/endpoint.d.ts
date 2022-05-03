@@ -95,7 +95,6 @@ export module Guild {
     executionMsAvg?: number;
     kvOperations?: number;
   }
-  [];
 }
 
 export module Deployment {
