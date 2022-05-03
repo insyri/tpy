@@ -33,8 +33,8 @@ export default class Tpy {
   getGuildStats = async (
     id: numstr,
     stringify?: boolean
-  ): Promise<Guild.Stats | undefined> =>
-    await this.raw<Guild.Stats>(`/guilds/${id}/stats`, 'GET', stringify);
+  ): Promise<Guild.Stats[] | undefined> =>
+    await this.raw<Guild.Stats[]>(`/guilds/${id}/stats`, 'GET', stringify);
 
   getEditableGuilds = async (
     stringify?: boolean
