@@ -7,6 +7,7 @@ export default class Tpy {
   // private readonly wss_url = "wss://workbench.pylon.bot/ws/";
   private readonly token: string;
 
+  // TODO: Add a fetcher parameter/type for intialization
   constructor(token: string) {
     if (!token) throw new Error('Token is required');
     this.token = token;
