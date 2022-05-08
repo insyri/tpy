@@ -2,3 +2,5 @@ node_modules
 src
 tsconfig.json
 .github
+.gitignore
+.prettierrc
