@@ -23,7 +23,7 @@ jobs:
       - run: npm run build:verbose
       - run: cat tsc-output.cpuprofile
   cd:
-    if: ${{ github.event_name }} == 'release' && ${{ github.event.action }} == 'published' && ${{ matrix.node-version }} == '18.x' && ${{ github.ref }} == 'main'
+    if: ${{ github.event_name }} == 'release' && ${{ github.event.action }} == 'published' && ${{ github.ref }} == 'main'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
