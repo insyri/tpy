@@ -21,5 +21,5 @@ jobs:
       - run: npm ci
       - run: npm run build:verbose
       - run: cat tsc-output.cpuprofile
-      - if: ${{ github.event_name }} == 'release' && ${{ github.event.action }} == 'published' && ${{ matrix.node-version }} == '18.x' && ${{ github.ref }} == 'main'
+        if: ${{ github.event_name }} == 'release' && ${{ github.event.action }} == 'published' && ${{ matrix.node-version }} == '18.x' && ${{ github.ref }} == 'main'
       - uses: ./.github/workflows/cd.yml
