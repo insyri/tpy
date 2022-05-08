@@ -10,7 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 1
       matrix:
         node-version: [16.x, 18.x]
     steps:
@@ -22,11 +21,9 @@ jobs:
       - run: npm ci
       - run: npm run build:verbose
       - run: cat tsc-output.cpuprofile
-  cd:
-    if: ${{ github.event_name }} == 'release' && ${{ github.event.action }} == 'published' && ${{ github.ref }} == 'main'
-    runs-on: ubuntu-latest
-    steps:
-    - run: echo "ok i pull up"
+      - name: CD?
+        if: ${{ github.event_name }} == 'release' && ${{ github.event.action }} == 'published' && ${{ github.ref }} == 'main'
+        run: echo "ok i pull up"
 #    - uses: actions/checkout@v3
 #    - uses: ./.github/workflows/cd.yml
     
