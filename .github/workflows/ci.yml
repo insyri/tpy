@@ -10,6 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       matrix:
         node-version: [16.x, 18.x]
     steps:
@@ -21,5 +22,10 @@ jobs:
       - run: npm ci
       - run: npm run build:verbose
       - run: cat tsc-output.cpuprofile
-        if: ${{ github.event_name }} == 'release' && ${{ github.event.action }} == 'published' && ${{ matrix.node-version }} == '18.x' && ${{ github.ref }} == 'main'
-      - uses: ./.github/workflows/cd.yml
+  cd:
+    if: ${{ github.event_name }} == 'release' && ${{ github.event.action }} == 'published' && ${{ matrix.node-version }} == '18.x' && ${{ github.ref }} == 'main'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/workflows/cd.yml
+    
