@@ -1,8 +1,7 @@
 name: CD
 
 on:
-  repository_dispatch:
-    types: publish
+  workflow_call:
 
 jobs:
   npm:
