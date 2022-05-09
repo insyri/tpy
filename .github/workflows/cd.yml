@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  publish:
+  Publish:
     permissions:
       contents: read
       packages: write
