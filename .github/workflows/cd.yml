@@ -10,7 +10,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        registry-url: [https://registry.npmjs.org', https://npm.pkg.github.com]
+        registry-url: [https://registry.npmjs.org, https://npm.pkg.github.com]
         token: [${{ secrets.NPM_TOKEN }}, ${{ secrets.GH_PKG_REG_TOKEN }}]
         exclude:
           - registry-url: https://npm.pkg.github.com
@@ -24,7 +24,6 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: ${{ matrix.registry-url }}
-      - run: npm ci # needed?
       - run: npm publish 
         env:
           NODE_AUTH_TOKEN: ${{ matrix.token }}

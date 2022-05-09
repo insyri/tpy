@@ -25,4 +25,3 @@ jobs:
     needs: build
     if: github.event_name == 'release' && github.event.action == 'published'
     uses: ./.github/workflows/cd.yml
-    
