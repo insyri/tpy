@@ -40,4 +40,6 @@ jobs:
     needs: Build # Test
     if: github.event_name == 'release' && github.event.action == 'published'
     uses: ./.github/workflows/cd.yml
-    secrets: inherit
+    with:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GH_PKG_REG_TOKEN: ${{ secrets.GH_PKG_REG_TOKEN }}

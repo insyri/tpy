@@ -2,6 +2,11 @@ name: CD
 
 on:
   workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
+      GH_PKG_REG_TOKEN:
+        required: true
 
 jobs:
   Publish:
