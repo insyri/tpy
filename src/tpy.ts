@@ -2,15 +2,28 @@ import fetch, { RequestInit } from 'node-fetch';
 import { Deployment, Guild, User } from './endpoint';
 import { numstr, PylonVerbs } from './minitypes';
 
+type FetchReturnType = (...args: any) => Promise<any>;
+/**
+ * Tpy class, intialized with a token and optionally a custom fetch function.
+ */
 export default class Tpy {
   private readonly api_url = 'https://pylon.bot/api';
-  // private readonly wss_url = "wss://workbench.pylon.bot/ws/";
+  // private readonly wss_url = 'wss://workbench.pylon.bot/ws/';
   private readonly token: string;
+  public somefetch: FetchReturnType = fetch;
+  public isDefaultFetch = false;
 
-  // TODO: Add a fetcher parameter/type for intialization
-  constructor(token: string) {
+  /**
+   * @param token The token to use for the API
+   * @param fetcher Custom fetch function to use, defaults to node-fetch. Note, the Pylon integrated fetch function is similar to node-fetch.
+   */
+  constructor(token: string, fetcher?: FetchReturnType) {
     if (!token) throw new Error('Token is required');
     this.token = token;
+    if (fetcher) {
+      this.isDefaultFetch = true;
+      this.somefetch = fetcher;
+    } else this.somefetch = fetch;
   }
 
   getUser = async (stringify?: boolean): Promise<User | undefined> =>
@@ -90,10 +103,7 @@ export default class Tpy {
     stringify: boolean = false,
     other?: RequestInit
   ): Promise<T | undefined> {
-    let r = (await fetch(
-      this.api_url + resource,
-      this.headers(method, other)
-    )) as Response;
+    let r = await fetch(this.api_url + resource, this.headers(method, other));
 
     if (!r.ok) return undefined;
 
