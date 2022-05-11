@@ -6,7 +6,7 @@ A strongly typed Pylon API client. https://pylon.bot/
 
 [![CI](https://github.com/insyri/tpy/actions/workflows/ci.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/ci.yml) [![CD](https://github.com/insyri/tpy/actions/workflows/cd.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/cd.yml)
 
-[![](https://shields.io/badge/TypeScript-05122A?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org/)
+[![](https://shields.io/badge/deno-05122A?logo=deno&style=for-the-badge)](https://deno.land/) [![](https://shields.io/badge/node.js-05122A?logo=node.js&style=for-the-badge)](https://nodejs.org/) [![](https://shields.io/badge/TypeScript-05122A?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org/)
 
 <!-- Add Node & Deno-->
 
@@ -33,7 +33,7 @@ Currently, the library is in early development with a list of TODOs. If you'd li
 
 ```
 src
-├── deno  (deno fetch)
-├── logic (independant, stripped)
-└── node  (node-fetch)
+├── deno  (deno std fetch)
+├── logic (independant, needs insert)
+└── node  (npm node-fetch)
 ```
