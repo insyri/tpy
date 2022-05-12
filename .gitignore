@@ -4,4 +4,8 @@ node_modules
 # Build directory
 dist
 
+# TypeScript diagnostics
 tsc-output.cpuprofile
+
+# Local testing
+.env*

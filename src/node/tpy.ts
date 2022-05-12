@@ -1,9 +1,9 @@
 import fetch, { RequestInit } from 'node-fetch';
-import { Deployment, Guild, User } from './endpoint';
+import { Deployment, Guild, User } from './api';
 import { numstr, PylonVerbs } from './minitypes';
 
 /**
- * Tpy class, intialized with a token and optionally a custom fetch function.
+ * Tpy class, intialized with a pylon token.
  */
 export default class Tpy {
   private readonly api_url = 'https://pylon.bot/api';
@@ -19,12 +19,12 @@ export default class Tpy {
   }
 
   getUser = async (stringify: boolean = false): Promise<User | undefined> =>
-    await this.raw<User>('/user', 'GET', stringify);
+    await this.httpRaw<User>('/user', 'GET', stringify);
 
   getAvailableGuilds = async (
     stringify: boolean = false
   ): Promise<Guild.Available[] | undefined> =>
-    await this.raw<Guild.Available[]>(
+    await this.httpRaw<Guild.Available[]>(
       '/user/guilds/available',
       'GET',
       stringify
@@ -34,18 +34,18 @@ export default class Tpy {
     id: numstr,
     stringify: boolean = false
   ): Promise<Guild.Info | undefined> =>
-    await this.raw<Guild.Info>(`/guilds/${id}`, 'GET', stringify);
+    await this.httpRaw<Guild.Info>(`/guilds/${id}`, 'GET', stringify);
 
   getGuildStats = async (
     id: numstr,
     stringify: boolean = false
   ): Promise<Guild.Stats[] | undefined> =>
-    await this.raw<Guild.Stats[]>(`/guilds/${id}/stats`, 'GET', stringify);
+    await this.httpRaw<Guild.Stats[]>(`/guilds/${id}/stats`, 'GET', stringify);
 
   getEditableGuilds = async (
     stringify: boolean = false
   ): Promise<Guild.Editable | undefined> =>
-    await this.raw<Guild.Editable>(`/guilds`, 'GET', stringify);
+    await this.httpRaw<Guild.Editable>(`/guilds`, 'GET', stringify);
 
   publishDeployment = async (
     id: numstr,
@@ -53,7 +53,7 @@ export default class Tpy {
     stringify: boolean = false
   ): Promise<
     | Deployment.Get<
-        typeof stringify extends undefined
+        typeof stringify extends false
           ? false
           : typeof stringify extends true
           ? true
@@ -61,7 +61,7 @@ export default class Tpy {
       >
     | undefined
   > =>
-    await this.raw<
+    await this.httpRaw<
       Deployment.Get<
         typeof stringify extends undefined
           ? false
@@ -89,7 +89,7 @@ export default class Tpy {
     } as RequestInit;
   }
 
-  async raw<T>(
+  async httpRaw<T>(
     resource: `/${string}`,
     method: PylonVerbs,
     stringify: boolean = false,

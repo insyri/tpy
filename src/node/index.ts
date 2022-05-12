@@ -1,6 +1,6 @@
-import * as EndpointTypes from './endpoint';
+import * as APITypes from './api';
 import * as Minitypes from './minitypes';
 import Tpy from './tpy';
 
 export default Tpy;
-export { EndpointTypes, Minitypes };
+export { APITypes, Minitypes };

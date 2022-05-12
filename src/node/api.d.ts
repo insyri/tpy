@@ -6,6 +6,23 @@ import {
 } from 'discord-api-types/v8';
 
 /**
+ * Unauthorized response in JSON format.
+ */
+export type Unauthorized = { message: 'not authorized' };
+
+/**
+ * General 404 response, where ${string} is the resource.
+ *
+ * ```txt
+ * /nonexistent => ...Requested URL /nonexistent not found
+ * /            => ...Requested URL  not found
+ *     notice the double space     ^^
+ * ```
+ */
+export type Api404 =
+  `⚠️ 404 — Not Found\n==================\nRequested URL ${string} not found`;
+
+/**
  * ```http
  * GET https://pylon.bot/api/user
  * ```
@@ -29,6 +46,11 @@ export interface User {
  * Guild related resources.
  */
 export module Guild {
+  /**
+   * 404 response for /guilds/:id
+   */
+  export type LostGuild = `could not find guild`;
+
   /**
    * Base guild payload.
    */
@@ -69,8 +91,6 @@ export module Guild {
    * GET /guilds/:guildId
    * ```
    * Returns some guild info (everything Discord API normally gives you) as well as a list of deployments.
-   *
-   * ⚠ This endpoint may break due to Discord deprecating their v8 API and soon shutting down.
    */
   export interface Info extends RESTPostAPIGuildsJSONBody {
     deployments: Deployment.GuildSpecific[];
@@ -146,7 +166,6 @@ export module Deployment {
   }
 
   /**
-   * @author @HighArcs
    * ```http
    * POST /deployments/:deploymentId
    * ```

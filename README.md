@@ -34,6 +34,6 @@ Currently, the library is in early development with a list of TODOs. If you'd li
 ```
 src
 ├── deno  (deno std fetch)
-├── logic (independant, needs insert)
+├── pylon (node-fetch like)
 └── node  (npm node-fetch)
 ```

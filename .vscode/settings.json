@@ -3,4 +3,7 @@
   "deno.enablePaths": [
     "./src/deno"
   ],
+  "deno.lint": true,
+  "deno.unstable": false,
+  "deno.testing.enable": true
 }
