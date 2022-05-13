@@ -1,9 +1,10 @@
 {
   "deno.enable": true,
-  "deno.enablePaths": [
-    "./src/deno"
-  ],
   "deno.lint": true,
   "deno.unstable": false,
-  "deno.testing.enable": true
+  "deno.testing.enable": true,
+  "deno.config": "./deno.jsonc",
+  "typescript.validate.enable": false,
+  "javascript.validate.enable": false,
+  "prettier.enable": false
 }

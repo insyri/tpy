@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "allowUnreachableCode": false,
+    "lib": [
+      "deno.window"
+    ],
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true
+  },
+  "fmt": {
+    "options": {
+      "singleQuote": true,
+      "useTabs": false,
+      "indentWidth": 2,
+      "lineWidth": 80
+    }
+  },
+  "lint": {
+    "rules": {
+      "include": ["no-inferrable-types"]
+    }
+  }
+}

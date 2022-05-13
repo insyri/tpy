@@ -1,14 +1,14 @@
-import { numstr } from './minitypes';
+import { numstr } from "./minitypes.d.ts";
 
 import {
   GatewayDispatchEvents,
   RESTPostAPIGuildsJSONBody,
-} from 'discord-api-types/v8';
+} from "https://deno.land/x/discord_api_types@0.32.1/v8.ts";
 
 /**
  * Unauthorized response in JSON format.
  */
-export type Unauthorized = { message: 'not authorized' };
+export type Unauthorized = { message: "not authorized" };
 
 /**
  * General 404 response, where ${string} is the resource.
@@ -45,7 +45,7 @@ export interface User {
 /**
  * Guild related resources.
  */
-export module Guild {
+export namespace Guild {
   /**
    * 404 response for /guilds/:id
    */
@@ -117,7 +117,7 @@ export module Guild {
   }
 }
 
-export module Deployment {
+export namespace Deployment {
   /**
    * This is an internal type where no API endpoint or resource returns this in total.
    */
