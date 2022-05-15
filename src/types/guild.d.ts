@@ -42,7 +42,7 @@ export namespace Guild {
     export interface Info extends RESTPostAPIGuildsJSONBody {
       deployments: Deployments.Structures.Base & {
         last_updated_at: null;
-        config: string & Deployments.Structures.Config;
+        config: Deployments.Structures.Config;
         disabled: boolean;
       };
       reigon: `deprecated`;

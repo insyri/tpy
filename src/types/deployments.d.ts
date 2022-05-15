@@ -82,6 +82,23 @@ export namespace Deployments {
        */
       revision: number;
     }
+    
+    /**
+     * Path to file, usually `.ts`.
+     * @param Extension Default `"ts"`, can override via generic string.
+     */
+    export type File<Extension extends string = "ts"> = `./${string}.${Extension}`;
+
+    /**
+     * The Pylon API returns this in a stringified form.
+     */
+    export interface DeploymentFiles {
+      path: File;
+      /**
+       * File contents.
+       */
+      content: string;
+    }
   }
 
   /**
@@ -97,7 +114,7 @@ export namespace Deployments {
       /**
        * Stringified `Deployments.Structures.Config` object.
        */
-      config: string & Deployments.Structures.Config;
+      config: string;
       /**
        * Pylon Workbench WebSocket URL. Includes the logged in user's authentication token for Pylon.
        */
@@ -109,5 +126,18 @@ export namespace Deployments {
     }
   }
 
-  export namespace POST {}
+  /**
+   * `POST /deployments`
+   */
+  export namespace POST {
+    export interface Info<Raw extends boolean = true> {
+      contents: string;
+      projects: {
+        /**
+         * Stringified `Deployments.Structures.File[]` object.
+         */
+        files: Raw extends true ? string : Structures.DeploymentFiles[];
+      }
+    }
+  }
 }
