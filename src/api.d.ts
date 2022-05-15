@@ -10,8 +10,6 @@
 // maps to...
 // User.Guilds.Available
 
-
-
 export namespace Guilds {}
 
 export namespace Deployment {}
@@ -20,7 +18,7 @@ export namespace Unspecific {
   /**
    * Unauthorized response in JSON format.
    */
-  export type Unauthorized = { message: "not authorized" };
+  export type Unauthorized = { message: 'not authorized' };
 
   /**
    * General 404 response, where ${string} is the resource.

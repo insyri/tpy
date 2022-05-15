@@ -1,17 +1,14 @@
-import { numstr } from "./types/minitypes.d.ts";
+import { numstr } from './types/minitypes.d.ts';
 
 import {
   // GatewayDispatchEvents,
   RESTPostAPIGuildsJSONBody,
-} from "https://deno.land/x/discord_api_types@0.32.1/v8.ts";
-
-
+} from 'https://deno.land/x/discord_api_types@0.32.1/v8.ts';
 
 /**
  * Guild related resources.
  */
 export namespace Guild {
-
   /**
    * Base guild payload.
    */
@@ -133,7 +130,7 @@ export namespace Deployment {
      * ```
      * Publishes a script, body needs to be a stringified `File[]` object.
      */
-    export interface Request<Raw extends boolean> extends Get<true>{
+    export interface Request<Raw extends boolean> extends Get<true> {
       contents: string;
       project: {
         files: Raw extends true ? string : File[];
@@ -141,10 +138,10 @@ export namespace Deployment {
     }
 
     export interface Missing {
-      msg: "missing json body"
+      msg: 'missing json body';
     }
 
-    // export type Response 
+    // export type Response
   }
 
   // /**

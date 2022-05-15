@@ -1,12 +1,12 @@
-import { GatewayDispatchEvents } from "https://deno.land/x/discord_api_types@0.32.1/v8.ts";
-import { Guild } from "./guild.d.ts";
-import { numstr } from "./minitypes.d.ts";
+import { GatewayDispatchEvents } from 'https://deno.land/x/discord_api_types@0.32.1/v8.ts';
+import { Guild } from './guild.d.ts';
+import { numstr } from './minitypes.d.ts';
 
 // TODO: Find pylon's cron specification and document it Deployments.Structures.CronTask.
 
 /**
  * `/deployments`
- * 
+ *
  * Deployment related resources.
  */
 export namespace Deployments {
@@ -33,7 +33,7 @@ export namespace Deployments {
 
     /**
      * Cron task specifications. Recieved stringified.
-     * 
+     *
      * > Note: The current minimum interval cron tasks can run at are once every 5 minutes. You may schedule up to 5 cron handlers.
      * @link https://pylon.bot/docs/pylon-tasks
      * @link https://pylon.bot/docs/reference/modules/pylon.tasks.html#cron
@@ -69,9 +69,9 @@ export namespace Deployments {
        * Undocumented.
        */
       app_id: numstr | null;
-       /**
-        * Undocumented.
-        */
+      /**
+       * Undocumented.
+       */
       name: string;
       /**
        * Undocumented.
@@ -82,12 +82,13 @@ export namespace Deployments {
        */
       revision: number;
     }
-    
+
     /**
      * Path to file, usually `.ts`.
      * @param Extension Default `"ts"`, can override via generic string.
      */
-    export type File<Extension extends string = "ts"> = `./${string}.${Extension}`;
+    export type File<Extension extends string = 'ts'> =
+      `./${string}.${Extension}`;
 
     /**
      * The Pylon API returns this in a stringified form.
@@ -107,7 +108,7 @@ export namespace Deployments {
   export namespace GET {
     /**
      * `GET /deployments/:deploymentId`
-     * 
+     *
      * Returns deployment information via ID.
      */
     export interface Info extends Structures.Base {
@@ -137,7 +138,7 @@ export namespace Deployments {
          * Stringified `Deployments.Structures.File[]` object.
          */
         files: Raw extends true ? string : Structures.DeploymentFiles[];
-      }
+      };
     }
   }
 }
