@@ -100,6 +100,13 @@ export namespace Deployments {
        */
       content: string;
     }
+
+    /**
+     * Return when a deployment POST body is invalid.
+     */
+    export interface Missing {
+      msg: 'missing json body';
+    }
   }
 
   /**
