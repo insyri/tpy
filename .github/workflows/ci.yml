@@ -52,4 +52,4 @@ jobs:
     needs: [Analyze]
     if: github.event_name == 'release' && github.event.action == 'published'
     uses: ./.github/workflows/cd.yml
-#     secrets: inherit
+    secrets: inherit
