@@ -9,29 +9,26 @@ on:
 # TODO: Add Node with dnt
 jobs:
 
-  Check:
+  Analyze:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
         with:
           deno-version: vx.x.x
-      - run: deno lint
-      - run: deno test
-
-  Format:
-    runs-on: ubuntu-latest
-    needs: Check
-    steps:
-      - uses: actions/checkout@v3
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: vx.x.x
-      - run: deno fmt
-      - run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "tpy bot"
+      - name: Checking Files
+        run: deno check
+      - name: Linting Files 
+        run: deno lint
+      - name: Running Tests
+        run: deno test
+      - name: Formatting Files
+        run: deno test
+      - name: Pushing Formatted Files
+        run: |
           if [[ ! -z $(git status -s) ]]; then
+            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "tpy bot"
             git add .
             git commit -m "chore: deno fmt"
           fi
@@ -41,8 +38,18 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
 
-#   CD:
-#     needs: [Check, Format]
-#     if: github.event_name == 'release' && github.event.action == 'published'
-#     uses: ./.github/workflows/cd.yml
+#   Build-Node:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: denoland/setup-deno@v1
+#         with:
+#           deno-version: vx.x.x
+#       - name: Get tag version
+#         run: deno run -A ./_npm.ts ${{steps.get_tag_version.outputs.TAG_VERSION}}
+
+  CD:
+    needs: [Analyze]
+    if: github.event_name == 'release' && github.event.action == 'published'
+    uses: ./.github/workflows/cd.yml
 #     secrets: inherit
