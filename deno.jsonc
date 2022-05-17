@@ -23,7 +23,6 @@
   "lint": {
     "rules": {
       "include": ["no-inferrable-types"],
-      "exclude": ["no-case-declarations"]
     }
   }
 }
