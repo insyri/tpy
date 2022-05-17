@@ -1,6 +1,6 @@
 import { RESTPostAPIGuildsJSONBody } from 'https://deno.land/x/discord_api_types@0.32.1/v8.ts';
-import { numstr } from '../types/minitypes.d.ts';
-import { Deployments } from './deployments.d.ts';
+import { numstr } from '../utils.ts';
+import Deployments from './deployments.d.ts';
 
 // TODO: specify Guild.GET.Info["deployments"]["last_updated_at"] type.
 
@@ -9,7 +9,7 @@ import { Deployments } from './deployments.d.ts';
  *
  * Guild related resources.
  */
-export namespace Guild {
+declare namespace Guild {
   /**
    * Not an API resource, this namespace behaves as templates and other base types.
    */
@@ -51,8 +51,10 @@ export namespace Guild {
      * `GET /guilds/:guildId/stats`
      *
      * Return some statistics of a script container. Some values are undefined when information is not available.
+     *
+     * Undocumented.
      */
-    export interface Stats {
+    export type Stats = Array<{
       date: number;
       /**
        * undefined if no information
@@ -75,6 +77,8 @@ export namespace Guild {
        * Float
        */
       kvOperations?: number;
-    }
+    }>;
   }
 }
+
+export default Guild;

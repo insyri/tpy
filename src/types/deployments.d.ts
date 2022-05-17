@@ -1,6 +1,6 @@
 import { GatewayDispatchEvents } from 'https://deno.land/x/discord_api_types@0.32.1/v8.ts';
-import { Guild } from './guild.d.ts';
-import { numstr } from './minitypes.d.ts';
+import Guild from './guild.d.ts';
+import { numstr } from '../utils.ts';
 
 // TODO: Find pylon's cron specification and document it Deployments.Structures.CronTask.
 
@@ -9,7 +9,7 @@ import { numstr } from './minitypes.d.ts';
  *
  * Deployment related resources.
  */
-export namespace Deployments {
+declare namespace Deployments {
   /**
    * Not an API resource, this namespace behaves as templates and other base types.
    */
@@ -135,10 +135,10 @@ export namespace Deployments {
   }
 
   /**
-   * `POST /deployments`
+   * `POST /deployments/:deploymentId`
    */
   export namespace POST {
-    export interface Info<Raw extends boolean = true> {
+    export interface Request<Raw extends boolean = true> {
       contents: string;
       projects: {
         /**
@@ -147,5 +147,9 @@ export namespace Deployments {
         files: Raw extends true ? string : Structures.DeploymentFiles[];
       };
     }
+
+    export interface Response {}
   }
 }
+
+export default Deployments;

@@ -1,5 +1,9 @@
-import { Deployment, Guild, User } from './old.api.d.ts';
-import { numstr, PylonVerbs } from './minitypes.d.ts';
+import HttpStatusCode from 'https://gist.githubusercontent.com/scokmen/f813c904ef79022e84ab2409574d1b45/raw/cd8709a2fccb005bb53e9bfb2461e07d40b4e8d8/HttpStatusCode.ts';
+import TpyErr from './tpy_err.d.ts';
+import Deployment from './types/deployments.d.ts';
+import Guild from './types/guild.d.ts';
+import User from './types/user.d.ts';
+import { numstr, PylonVerbs, TpyExpectType } from './utils.ts';
 
 /**
  * Tpy class, intialized with a pylon token.
@@ -17,26 +21,31 @@ export default class Tpy {
     this.token = token;
   }
 
-  getUser = async (): Promise<User | undefined> =>
-    await this.httpRaw<User>('/user', 'GET');
+  getUser = async (): Promise<User.GET.User | > =>
+    await this.httpRaw<User.GET.User>('/user', 'GET');
 
-  getAvailableGuilds = async (): Promise<Guild.Available[] | undefined> =>
-    await this.httpRaw<Guild.Available[]>('/user/guilds/available', 'GET');
+  getAvailableGuilds = async (): Promise<
+  TpyExpectType<User.GET.Guilds.Available>
+  > =>
+    await this.httpRaw<User.GET.Guilds.Available>(
+      '/user/guilds/available',
+      'GET',
+    );
 
-  getGuildInfo = async (id: numstr): Promise<Guild.Info | undefined> =>
-    await this.httpRaw<Guild.Info>(`/guilds/${id}`, 'GET');
+  getGuildInfo = async (id: numstr): Promise<TpyExpectType<Guild.GET.Info>> =>
+    await this.httpRaw<Guild.GET.Info>(`/guilds/${id}`, 'GET');
 
-  getGuildStats = async (id: numstr): Promise<Guild.Stats[] | undefined> =>
-    await this.httpRaw<Guild.Stats[]>(`/guilds/${id}/stats`, 'GET');
+  getGuildStats = async (id: numstr): Promise<TpyExpectType<Guild.GET.Stats>> =>
+    await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`, 'GET');
 
-  getEditableGuilds = async (): Promise<Guild.Editable | undefined> =>
-    await this.httpRaw<Guild.Editable>(`/guilds`, 'GET');
+  getEditableGuilds = async (): Promise<TpyExpectType<User.GET.Guilds.Guilds>> =>
+    await this.httpRaw<User.GET.Guilds.Guilds>(`/guilds`, 'GET');
 
   publishDeployment = async (
     id: numstr,
-    body: Deployment.Post<false>,
-  ): Promise<Deployment.Post<true>> => {
-    return await this.httpRaw<Deployment.Post<true>>(
+    body: Deployment.POST.Request<false>,
+  ): Promise<Deployment.POST.Response> => {
+    return await this.httpRaw<Deployment.POST.Response>(
       `/deployments/${id}`,
       'POST',
       {
@@ -68,14 +77,6 @@ export default class Tpy {
   //     >
   //   >(`/deployments/${id}`, "POST");
 
-  findGuildStatWithStuff = (
-    s: Guild.Stats[],
-  ): Required<Guild.Stats> | undefined => {
-    const i = s.findIndex((s) => s.cpuMs === undefined);
-    if (i === -1) return undefined;
-    return s[i] as Required<Guild.Stats>;
-  };
-
   headers(method: PylonVerbs, other?: RequestInit): RequestInit {
     return {
       method,
@@ -100,19 +101,38 @@ export default class Tpy {
    *
    * @param resource The resource to request that will be concatenated with the api url.
    * @param method HTTP method to use. Currently, the Pylon API only uses GET and POST.
-   * @returns {T}
+   * @returns {[T, TpyErr]}
    */
-  async httpRaw<T>(
+  httpRaw = async <T>(
     resource: `/${string}`,
     method: PylonVerbs,
     // handle_unauth: boolean,
     other?: RequestInit,
-  ): Promise<T> {
-    return (await (
-      await fetch(this.api_url + resource, this.headers(method, other))
-    ).json()) as T;
-    // as Partial<Unauthorized>;
-    // if (!handle_unauth) return m as T;
-    // return m.message && m.message === "not authorized" ? undefined : m as T;
-  }
+  ): Promise<[T | Response, TpyErr]> => {
+    const res = await fetch(
+      this.api_url + resource,
+      this.headers(method, other),
+    );
+    let data: [T | Response, TpyErr] = [res, TpyErr.IDK];
+
+    switch (<HttpStatusCode> res.status) {
+      case HttpStatusCode.OK:
+        data = [await res.json() as T, TpyErr.NO_ERR];
+        break;
+      case HttpStatusCode.UNAUTHORIZED:
+        data = [res, TpyErr.UNAUTHORIZED];
+        break;
+      case HttpStatusCode.METHOD_NOT_ALLOWED:
+        data = [res, TpyErr.METHOD_NOT_ALLOWED];
+        break;
+      case HttpStatusCode.BAD_REQUEST:
+        const pres = await res.json();
+        if ('msg' in pres && pres['msg'] === 'missing json body') {
+          data = [res, TpyErr.MISSING_JSON_BODY];
+        }
+        data = [res, TpyErr.IDK];
+        break;
+    }
+    return data;
+  };
 }

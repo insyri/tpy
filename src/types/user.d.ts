@@ -1,12 +1,12 @@
-import { numstr, Unpacked } from '../types/minitypes.d.ts';
-import { Guild } from './guild.d.ts';
+import { numstr, Unpacked } from '../utils.ts';
+import Guild from './guild.d.ts';
 
 /**
  * `/user`
  *
  * User related resources.
  */
-export namespace User {
+declare namespace User {
   /**
    * `GET /user`
    *
@@ -18,7 +18,7 @@ export namespace User {
      *
      * Gets basic user information.
      */
-    export interface _ {
+    export interface User {
       id: numstr;
       /**
        * ISO 8601 / RFC 3339.
@@ -44,7 +44,7 @@ export namespace User {
        * Returns all guilds the respective user can edit with Pylon.
        * More specifically, the list of guilds the user is in where the user has `manage server` permissions or above.
        */
-      export type _ = Array<
+      export type Guilds = Array<
         Unpacked<Available> & {
           /**
            * The user's nickname in the guild.
@@ -71,3 +71,5 @@ export namespace User {
     }
   }
 }
+
+export default User;

@@ -38,7 +38,8 @@ deno test ./tests/ -A -- --both
 
 ### Node.js
 
-Tpy uses [`dnt`](https://deno.land/x/dnt) for transforming Deno projects to Node.js. By doing the following:
+Tpy uses [`dnt`](https://deno.land/x/dnt) for transforming Deno projects to
+Node.js. By doing the following:
 
 ```ps1
 deno run -A _npm.ts "x.x.x" # Script requires bumped version
@@ -54,7 +55,8 @@ TODO
 
 ---
 
-Running tasks with permission flags can be tedious, using the `-A` flag gives all permissions.
+Running tasks with permission flags can be tedious, using the `-A` flag gives
+all permissions.
 
 ```ps1
 deno task --allow-write --allow-read --allow-net analyze:online
@@ -62,8 +64,13 @@ deno task --allow-write --allow-read --allow-net analyze:online
 deno task -A analyze:offline
 ```
 
-It is encouraged to read through the code every time you grant all permissions to potentially malicous code.
+It is encouraged to read through the code every time you grant all permissions
+to potentially malicous code.
 
 ---
 
-When using the [Deno VSCode Extension](https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno), it is encouraged to manually disable the [TypeScript VSCode Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript) as the language server standards are different and often break each other.
+When using the
+[Deno VSCode Extension](https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno),
+it is encouraged to manually disable the
+[TypeScript VSCode Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript)
+as the language server standards are different and often break each other.

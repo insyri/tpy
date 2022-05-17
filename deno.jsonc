@@ -22,7 +22,8 @@
   },
   "lint": {
     "rules": {
-      "include": ["no-inferrable-types"]
+      "include": ["no-inferrable-types"],
+      "exclude": ["no-case-declarations"]
     }
   }
 }

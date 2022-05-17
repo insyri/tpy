@@ -1,4 +1,4 @@
-export namespace Unspecific {
+declare namespace BadResponse {
   export interface ErrorMessageBase {
     description: string;
     status: number;
@@ -27,6 +27,10 @@ export namespace Unspecific {
   export type OldResourceNotFound =
     `⚠️ 404 — Not Found\n==================\nRequested URL ${string} not found`;
 
+  export interface MissingJsonBody {
+    msg: 'missing json body';
+  }
+
   // found this when doing /user/guilds/available/{input} or
   // found this when doing /user/guilds/{input}
   // found this when doing /user/{input}
@@ -43,3 +47,5 @@ export namespace Unspecific {
     message: `Method ${string} not allowed for URL /${string}`;
   }
 }
+
+export default BadResponse;
