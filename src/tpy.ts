@@ -21,7 +21,7 @@ export default class Tpy {
     this.token = token;
   }
 
-  getUser = async (): Promise<User.GET.User | > =>
+  getUser = async (): Promise<TpyExpectType<User.GET.User>> =>
     await this.httpRaw<User.GET.User>('/user', 'GET');
 
   getAvailableGuilds = async (): Promise<
@@ -44,7 +44,7 @@ export default class Tpy {
   publishDeployment = async (
     id: numstr,
     body: Deployment.POST.Request<false>,
-  ): Promise<Deployment.POST.Response> => {
+  ): Promise<TpyExpectType<Deployment.POST.Response>> => {
     return await this.httpRaw<Deployment.POST.Response>(
       `/deployments/${id}`,
       'POST',
@@ -116,22 +116,26 @@ export default class Tpy {
     let data: [T | Response, TpyErr] = [res, TpyErr.IDK];
 
     switch (<HttpStatusCode> res.status) {
-      case HttpStatusCode.OK:
+      case HttpStatusCode.OK: {
         data = [await res.json() as T, TpyErr.NO_ERR];
         break;
-      case HttpStatusCode.UNAUTHORIZED:
+      }
+      case HttpStatusCode.UNAUTHORIZED: {
         data = [res, TpyErr.UNAUTHORIZED];
         break;
-      case HttpStatusCode.METHOD_NOT_ALLOWED:
+      }
+      case HttpStatusCode.METHOD_NOT_ALLOWED: {
         data = [res, TpyErr.METHOD_NOT_ALLOWED];
         break;
-      case HttpStatusCode.BAD_REQUEST:
+      }
+      case HttpStatusCode.BAD_REQUEST: {
         const pres = await res.json();
         if ('msg' in pres && pres['msg'] === 'missing json body') {
           data = [res, TpyErr.MISSING_JSON_BODY];
         }
         data = [res, TpyErr.IDK];
         break;
+      }
     }
     return data;
   };
