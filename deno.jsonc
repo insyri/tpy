@@ -22,7 +22,12 @@
   },
   "lint": {
     "rules": {
-      "include": ["no-inferrable-types"],
+      "include": ["no-inferrable-types"]
     }
+  },
+  "tasks": {
+    "analyze:offline": "",
+    "analyze:online": "",
+    "dnt": "deno run --allow-read --allow-write _npm.ts"
   }
 }

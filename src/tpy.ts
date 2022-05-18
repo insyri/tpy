@@ -5,6 +5,8 @@ import Guild from './types/guild.d.ts';
 import User from './types/user.d.ts';
 import { numstr, PylonVerbs, TpyExpectType } from './utils.ts';
 
+type HttpRawType<T> = [TpyErr, T?];
+
 /**
  * Tpy class, intialized with a pylon token.
  */
@@ -24,22 +26,22 @@ export default class Tpy {
   getUser = async (): Promise<TpyExpectType<User.GET.User>> =>
     await this.httpRaw<User.GET.User>('/user', 'GET');
 
-  getAvailableGuilds = async (): Promise<
-  TpyExpectType<User.GET.Guilds.Available>
-  > =>
-    await this.httpRaw<User.GET.Guilds.Available>(
-      '/user/guilds/available',
-      'GET',
-    );
+  // getAvailableGuilds = async (): Promise<
+  // TpyExpectType<User.GET.Guilds.Available>
+  // > =>
+  //   await this.httpRaw<User.GET.Guilds.Available>(
+  //     '/user/guilds/available',
+  //     'GET',
+  //   );
 
-  getGuildInfo = async (id: numstr): Promise<TpyExpectType<Guild.GET.Info>> =>
-    await this.httpRaw<Guild.GET.Info>(`/guilds/${id}`, 'GET');
+  // getGuildInfo = async (id: numstr): Promise<TpyExpectType<Guild.GET.Guild>> =>
+  //   await this.httpRaw<Guild.GET.Guild>(`/guilds/${id}`, 'GET');
 
-  getGuildStats = async (id: numstr): Promise<TpyExpectType<Guild.GET.Stats>> =>
-    await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`, 'GET');
+  // getGuildStats = async (id: numstr): Promise<TpyExpectType<Guild.GET.Stats>> =>
+  //   await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`, 'GET');
 
-  getEditableGuilds = async (): Promise<TpyExpectType<User.GET.Guilds.Guilds>> =>
-    await this.httpRaw<User.GET.Guilds.Guilds>(`/guilds`, 'GET');
+  // getEditableGuilds = async (): Promise<TpyExpectType<User.GET.Guilds.Guilds>> =>
+  //   await this.httpRaw<User.GET.Guilds.Guilds>(`/guilds`, 'GET');
 
   publishDeployment = async (
     id: numstr,
@@ -101,41 +103,85 @@ export default class Tpy {
    *
    * @param resource The resource to request that will be concatenated with the api url.
    * @param method HTTP method to use. Currently, the Pylon API only uses GET and POST.
-   * @returns {[T, TpyErr]}
+   * @returns {HttpRawType}
    */
   httpRaw = async <T>(
     resource: `/${string}`,
     method: PylonVerbs,
     // handle_unauth: boolean,
     other?: RequestInit,
-  ): Promise<[T | Response, TpyErr]> => {
+  ): Promise<HttpRawType<T>> => {
     const res = await fetch(
       this.api_url + resource,
       this.headers(method, other),
     );
-    let data: [T | Response, TpyErr] = [res, TpyErr.IDK];
+    
+    const parsed: [Record<string, unknown>, string] = [{}, ''];
+
+    try {
+      // failable
+      parsed[0] = await res.json() as Record<string, unknown>;
+    } catch {
+      // non-failable
+      parsed[1] = await res.text();
+    }
+
+    let data: HttpRawType<T> = [TpyErr.NOT_SET, undefined];
 
     switch (<HttpStatusCode> res.status) {
+
       case HttpStatusCode.OK: {
         data = [await res.json() as T, TpyErr.NO_ERR];
         break;
       }
+
       case HttpStatusCode.UNAUTHORIZED: {
         data = [res, TpyErr.UNAUTHORIZED];
         break;
       }
+
       case HttpStatusCode.METHOD_NOT_ALLOWED: {
         data = [res, TpyErr.METHOD_NOT_ALLOWED];
         break;
       }
+
       case HttpStatusCode.BAD_REQUEST: {
         const pres = await res.json();
-        if ('msg' in pres && pres['msg'] === 'missing json body') {
+        if ('msg' in pres && pres['msg'] === 'missing json body')
           data = [res, TpyErr.MISSING_JSON_BODY];
+
+        if ('message' in pres && pres['message'] === 'not authorized')
+          data = [res, TpyErr.UNAUTHORIZED];
+        
+        break;
+        
+      }
+
+      case HttpStatusCode.NOT_FOUND: {
+        const tes = await res.text();
+        const pres = await res.json();
+
+        // ⚠️
+        if (tes[0] === "\u26A0\uFE0F")
+          data = [res, TpyErr.NOT_FOUND];
+
+        switch (tes) {
+          case 'could not find guild':
+            data = [res, TpyErr.GUILD_NOT_FOUND];
+            break;
+
+          case 'could not find deployment':
+            data = [res, TpyErr.DEPLOYMENT_NOT_FOUND];
+            break;
+        
+          default:
+            break;
         }
-        data = [res, TpyErr.IDK];
+
+        // data = [res, TpyErr.NOT_FOUND];
         break;
       }
+
     }
     return data;
   };

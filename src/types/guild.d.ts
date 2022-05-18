@@ -38,7 +38,7 @@ declare namespace Guild {
      *
      * Returns some guild info (everything Discord API normally gives you) as well as a list of deployments.
      */
-    export interface Info extends RESTPostAPIGuildsJSONBody {
+    export interface Guild extends RESTPostAPIGuildsJSONBody {
       deployments: Deployments.Structures.Base & {
         last_updated_at: null;
         config: Deployments.Structures.Config;

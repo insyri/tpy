@@ -1,6 +1,8 @@
-import * as APITypes from './src/api.d.ts';
-import * as Minitypes from './src/types/minitypes.d.ts';
+import type Guild from './src/types/guild.d.ts';
+import type Deployment from './src/types/deployments.d.ts';
+import type User from './src/types/user.d.ts';
+import type BadResponse from './src/types/bad_response.d.ts';
 import Tpy from './src/tpy.ts';
 
 export default Tpy;
-export { APITypes, Minitypes };
+export type { Deployment, Guild, User, BadResponse };

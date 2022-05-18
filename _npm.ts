@@ -1,10 +1,10 @@
-import { build, emptyDir } from 'https://deno.land/x/dnt@0.23.0/mod.ts';
+import { build } from 'https://deno.land/x/dnt@0.23.0/mod.ts';
 
 await Deno.remove('npm', { recursive: true }).catch((_) =>
   console.error('Failed to remove npm folder')
 );
 
-await emptyDir('npm');
+await Deno.mkdir('npm');
 
 await build({
   typeCheck: true,

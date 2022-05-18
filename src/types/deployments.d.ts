@@ -118,7 +118,7 @@ declare namespace Deployments {
      *
      * Returns deployment information via ID.
      */
-    export interface Info extends Structures.Base {
+    export interface Deployments extends Structures.Base {
       /**
        * Stringified `Deployments.Structures.Config` object.
        */
