@@ -17,7 +17,7 @@ declare namespace Deployments {
     /**
      * Deployment configurations. Recieved stringified.
      */
-    export interface Config {
+    export type Config = {
       enabled: boolean;
       /**
        * Undocumented.
@@ -38,7 +38,7 @@ declare namespace Deployments {
      * @link https://pylon.bot/docs/pylon-tasks
      * @link https://pylon.bot/docs/reference/modules/pylon.tasks.html#cron
      */
-    export interface CronTask {
+    export type CronTask = {
       /**
        * Cron identifier. Identified like so:
        * ```ts
@@ -52,7 +52,7 @@ declare namespace Deployments {
       cronString: string;
     }
 
-    export interface Base {
+    export type Base = {
       /**
        * Deployment ID.
        */
@@ -93,7 +93,7 @@ declare namespace Deployments {
     /**
      * The Pylon API returns this in a stringified form.
      */
-    export interface DeploymentFiles {
+    export type DeploymentFiles = {
       path: File;
       /**
        * File contents.
@@ -104,7 +104,7 @@ declare namespace Deployments {
     /**
      * Return when a deployment POST body is invalid.
      */
-    export interface Missing {
+    export type Missing =  {
       msg: 'missing json body';
     }
   }
@@ -114,11 +114,11 @@ declare namespace Deployments {
    */
   export namespace GET {
     /**
-     * `GET /deployments/:deploymentId`
+     * `GET /deployments/:id`
      *
      * Returns deployment information via ID.
      */
-    export interface Deployments extends Structures.Base {
+    export type Deployments = Structures.Base & {
       /**
        * Stringified `Deployments.Structures.Config` object.
        */
@@ -135,10 +135,10 @@ declare namespace Deployments {
   }
 
   /**
-   * `POST /deployments/:deploymentId`
+   * `POST /deployments/:id`
    */
   export namespace POST {
-    export interface Request<Raw extends boolean = true> {
+    export type Request<Raw extends boolean = true> = {
       contents: string;
       projects: {
         /**
@@ -148,7 +148,7 @@ declare namespace Deployments {
       };
     }
 
-    export interface Response {}
+    export type Response = {}
   }
 }
 

@@ -18,7 +18,7 @@ declare namespace User {
      *
      * Gets basic user information.
      */
-    export interface User {
+    export type User  = {
       id: numstr;
       /**
        * ISO 8601 / RFC 3339.

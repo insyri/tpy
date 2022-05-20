@@ -18,14 +18,14 @@ export namespace SomeResource {
      *
      * Information on the static GET resource.
      */
-    export interface _ {}
+    export type _ = {};
 
     /**
      * `GET /SomeResource/Foo`
      *
      * Information on the Foo GET resource.
      */
-    export interface Foo {}
+    export type Foo = {};
 
     /**
      * `GET /SomeResource/Bar/`
@@ -38,14 +38,14 @@ export namespace SomeResource {
        *
        * Information on the Bar GET resource.
        */
-      export interface _ {}
+      export type _ = {};
 
       /**
        * `GET /SomeResource/Bar/:Param`
        *
        * Information on the dynamic Bar GET resource.
        */
-      export interface Param {}
+      export type Param = {};
     }
   }
 }

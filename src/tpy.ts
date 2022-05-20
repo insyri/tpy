@@ -3,9 +3,8 @@ import TpyErr from './tpy_err.d.ts';
 import Deployment from './types/deployments.d.ts';
 import Guild from './types/guild.d.ts';
 import User from './types/user.d.ts';
+import BadResponse from './types/bad_response.d.ts';
 import { numstr, PylonVerbs, TpyExpectType } from './utils.ts';
-
-type HttpRawType<T> = [TpyErr, T?];
 
 /**
  * Tpy class, intialized with a pylon token.
@@ -43,18 +42,18 @@ export default class Tpy {
   // getEditableGuilds = async (): Promise<TpyExpectType<User.GET.Guilds.Guilds>> =>
   //   await this.httpRaw<User.GET.Guilds.Guilds>(`/guilds`, 'GET');
 
-  publishDeployment = async (
-    id: numstr,
-    body: Deployment.POST.Request<false>,
-  ): Promise<TpyExpectType<Deployment.POST.Response>> => {
-    return await this.httpRaw<Deployment.POST.Response>(
-      `/deployments/${id}`,
-      'POST',
-      {
-        body: JSON.stringify(body),
-      },
-    );
-  };
+  // publishDeployment = async (
+  //   id: numstr,
+  //   body: Deployment.POST.Request<false>,
+  // ): Promise<TpyExpectType<Deployment.POST.Response>> => {
+  //   return await this.httpRaw<Deployment.POST.Response>(
+  //     `/deployments/${id}`,
+  //     'POST',
+  //     {
+  //       body: JSON.stringify(body),
+  //     },
+  //   );
+  // };
 
   // publishDeployment = async (
   //   id: numstr,
@@ -89,7 +88,6 @@ export default class Tpy {
 
   /**
    * Connects to the websocket with an optional resource.
-   * @returns WebSocket
    */
   connectSocket(ws_ops?: ConstructorParameters<typeof WebSocket>): WebSocket {
     return new WebSocket(
@@ -97,92 +95,120 @@ export default class Tpy {
       ws_ops?.[1],
     );
   }
+  
+  // Old text
+  // * This function attempts to handle a type sound approach to handling the API's
+  // * response. Sometimes the response is a JSON object, sometimes it is a string.
+  // * While developers can input a generic type for an expected output, the generic
+  // * may add a `tpydebug` property to the object that will be placement of a raw
+  // * string from the API response. In most cases, developers would not be using this
+  // * property since `TpyErr` can be used to infer errors, however, it is there in case
+  // * developers need to inspect the response string.
 
   /**
-   * Some parts of the Pylon API return a stringified object.
-   *
+   * Makes a request to the API.
+   * 
+   * This is how the function will handle said response until the API is updated to return only JSON.
+   * 
    * @param resource The resource to request that will be concatenated with the api url.
    * @param method HTTP method to use. Currently, the Pylon API only uses GET and POST.
-   * @returns {HttpRawType}
    */
-  httpRaw = async <T>(
+  httpRaw = async <T extends Record<string, unknown>>(
     resource: `/${string}`,
-    method: PylonVerbs,
-    // handle_unauth: boolean,
+    method: PylonVerbs = 'GET',
     other?: RequestInit,
-  ): Promise<HttpRawType<T>> => {
+  ): Promise<[TpyErr, T | undefined]> => {
+
     const res = await fetch(
       this.api_url + resource,
       this.headers(method, other),
     );
-    
-    const parsed: [Record<string, unknown>, string] = [{}, ''];
 
-    try {
-      // failable
-      parsed[0] = await res.json() as Record<string, unknown>;
-    } catch {
-      // non-failable
-      parsed[1] = await res.text();
+    const objres: Record<string, unknown> | string = await res.json().catch(async () => await res.text())
+
+    // The only known cases where responses are not JSON are:
+    // - 404 * = `⚠️ 404 — Not Found\n==================\nReq`
+    // - 404 /guilds/:id = `could not find guild`
+    // - 404 /deployments/:id = `could not find deployment`
+    // So we assume that the response is a failed response.
+    if (typeof objres === 'string') {
+      if ((<BadResponse.BadStringResponses>objres).startsWith("\u26A0\uFE0F")) return [TpyErr.RESOURCE_NOT_FOUND, undefined]
+      switch (objres) {
+        case value:
+          
+          break;
+      
+        default:
+          break;
+      }
     }
 
-    let data: HttpRawType<T> = [TpyErr.NOT_SET, undefined];
+    // switch (<HttpStatusCode> res.status) {
 
-    switch (<HttpStatusCode> res.status) {
+    //   case HttpStatusCode.OK: {
+    //     return [TpyErr.NO_ERR, parsed[0] as T];
+    //   }
 
-      case HttpStatusCode.OK: {
-        data = [await res.json() as T, TpyErr.NO_ERR];
-        break;
-      }
+    //   case HttpStatusCode.UNAUTHORIZED: {
+    //     data = [res, TpyErr.UNAUTHORIZED];
+    //     break;
+    //   }
 
-      case HttpStatusCode.UNAUTHORIZED: {
-        data = [res, TpyErr.UNAUTHORIZED];
-        break;
-      }
+    //   case HttpStatusCode.METHOD_NOT_ALLOWED: {
+    //     data = [res, TpyErr.METHOD_NOT_ALLOWED];
+    //     break;
+    //   }
 
-      case HttpStatusCode.METHOD_NOT_ALLOWED: {
-        data = [res, TpyErr.METHOD_NOT_ALLOWED];
-        break;
-      }
+    //   case HttpStatusCode.BAD_REQUEST: {
+    //     const pres = await res.json();
+    //     if ('msg' in pres && pres['msg'] === 'missing json body')
+    //       data = [res, TpyErr.MISSING_JSON_BODY];
 
-      case HttpStatusCode.BAD_REQUEST: {
-        const pres = await res.json();
-        if ('msg' in pres && pres['msg'] === 'missing json body')
-          data = [res, TpyErr.MISSING_JSON_BODY];
-
-        if ('message' in pres && pres['message'] === 'not authorized')
-          data = [res, TpyErr.UNAUTHORIZED];
+    //     if ('message' in pres && pres['message'] === 'not authorized')
+    //       data = [res, TpyErr.UNAUTHORIZED];
         
-        break;
+    //     break;
         
-      }
+    //   }
 
-      case HttpStatusCode.NOT_FOUND: {
-        const tes = await res.text();
-        const pres = await res.json();
+    //   case HttpStatusCode.NOT_FOUND: {
+    //     const tes = await res.text();
+    //     const pres = await res.json();
 
-        // ⚠️
-        if (tes[0] === "\u26A0\uFE0F")
-          data = [res, TpyErr.NOT_FOUND];
+    //     // ⚠️
+    //     if (tes[0] === "\u26A0\uFE0F")
+    //       data = [res, TpyErr.NOT_FOUND];
 
-        switch (tes) {
-          case 'could not find guild':
-            data = [res, TpyErr.GUILD_NOT_FOUND];
-            break;
+    //     switch (tes) {
+    //       case 'could not find guild':
+    //         data = [res, TpyErr.GUILD_NOT_FOUND];
+    //         break;
 
-          case 'could not find deployment':
-            data = [res, TpyErr.DEPLOYMENT_NOT_FOUND];
-            break;
+    //       case 'could not find deployment':
+    //         data = [res, TpyErr.DEPLOYMENT_NOT_FOUND];
+    //         break;
         
-          default:
-            break;
-        }
+    //       default:
+    //         break;
+    //     }
 
-        // data = [res, TpyErr.NOT_FOUND];
-        break;
-      }
+    //     break;
+    //   }
 
-    }
-    return data;
+    // }
+    // return data;
   };
 }
+
+// type HttpRawRT<T extends Record<string, unknown>> = TpyErr extends 0 /* NO_ERR */ ? [TpyErr.NO_ERR, T] : [TpyErr, undefined];
+
+// const j = new Tpy("")
+// const [e, t] = await j.httpRaw<User.GET.User>("/user", "GET")
+// if (e !== TpyErr.NO_ERR) throw `Error: ${t}`
+// t.displayName
+/*
+
+[TpyErr.NO_ERR, NOT undefined]
+[TpyErr.ERR, undefined]
+
+*/

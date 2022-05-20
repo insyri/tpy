@@ -17,7 +17,7 @@ declare namespace Guild {
     /**
      * Base guild payload.
      */
-    export interface Payload {
+    export type Payload = {
       id: numstr;
       name: string;
       /**
@@ -34,11 +34,11 @@ declare namespace Guild {
    */
   export namespace GET {
     /**
-     * `GET /guilds/:guildId`
+     * `GET /guilds/:id`
      *
      * Returns some guild info (everything Discord API normally gives you) as well as a list of deployments.
      */
-    export interface Guild extends RESTPostAPIGuildsJSONBody {
+    export type Guild = RESTPostAPIGuildsJSONBody & {
       deployments: Deployments.Structures.Base & {
         last_updated_at: null;
         config: Deployments.Structures.Config;
@@ -48,7 +48,7 @@ declare namespace Guild {
     }
 
     /**
-     * `GET /guilds/:guildId/stats`
+     * `GET /guilds/:id/stats`
      *
      * Return some statistics of a script container. Some values are undefined when information is not available.
      *
