@@ -148,7 +148,19 @@ declare namespace Deployments {
       };
     }
 
-    export type Response = {}
+    export type Response<Raw extends boolean = true> = Deployments.GET.Deployments & {
+      errors: unknown[],
+      script: {
+        id: numstr;
+        projects: {
+          
+        /**
+         * Stringified `Deployments.Structures.File[]` object.
+         */
+        files: Raw extends true ? string : Structures.DeploymentFiles[];
+        }
+      }
+    }
   }
 }
 
