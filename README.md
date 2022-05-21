@@ -14,14 +14,18 @@ A strongly typed Pylon API client. https://pylon.bot/
 <!-- Add Node & Deno-->
 
 ```ts
-import Tpy from 'https://deno.land/x/tpy@x.x.x/mod.ts';
+import Tpy, { TpyErr } from 'https://deno.land/x/tpy@0.0.1/mod.ts';
 // Or use Node
 // import Tpy from 'tpy';
 
-const client = new Tpy('my_pylon_token');
+const client = new Tpy('My.pYl0N_tOKEn');
+const user = await client.getUser();
 
-let guildInfo = await client.getGuildInfo('759174794968301569');
-console.log(guildInfo.name);
+// Tpy has strongly typed error handling so there are no need for type gaurds.
+// See type TpyTup for how union types are avoided.
+if (user[0] === TpyErr.NO_ERR) {
+  console.log(`User logged in: ${user[1]?.displayName}`);
+}
 ```
 
 ## Contributing
