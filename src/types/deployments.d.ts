@@ -29,7 +29,7 @@ declare namespace Deployments {
       tasks: {
         cronTasks: CronTask[];
       };
-    }
+    };
 
     /**
      * Cron task specifications. Recieved stringified.
@@ -50,7 +50,7 @@ declare namespace Deployments {
        * Follows cron specification [to be documented].
        */
       cronString: string;
-    }
+    };
 
     export type Base = {
       /**
@@ -81,7 +81,7 @@ declare namespace Deployments {
        * Script revision number. Increments every time a script is published.
        */
       revision: number;
-    }
+    };
 
     /**
      * Path to file, usually `.ts`.
@@ -99,14 +99,14 @@ declare namespace Deployments {
        * File contents.
        */
       content: string;
-    }
+    };
 
     /**
      * Return when a deployment POST body is invalid.
      */
-    export type Missing =  {
+    export type Missing = {
       msg: 'missing json body';
-    }
+    };
   }
 
   /**
@@ -131,7 +131,7 @@ declare namespace Deployments {
        * Deployment's guild information.
        */
       guild: Guild.Structures.Payload;
-    }
+    };
   }
 
   /**
@@ -146,21 +146,22 @@ declare namespace Deployments {
          */
         files: Raw extends true ? string : Structures.DeploymentFiles[];
       };
-    }
+    };
 
-    export type Response<Raw extends boolean = true> = Deployments.GET.Deployments & {
-      errors: unknown[],
-      script: {
-        id: numstr;
-        projects: {
-          
-        /**
-         * Stringified `Deployments.Structures.File[]` object.
-         */
-        files: Raw extends true ? string : Structures.DeploymentFiles[];
-        }
-      }
-    }
+    export type Response<Raw extends boolean = true> =
+      & Deployments.GET.Deployments
+      & {
+        errors: unknown[];
+        script: {
+          id: numstr;
+          projects: {
+            /**
+             * Stringified `Deployments.Structures.File[]` object.
+             */
+            files: Raw extends true ? string : Structures.DeploymentFiles[];
+          };
+        };
+      };
   }
 }
 

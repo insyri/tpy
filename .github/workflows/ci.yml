@@ -3,12 +3,8 @@ name: CI
 on:
   push:
   pull_request:
-  release:
-    types: published
 
-# TODO: Add Node with dnt
 jobs:
-
   Format:
     runs-on: ubuntu-latest
     steps:
@@ -23,11 +19,8 @@ jobs:
             git config --local user.name "tpy bot"
             git add .
             git commit -m "chore: deno fmt"
+            git push origin main
           fi
-      - uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GH_GIT }}
-          branch: ${{ github.ref }}
 
   Analyze:
     runs-on: ubuntu-latest
@@ -36,25 +29,7 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: vx.x.x
-      - name: Checking Files
-        run: deno check
       - name: Linting Files
         run: deno lint
       - name: Running Tests
         run: deno test
-
-#   Build-Node:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v3
-#       - uses: denoland/setup-deno@v1
-#         with:
-#           deno-version: vx.x.x
-#       - name: Get tag version
-#         run: deno run -A ./_npm.ts ${{steps.get_tag_version.outputs.TAG_VERSION}}
-
-#   CD:
-#     needs: [Analyze]
-#     if: github.event_name == 'release' && github.event.action == 'published'
-#     uses: ./.github/workflows/cd.yml
-#     secrets: inherit

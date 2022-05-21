@@ -5,4 +5,4 @@ import type BadResponse from './src/types/bad_response.d.ts';
 import Tpy from './src/tpy.ts';
 
 export default Tpy;
-export type { Deployment, Guild, User, BadResponse };
+export type { BadResponse, Deployment, Guild, User };

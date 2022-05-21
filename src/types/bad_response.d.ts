@@ -3,7 +3,7 @@ declare namespace BadResponse {
     description: string;
     status: number;
     message: string;
-  }
+  };
 
   /**
    * Unauthorized response in JSON format.
@@ -34,7 +34,7 @@ declare namespace BadResponse {
 
   export type MissingJsonBody = {
     msg: 'missing json body';
-  }
+  };
 
   // found this when doing /user/guilds/available/{input} or
   // found this when doing /user/guilds/{input}
@@ -44,15 +44,18 @@ declare namespace BadResponse {
     description: 'Not Found';
     status: 404;
     message: `Requested URL /${string} not found`;
-  }
+  };
 
   export type MethodNotAllowed = ErrorMessageBase & {
     description: 'Method Not Allowed';
     status: 405;
     message: `Method ${string} not allowed for URL /${string}`;
-  }
+  };
 
-  export type BadStringResponses = OldResourceNotFound | LostGuild | LostDeployment
+  export type BadStringResponses =
+    | OldResourceNotFound
+    | LostGuild
+    | LostDeployment;
 }
 
 export default BadResponse;

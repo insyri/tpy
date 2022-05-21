@@ -24,7 +24,7 @@ declare namespace Guild {
        * UUID without hyphens.
        */
       icon: string | null;
-    }
+    };
   }
 
   /**
@@ -45,7 +45,7 @@ declare namespace Guild {
         disabled: boolean;
       };
       reigon: `deprecated`;
-    }
+    };
 
     /**
      * `GET /guilds/:id/stats`

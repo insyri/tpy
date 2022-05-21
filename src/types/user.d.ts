@@ -18,7 +18,7 @@ declare namespace User {
      *
      * Gets basic user information.
      */
-    export type User  = {
+    export type User = {
       id: numstr;
       /**
        * ISO 8601 / RFC 3339.
@@ -30,7 +30,7 @@ declare namespace User {
       avatar: string | null;
       displayName: string;
       hasAccess: boolean;
-    }
+    };
 
     /**
      * `GET /user/guilds`
