@@ -20,5 +20,8 @@ jobs:
             git config --local user.name "tpy bot"
             git add .
             git commit -m "chore: deno fmt"
-            git push origin ${{ github.ref }}
           fi
+      - uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GH_GIT }}
+          branch: ${{ github.ref }}
