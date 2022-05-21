@@ -21,8 +21,9 @@ const [err, user] = await client.getUser();
 
 // Tpy has strongly typed error handling so there are no need for type gaurds.
 // See type TpyTup for how union types are avoided.
-if (err)
-  throw new Error(`There was an error while fetching the user: ${err}`)
+if (err) {
+  throw new Error(`There was an error while fetching the user: ${err}`);
+}
 
 console.log(`User logged in: ${user!.displayName}`);
 ```
