@@ -5,31 +5,20 @@ on:
   pull_request:
 
 jobs:
-  Format:
+  Cleaning:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
         with:
           deno-version: vx.x.x
-      - run: deno fmt
+      - name: Format and Lint
+        run: deno task precommit
       - run: |
           if [[ ! -z $(git status -s) ]]; then
             git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git config --local user.name "tpy bot"
             git add .
             git commit -m "chore: deno fmt"
-            git push origin main
+            git push origin ${{ github.ref }}
           fi
-
-  Analyze:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: vx.x.x
-      - name: Linting Files
-        run: deno lint
-      - name: Running Tests
-        run: deno test

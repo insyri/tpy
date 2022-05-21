@@ -6,7 +6,7 @@ async function npm() {
   await emptyDir('npm');
 
   await build({
-    entryPoints: ['/mod.ts'],
+    entryPoints: ['./mod.ts'],
     outDir: './npm',
     package: {
       name: 'tpy',
