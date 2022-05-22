@@ -1,7 +1,10 @@
 {
   "recommendations": [
     "denoland.vscode-deno"
-    // "ms-vscode.vscode-typescript-next",
-    // "esbenp.prettier-vscode"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript-next",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint"
   ]
 }

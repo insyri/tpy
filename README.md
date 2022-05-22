@@ -5,6 +5,7 @@
 A strongly typed Pylon API client. https://pylon.bot/
 
 [![CI](https://github.com/insyri/tpy/actions/workflows/ci.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/ci.yml)
+[![README Integrity](https://github.com/insyri/tpy/actions/workflows/readme.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/readme.yml)
 [![CD](https://github.com/insyri/tpy/actions/workflows/cd.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/cd.yml)
 
 [![](https://shields.io/badge/deno-05122A?logo=deno&style=for-the-badge)](https://deno.land/)
