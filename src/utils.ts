@@ -1,4 +1,4 @@
-import TpyErr from './tpy_err.d.ts';
+import { TpyErr } from './tpy_err.ts';
 
 export type numstr = `${number}`;
 export type PylonVerbs = 'GET' | 'POST';

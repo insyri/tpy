@@ -1,4 +1,4 @@
-declare enum TpyErr {
+export enum TpyErr {
   NO_ERR,
   UNIDENTIFIABLE,
   UNAUTHORIZED,
@@ -8,5 +8,3 @@ declare enum TpyErr {
   GUILD_NOT_FOUND,
   DEPLOYMENT_NOT_FOUND,
 }
-
-export default TpyErr;

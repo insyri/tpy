@@ -1,9 +1,9 @@
 import HttpStatusCode from 'https://gist.githubusercontent.com/scokmen/f813c904ef79022e84ab2409574d1b45/raw/cd8709a2fccb005bb53e9bfb2461e07d40b4e8d8/HttpStatusCode.ts';
-import TpyErr from './tpy_err.d.ts';
-import Deployment from './types/deployments.d.ts';
-import Guild from './types/guild.d.ts';
-import User from './types/user.d.ts';
-import BadResponse from './types/bad_response.d.ts';
+import { TpyErr } from './tpy_err.ts';
+import type Deployment from './types/deployments.d.ts';
+import type Guild from './types/guild.d.ts';
+import type User from './types/user.d.ts';
+import type BadResponse from './types/bad_response.d.ts';
 import { MaybeArr, numstr, PylonVerbs, TpyTup } from './utils.ts';
 
 /**
@@ -89,10 +89,10 @@ export default class Tpy {
       this.headers(method, other),
     );
 
-    const res: MaybeArr<Record<string, unknown>> | string = await rawres.json()
-      .catch(
-        async () => await rawres.text(),
-      );
+    let res: MaybeArr<Record<string, unknown>> | string = await rawres.text();
+    try {
+      res = JSON.parse(res) as MaybeArr<Record<string, unknown>>;
+    } catch { /* do nothing */ }
 
     // The only known cases where responses are not JSON are:
     // - 404 * = `⚠️ 404 — Not Found\n==================\nReq`
