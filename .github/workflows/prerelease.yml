@@ -1,0 +1,17 @@
+name: Test Builds On Pre-Release
+
+on:
+  release:
+    types: 
+      - created
+
+jobs:
+  Await-CI:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo j
+  Write-Things:
+    runs-on: ubuntu-latest
+    needs: [Await-CI]
+    steps:
+      - run: echo t

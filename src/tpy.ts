@@ -83,7 +83,9 @@ export default class Tpy {
     resource: `/${string}`,
     method: PylonVerbs = 'GET',
     other?: RequestInit,
-  ): Promise<[TpyErr, T | undefined]> => {
+  ): Promise<
+    [TpyErr.NO_ERR, T] | [Exclude<TpyErr, TpyErr.NO_ERR>, undefined]
+  > => {
     const rawres = await fetch(
       this.api_url + resource,
       this.headers(method, other),
@@ -100,7 +102,10 @@ export default class Tpy {
     // - 404 /deployments/:id = `could not find deployment`
     // So we assume that the response is a failed response.
 
-    let stringresponse: [TpyErr, undefined] | null = null;
+    let stringresponse: [TpyErr.NO_ERR, T] | [
+      Exclude<TpyErr, TpyErr.NO_ERR>,
+      undefined,
+    ] | null = null;
 
     if (typeof res === 'string') {
       // deno-fmt-ignore
@@ -113,7 +118,10 @@ export default class Tpy {
 
     if (stringresponse != null) return stringresponse;
 
-    let data: [TpyErr, T | undefined] | null = null;
+    let data:
+      | [TpyErr.NO_ERR, T]
+      | [Exclude<TpyErr, TpyErr.NO_ERR>, undefined]
+      | null = null;
 
     // typeof [] === 'object' -> true
     if (typeof res === 'object') {

@@ -5,12 +5,13 @@
 A strongly typed Pylon API client. https://pylon.bot/
 
 [![CI](https://github.com/insyri/tpy/actions/workflows/ci.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/ci.yml)
-[![README Integrity](https://github.com/insyri/tpy/actions/workflows/readme.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/readme.yml)
 [![CD](https://github.com/insyri/tpy/actions/workflows/cd.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/cd.yml)
 
 [![](https://shields.io/badge/deno-05122A?logo=deno&style=for-the-badge)](https://deno.land/)
 [![](https://shields.io/badge/node.js-05122A?logo=node.js&style=for-the-badge)](https://nodejs.org/)
 [![](https://shields.io/badge/typescript-05122A?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org/)
+
+[![README Integrity](https://github.com/insyri/tpy/actions/workflows/readme.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/readme.yml)
 
 ```ts
 import Tpy, { TpyErrToString } from 'https://deno.land/x/tpy@0.0.1/mod.ts';
