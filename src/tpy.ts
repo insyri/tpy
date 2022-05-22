@@ -3,7 +3,6 @@ import { TpyErr } from './tpy_err.ts';
 import type Deployment from './types/deployments.d.ts';
 import type Guild from './types/guild.d.ts';
 import type User from './types/user.d.ts';
-import type BadResponse from './types/bad_response.d.ts';
 import { MaybeArr, numstr, PylonVerbs, TpyTup } from './utils.ts';
 
 /**
@@ -102,26 +101,25 @@ export default class Tpy {
     // - 404 /deployments/:id = `could not find deployment`
     // So we assume that the response is a failed response.
 
-    let stringresponse: [TpyErr.NO_ERR, T] | [
-      Exclude<TpyErr, TpyErr.NO_ERR>,
-      undefined,
-    ] | null = null;
+    let stringresponse: TpyTup<T> | null = null;
 
     if (typeof res === 'string') {
       // deno-fmt-ignore
-      if ((res as BadResponse.BadStringResponses).startsWith('\u26A0\uFE0F')) return stringresponse = [TpyErr.RESOURCE_NOT_FOUND, undefined];
+      if (res.startsWith('\u26A0\uFE0F')) return stringresponse = [TpyErr.RESOURCE_NOT_FOUND, undefined];
       // deno-fmt-ignore
-      if ((res as BadResponse.BadStringResponses) === "could not find deployment") return stringresponse = [TpyErr.DEPLOYMENT_NOT_FOUND, undefined];
+      if (res === "could not find deployment") return stringresponse = [TpyErr.DEPLOYMENT_NOT_FOUND, undefined];
       // deno-fmt-ignore
-      if ((res as BadResponse.BadStringResponses) === "could not find guild") return stringresponse = [TpyErr.GUILD_NOT_FOUND, undefined];
+      if (res === "could not find guild") return stringresponse = [TpyErr.GUILD_NOT_FOUND, undefined];
     }
 
     if (stringresponse != null) return stringresponse;
 
     let data:
       | [TpyErr.NO_ERR, T]
-      | [Exclude<TpyErr, TpyErr.NO_ERR>, undefined]
-      | null = null;
+      | [Exclude<TpyErr, TpyErr.NO_ERR>, undefined] = [
+        TpyErr.UNIDENTIFIABLE,
+        undefined,
+      ];
 
     // typeof [] === 'object' -> true
     if (typeof res === 'object') {
@@ -158,8 +156,6 @@ export default class Tpy {
         }
       }
     }
-
-    if (data != null) return data;
-    return [TpyErr.UNIDENTIFIABLE, undefined]; // impossible
+    return data;
   };
 }
