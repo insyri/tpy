@@ -17,15 +17,22 @@
       "useTabs": false,
       "indentWidth": 2,
       "lineWidth": 80
+    },
+    "files": {
+      "exclude": ["npm"]
     }
   },
   "lint": {
     "rules": {
       "include": ["no-inferrable-types"]
+    },
+    "files": {
+      "exclude": ["npm"]
     }
   },
   "tasks": {
     "precommit": "deno lint && deno fmt",
+    "readme": "deno run --allow-read --allow-write --allow-run _readme.verify.ts",
     "dnt": "deno run --allow-read --allow-write --allow-run --allow-env _npm.ts"
   }
 }

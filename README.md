@@ -12,7 +12,7 @@ A strongly typed Pylon API client. https://pylon.bot/
 [![](https://shields.io/badge/typescript-05122A?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org/)
 
 ```ts
-import Tpy, { TpyErr } from 'https://deno.land/x/tpy@0.0.1/mod.ts';
+import Tpy, { TpyErrToString } from 'https://deno.land/x/tpy@0.0.1/mod.ts';
 // Or use Node
 // import Tpy from 'tpy';
 
@@ -21,11 +21,10 @@ const [err, user] = await client.getUser();
 
 // Tpy has strongly typed error handling so there are no need for type gaurds.
 // See type TpyTup for how union types are avoided.
-if (err) {
-  throw new Error(`There was an error while fetching the user: ${err}`);
-}
-
-console.log(`User logged in: ${user!.displayName}`);
+// deno-fmt-ignore
+if (err)
+  throw `There was an error while fetching the user: ${TpyErrToString(err)}.`;
+else console.log(`User logged in: ${user?.displayName}`);
 ```
 
 ## Contributing
