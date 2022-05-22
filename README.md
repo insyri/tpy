@@ -14,7 +14,7 @@ A strongly typed Pylon API client. https://pylon.bot/
 [![README Integrity](https://github.com/insyri/tpy/actions/workflows/readme.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/readme.yml)
 
 ```ts
-import Tpy, { TpyErrToString } from 'https://deno.land/x/tpy@0.0.1/mod.ts';
+import Tpy from 'https://deno.land/x/tpy@0.0.1/mod.ts';
 // Or use Node
 // import Tpy from 'tpy';
 
@@ -22,11 +22,11 @@ const client = new Tpy('My.pYl0N_tOKEn');
 const [err, user] = await client.getUser();
 
 // Tpy has strongly typed error handling so there are no need for type gaurds.
-// See type TpyTup for how union types are avoided.
-// deno-fmt-ignore
-if (err)
+// If there's an error, the response will return undefined,
+// Otherwise, the response will the requested type as expected.
+if (err) {
   throw `There was an error while fetching the user: ${TpyErrToString(err)}.`;
-else console.log(`User logged in: ${user?.displayName}`);
+} else console.log(`User logged in: ${user.displayName}`);
 ```
 
 ## Contributing
