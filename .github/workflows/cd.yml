@@ -24,10 +24,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: vx.x.x
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
           registry-url: ${{ matrix.registry-url }}
+      - run: deno task dnt
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ matrix.token }}

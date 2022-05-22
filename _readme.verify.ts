@@ -25,7 +25,13 @@ for (const v of file.split('\n')) {
   skip_next_line = true;
 }
 
-const READMEmd = decode(Deno.readFileSync('README.md'));
+const readme_run = Deno.run({
+  cmd: ['deno', 'run', '--allow-net', '_readme.ts'],
+  stderr: 'piped',
+});
+const status = (await readme_run.status()).success;
+
+const READMEmd = decode(Deno.readFileSync('README.md')) + `\nREADME integrity: ${status ? "passing" : "failing"}`;
 Deno.writeFileSync(
   'README.md',
   encode(
@@ -36,11 +42,7 @@ Deno.writeFileSync(
   ),
 );
 
-const readme_run = Deno.run({
-  cmd: ['deno', 'run', '--allow-net', '_readme.ts'],
-  stderr: 'piped',
-});
 
-if (!(await readme_run.status()).success) {
+if (!status) {
   throw decode(await readme_run.stderrOutput());
 }

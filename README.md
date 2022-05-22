@@ -11,8 +11,7 @@ A strongly typed Pylon API client. https://pylon.bot/
 [![](https://shields.io/badge/node.js-05122A?logo=node.js&style=for-the-badge)](https://nodejs.org/)
 [![](https://shields.io/badge/typescript-05122A?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org/)
 
-[![README Integrity](https://github.com/insyri/tpy/actions/workflows/readme.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/readme.yml)
-
+<!-- DO NOT EDIT, edit in ./_readme.ts -->
 ```ts
 import Tpy from 'https://deno.land/x/tpy@0.0.1/mod.ts';
 // Or use Node
