@@ -8,5 +8,11 @@
   "javascript.validate.enable": false,
   "prettier.enable": false,
   "eslint.enable": false,
-  "deno.enablePaths": ["./src", "./mod.ts", "./_npm.ts", "./_readme.ts", "./_readme.verify.ts"]
+  "deno.enablePaths": [
+    "./src",
+    "./mod.ts",
+    "./_npm.ts",
+    "./_readme.ts",
+    "./_readme.verify.ts"
+  ]
 }
