@@ -13,4 +13,4 @@ if (err) {
   // deno-fmt-ignore
   // throw `There was an error while fetching the user: ${TpyErrToString(err)}.`; // REPLACE
   console.log(`There was an error while fetching the user: ${TpyErrToString(err)}.`);
-} else console.log(`User logged in: ${user?.displayName}`);
+} else console.log(`User logged in: ${user.displayName}`);

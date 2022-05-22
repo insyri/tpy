@@ -1,11 +1,7 @@
-const file = new TextDecoder('utf-8').decode(Deno.readFileSync('_readme.ts'));
+const decode = (stream: Uint8Array) => new TextDecoder('utf-8').decode(stream);
+const encode = (stream: string) => new TextEncoder().encode(stream);
 
-const readme_run = Deno.run({
-  cmd: ['deno', 'run', '--allow-net', '_readme.ts'],
-  stderr: 'piped',
-});
-
-const status = (await readme_run.status()).success;
+const file = decode(Deno.readFileSync('_readme.ts'));
 
 const new_file: string[] = [];
 let skip_next_line = false;
@@ -29,26 +25,22 @@ for (const v of file.split('\n')) {
   skip_next_line = true;
 }
 
-const formatted_readme = new_file.join('\n');
+const READMEmd = decode(Deno.readFileSync('README.md'));
+Deno.writeFileSync(
+  'README.md',
+  encode(
+    READMEmd.replace(
+      /\`\`\`ts\n(.|\n)+\`\`\`/g,
+      `\`\`\`ts\n${new_file.join('\n')}\`\`\``,
+    ),
+  ),
+);
 
-Deno.writeFile('_test.ts', new TextEncoder().encode(formatted_readme));
+const readme_run = Deno.run({
+  cmd: ['deno', 'run', '--allow-net', '_readme.ts'],
+  stderr: 'piped',
+});
 
-// find places in the codeblock
-
-// https://stackoverflow.com/a/274094/15325967
-function regexIndexOf(string: string, regex: RegExp, startpos = 0) {
-  const indexOf = string.substring(startpos).search(regex);
-  return (indexOf >= 0) ? (indexOf + startpos) : indexOf;
+if (!(await readme_run.status()).success) {
+  throw decode(await readme_run.stderrOutput());
 }
-
-const s = file.match(/```ts\n(.|\n)+```/g);
-if (s === null) throw "Can't find codeblock"
-
-const current_codeblock = file.substring(regexIndexOf(file, /```ts\n(.|\n)+```/g), s[0].length);
-Deno.writeFile('new.README.md', file.replace(current_codeblock, new TextEncoder().encode(formatted_readme)));
-
-console.log(file.substring(current_codeblock));
-// const codeblock_index_start = file.indexOf('```ts\n') + '```ts\n'.length;
-// const codeblock_index_end = file.indexOf('```',) - '```'.length;
-
-if (!status) throw new TextDecoder().decode(await readme_run.stderrOutput());
