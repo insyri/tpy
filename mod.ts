@@ -4,8 +4,9 @@ import type User from './src/types/user.d.ts';
 import type BadResponse from './src/types/bad_response.d.ts';
 import type { TpyErr } from './src/tpy_err.ts';
 import * as Utils from './src/utils.ts';
+import TpyErrToString, { TpyErrAsStrings } from './src/logging.ts';
 import Tpy from './src/tpy.ts';
 
 export default Tpy;
-export type { BadResponse, Deployment, Guild, TpyErr, User };
-export { Utils };
+export type { BadResponse, Deployment, Guild, TpyErr, TpyErrAsStrings, User };
+export { TpyErrToString, Utils };
