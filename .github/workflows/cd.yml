@@ -3,20 +3,11 @@ name: CD
 on:
   release:
     types: 
-      - created
       - prereleased
       - published
 
 jobs:
-  Prep-Release:
-    if: ${{ github.event.type }} == "created"
-    runs-on: ubuntu-latest
-    steps:
-      - run: "j"
-
-
   Publish:
-    if: ${{ github.event.type }} == "release" || ${{ github.event.type }} == "published"
     permissions:
       contents: read
       packages: write
