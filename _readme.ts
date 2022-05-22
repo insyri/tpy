@@ -9,8 +9,8 @@ const [err, user] = await client.getUser();
 // Tpy has strongly typed error handling so there are no need for type gaurds.
 // If there's an error, the response will return undefined,
 // Otherwise, the response will the requested type as expected.
-// deno-fmt-ignore
-if (err)
+if (err) {
+  // deno-fmt-ignore
   // throw `There was an error while fetching the user: ${TpyErrToString(err)}.`; // REPLACE
   console.log(`There was an error while fetching the user: ${TpyErrToString(err)}.`);
-else console.log(`User logged in: ${user?.displayName}`);
+} else console.log(`User logged in: ${user?.displayName}`);
