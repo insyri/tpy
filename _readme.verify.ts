@@ -31,7 +31,8 @@ const readme_run = Deno.run({
 });
 const status = (await readme_run.status()).success;
 
-const READMEmd = decode(Deno.readFileSync('README.md')) + `\nREADME integrity: ${status ? "passing" : "failing"}`;
+const READMEmd = decode(Deno.readFileSync('README.md')) +
+  `\nREADME integrity: ${status ? 'passing' : 'failing'}`;
 Deno.writeFileSync(
   'README.md',
   encode(
@@ -41,7 +42,6 @@ Deno.writeFileSync(
     ),
   ),
 );
-
 
 if (!status) {
   throw decode(await readme_run.stderrOutput());
