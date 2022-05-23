@@ -31,14 +31,14 @@ const readme_run = Deno.run({
 });
 const status = (await readme_run.status()).success;
 
-const READMEmd = decode(Deno.readFileSync('README.md')) +
-  `\nREADME integrity: ${status ? 'passing' : 'failing'}`;
+const READMEmd = decode(Deno.readFileSync('README.md'));
 Deno.writeFileSync(
   'README.md',
   encode(
     READMEmd.replace(
       /\`\`\`ts\n(.|\n)+\`\`\`/g,
-      `\`\`\`ts\n${new_file.join('\n')}\`\`\``,
+      `\`\`\`ts\n${new_file.join('\n')}\n${+
+        `README integrity: ${status ? 'passing' : 'failing'}`}\`\`\``,
     ),
   ),
 );

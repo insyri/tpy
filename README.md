@@ -35,9 +35,3 @@ if (err) {
 Currently, the library is in early development with a list of TODOs. If you'd
 like to contribute please read the
 [contributing guide](.github/CONTRIBUTING.md).
-
-README integrity: passing
-
-README integrity: passing
-
-README integrity: passing
