@@ -1,10 +1,9 @@
 name: CD
 
 on:
-  release:
-    types: 
-      - prereleased
-      - published
+  push:
+    tags:
+    - 'v*.*.*'
 
 jobs:
   Publish:
@@ -31,7 +30,7 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: ${{ matrix.registry-url }}
-      - run: deno task dnt
+      - run: deno task dnt ${{ github.ref_name }}
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ matrix.token }}
