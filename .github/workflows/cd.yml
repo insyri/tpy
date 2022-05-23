@@ -15,12 +15,12 @@ jobs:
       matrix:
         registry-url:
           ['https://registry.npmjs.org', 'https://npm.pkg.github.com']
-        token: ['${{ NPM_TOKEN }}', '${{ GH_PKG_REG_TOKEN }}']
+        token: ['${{ secrets.NPM_TOKEN }}', '${{ secrets.GH_PKG_REG_TOKEN }}']
         exclude:
           - registry-url: https://npm.pkg.github.com
-            token: ${{ NPM_TOKEN }}
+            token: ${{ secrets.NPM_TOKEN }}
           - registry-url: https://registry.npmjs.org
-            token: ${{ GH_PKG_REG_TOKEN }}
+            token: ${{ secrets.GH_PKG_REG_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

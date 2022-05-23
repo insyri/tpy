@@ -1,8 +1,6 @@
 import { build, emptyDir } from 'https://deno.land/x/dnt@0.22.0/mod.ts';
 
 async function npm() {
-  await Deno.remove('npm', { recursive: true }).catch((_) => {});
-
   await emptyDir('npm');
 
   await build({
