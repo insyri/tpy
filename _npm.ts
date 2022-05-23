@@ -1,7 +1,6 @@
 import { build, emptyDir } from 'https://deno.land/x/dnt@0.22.0/mod.ts';
 
 async function npm() {
-
   await emptyDir('npm');
 
   await build({
