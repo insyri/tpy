@@ -6,10 +6,13 @@ on:
     - 'v*.*.*'
 
 jobs:
-  GitHub:
+  Publish:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        registry-url: ['https://npm.pkg.github.com', 'https://registry.npmjs.org']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,24 +22,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-          registry-url: https://npm.pkg.github.com
-      - run: deno task dnt ${{ github.ref_name }}
-      - run: cd npm && npm publish
+          registry-url: ${{ matrix.registry-url }}
+      - name: Set Appropriate Token to $TOKEN
+        run: |
+            if [[ ${{ matrix.registry-url }} == 'https://registry.npmjs.org' ]]
+            then
+              echo "TOKEN=${{ secrets.NPM_TOKEN }}" >> $GITHUB_ENV
+            else
+              echo "TOKEN=${{ secrets.GH_PKG_REG_TOKEN }}" >> $GITHUB_ENV
+            fi
+      - run: cd npm && npm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_PKG_REG_TOKEN }}
-
-  NPM:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: vx.x.x
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
-          registry-url: https://registry.npmjs.org
-      - run: deno task dnt ${{ github.ref_name }}
-      - run: cd npm && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: $TOKEN
