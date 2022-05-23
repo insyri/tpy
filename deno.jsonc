@@ -33,6 +33,6 @@
   "tasks": {
     "precommit": "deno lint && deno fmt && deno task readme",
     "readme": "deno run --allow-read --allow-write --allow-run _readme.verify.ts",
-    "dnt": "deno run --allow-read --allow-write --allow-run --allow-env _npm.ts"
+    "dnt": "deno run --allow-read --allow-write --allow-run --allow-env --allow-net _npm.ts"
   }
 }
