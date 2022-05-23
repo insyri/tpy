@@ -1,6 +1,7 @@
 import { build, emptyDir } from 'https://deno.land/x/dnt@0.22.0/mod.ts';
 
 async function npm() {
+
   await emptyDir('npm');
 
   await build({
@@ -34,10 +35,16 @@ async function npm() {
             },
             {
               name: 'RequestInit',
-              exportName: 'default',
               typeOnly: true,
             },
           ],
+        },
+        {
+          package: {
+            name: '@types/node',
+            version: '17.0.35',
+          },
+          globalNames: [],
         },
       ],
     },
