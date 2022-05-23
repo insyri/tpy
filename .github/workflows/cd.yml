@@ -20,7 +20,10 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: https://npm.pkg.github.com
-      - run: deno task dnt ${{ github.ref_name }} && cd npm
+      - run: deno task dnt ${{ github.ref_name }}
+      - run: ls
+      - run: cd npm
+      - run: ls
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PKG_REG_TOKEN }}
@@ -36,7 +39,10 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: https://registry.npmjs.org
-      - run: deno task dnt ${{ github.ref_name }} && cd npm
+      - run: deno task dnt ${{ github.ref_name }}
+      - run: ls
+      - run: cd npm
+      - run: ls
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
