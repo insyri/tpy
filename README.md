@@ -28,7 +28,8 @@ if (err) {
   throw `There was an error while fetching the user: ${TpyErrToString(err)}.`;
   // user is now !undefined.
 } else console.log(`User logged in: ${user.displayName}`);
-```
+
+NaN```
 
 ## Contributing
 
