@@ -6,20 +6,10 @@ on:
     - 'v*.*.*'
 
 jobs:
-  Publish:
+  GitHub:
     permissions:
       contents: read
       packages: write
-    strategy:
-      matrix:
-        registry-url:
-          ['https://registry.npmjs.org', 'https://npm.pkg.github.com']
-        token: ['${{ secrets.NPM_TOKEN }}', '${{ secrets.GH_PKG_REG_TOKEN }}']
-        exclude:
-          - registry-url: https://npm.pkg.github.com
-            token: ${{ secrets.NPM_TOKEN }}
-          - registry-url: https://registry.npmjs.org
-            token: ${{ secrets.GH_PKG_REG_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -29,8 +19,24 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-          registry-url: ${{ matrix.registry-url }}
+          registry-url: https://npm.pkg.github.com
       - run: deno task dnt ${{ github.ref_name }}
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ matrix.token }}
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PKG_REG_TOKEN }}
+
+  NPM:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: vx.x.x
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: https://registry.npmjs.org
+      - run: deno task dnt ${{ github.ref_name }}
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

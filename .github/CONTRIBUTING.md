@@ -25,10 +25,12 @@ Tpy uses [`dnt`](https://deno.land/x/dnt) for transforming Deno projects to
 Node.js. By doing the following:
 
 ```bash
-deno run -A _npm.ts "x.x.x" # Script requires bumped version
+deno task dnt "vx.x.x" # Script requires bumped version
 ```
 
 Will generate an `npm` folder with contents in it ready to ship on npm.
+
+On each release, these are automatically built and deployed.
 
 ### Notes
 
