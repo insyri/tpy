@@ -37,9 +37,9 @@ Deno.writeFileSync(
   encode(
     READMEmd.replace(
       /\`\`\`ts\n(.|\n)+\`\`\`/g,
-      `\`\`\`ts\n${new_file.join('\n')}\n${+`README integrity: ${
+      `\`\`\`ts\n${new_file.join('\n')}\n${`// README integrity: ${
         status ? 'passing' : 'failing'
-      }`}\`\`\``,
+      }`}\n\`\`\``,
     ),
   ),
 );

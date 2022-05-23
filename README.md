@@ -29,7 +29,8 @@ if (err) {
   // user is now !undefined.
 } else console.log(`User logged in: ${user.displayName}`);
 
-NaN```
+// README integrity: passing
+```
 
 ## Contributing
 
