@@ -1,4 +1,4 @@
-import { RESTPostAPIGuildsJSONBody } from 'https://deno.land/x/discord_api_types@0.32.1/v8.ts';
+import { RESTPostAPIGuildsJSONBody } from 'https://deno.land/x/discord_api_types@0.33.0/rest/v8/guild.ts';
 import { numstr } from '../utils.ts';
 import Deployments from './deployments.d.ts';
 

@@ -1,4 +1,4 @@
-import { GatewayDispatchEvents } from 'https://deno.land/x/discord_api_types@0.32.1/v8.ts';
+import { GatewayDispatchEvents } from 'https://deno.land/x/discord_api_types@0.33.0/gateway/v8.ts';
 import Guild from './guild.d.ts';
 import { numstr } from '../utils.ts';
 
