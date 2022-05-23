@@ -23,6 +23,7 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: ${{ matrix.registry-url }}
+      - run: deno task dnt ${{ github.ref_name }}
       - name: Set Appropriate Token to $TOKEN
         run: |
             if [[ ${{ matrix.registry-url }} == 'https://registry.npmjs.org' ]]
