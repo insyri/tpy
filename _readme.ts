@@ -1,4 +1,4 @@
-// import Tpy from 'https://deno.land/x/tpy@0.0.1/mod.ts'; // REPLACE
+// import Tpy from 'https://deno.land/x/tpy@v0.1.1/mod.ts'; // REPLACE
 import Tpy, { TpyErrToString } from './mod.ts';
 // Or use Node
 // import Tpy from 'tpy';
