@@ -6,11 +6,11 @@ A strongly typed Pylon API client. https://pylon.bot/
 
 [![CI](https://github.com/insyri/tpy/actions/workflows/ci.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/ci.yml)
 
-The Pylon API does not have a standardized response, meaning there
-are alot of edge cases and can result sometimes in unexpected responses. Tpy
-aims to resolve this by providing type safe interaction along with a provided
-Go-like error handler. Tpy also provides a predictable interface with
-documentation on almost all used endpoints.
+The Pylon API does not have a standardized response, meaning there are alot of
+edge cases and can result sometimes in unexpected responses. Tpy aims to resolve
+this by providing type safe interaction along with a provided Go-like error
+handler. Tpy also provides a predictable interface with documentation on almost
+all used endpoints.
 
 ```bash
 npm install tpy
@@ -48,6 +48,7 @@ you'd like to contribute, please read the
 [contributing guide](.github/CONTRIBUTING.md) before you start working.
 
 ## Legal
+
 Pylon is a copyright (c) of Uplol Inc. All rights reserved to Uplol.
 
 Tpy is licensed under the MIT License.
