@@ -1,6 +1,10 @@
 import { build, emptyDir } from 'https://deno.land/x/dnt@0.22.0/mod.ts';
 
 async function npm() {
+  if (!(Deno.args[0]) || !(Deno.args[0].match(/v\d\.\d\.\d.+/g))) {
+    throw 'expecting 1 arg that matches \/\v\\\d\\\.\\\d\\\.\\\d\.\+\/\g';
+  }
+
   await emptyDir('npm');
 
   await build({
