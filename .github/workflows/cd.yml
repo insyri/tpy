@@ -32,7 +32,6 @@ jobs:
             else
               echo "TOKEN=${{ secrets.GH_PKG_REG_TOKEN }}" >> $GITHUB_ENV
             fi
-      - run: npm whoami
       - run: cd npm && npm publish --access public
         env:
           NODE_AUTH_TOKEN: $TOKEN
