@@ -11,7 +11,8 @@ appropriate issue.
 
 1. Fork and clone the repository; verify you are on the `main` branch.
 2. Code it!
-3. Finalize, and document your changes in JSDoc. You can perform formatting locally by executing the `precommit` task.
+3. Finalize, and document your changes in JSDoc. You can perform formatting
+   locally by executing the `precommit` task.
 
 ```bash
 deno task precommit
