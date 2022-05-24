@@ -1,4 +1,4 @@
-<img align="right" width="150" src=".github/assets/pylon-dicon.webp">
+<img align="right" width="150" src=".github/assets/pylon-dicon.png">
 
 # tpy
 
