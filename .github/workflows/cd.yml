@@ -4,11 +4,6 @@ on:
   push:
     tags:
     - 'v*.*.*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'match v*.*.*'     
-        required: true
 
 jobs:
   Publish:
@@ -37,6 +32,4 @@ jobs:
             else
               echo "TOKEN=${{ secrets.GH_PKG_REG_TOKEN }}" >> $GITHUB_ENV
             fi
-      - run: cd npm && npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: $TOKEN
+      - run: cd npm && "TOKEN=$TOKEN" >> .env && npm publish --access publish
