@@ -6,6 +6,16 @@ A strongly typed Pylon API client. https://pylon.bot/
 
 [![CI](https://github.com/insyri/tpy/actions/workflows/ci.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/ci.yml)
 
+The Pylon API does not have a standard response per each variable, meaning there
+are alot of edge cases and can result sometimes in unexpected responses. Tpy
+aims to resolve this by providing type safe interaction along with a provided
+Go-like error handler. Tpy also provides a predictable interface with
+documentation on almost all used endpoints.
+
+```bash
+npm install tpy
+```
+
 [![](https://shields.io/badge/deno-05122A?logo=deno&style=for-the-badge)](https://deno.land/)
 [![](https://shields.io/badge/node.js-05122A?logo=node.js&style=for-the-badge)](https://nodejs.org/)
 [![](https://shields.io/badge/typescript-05122A?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org/)
@@ -33,6 +43,6 @@ if (err) {
 
 ## Contributing
 
-Currently, the library is in early development with a list of TODOs. If you'd
-like to contribute please read the
-[contributing guide](.github/CONTRIBUTING.md).
+Currently, the library is missing some documentation and has some dirty code. If
+you'd like to contribute please read the
+[contributing guide](.github/CONTRIBUTING.md) before you start working.
