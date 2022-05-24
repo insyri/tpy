@@ -25,7 +25,7 @@ declare namespace User {
        */
       lastSeenAt: string;
       /**
-       * UUID without hypens.
+       * UUID without hyphens.
        */
       avatar: string | null;
       displayName: string;
@@ -42,7 +42,7 @@ declare namespace User {
        * `GET /user/guilds`
        *
        * Returns all guilds the respective user can edit with Pylon.
-       * More specifically, the list of guilds the user is in where the user has `manage server` permissions or above.
+       * More specifically, all guilds which the user has `manage server` or `administrator` permissions in.
        */
       export type Guilds = Array<
         Unpacked<Available> & {
@@ -57,7 +57,7 @@ declare namespace User {
        * `GET /user/guilds/available`
        *
        * Returns all guilds a user can edit with Pylon.
-       * More specifically, the list of guilds the user is in where the user has `manage server` permissions.
+       * More specifically, all guilds which the user has `manage server` or `administrator` permissions in.
        */
       export type Available = Array<
         Guild.Structures.Payload & {
