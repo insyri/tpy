@@ -1,4 +1,7 @@
-<img align="right" width="150" src="https://pylon.bot/docs/img/pylon-icon.svg" />
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="./.github/assets/pylon-logo-dark.svg" />
+  <img align="right" width="150" src="./github/assets/pylon-logo-light.svg" />
+</picture>
 
 # tpy
 
