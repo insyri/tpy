@@ -1,14 +1,10 @@
-<picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/insyri/tpy/main/.github/assets/pylon-logo-dark.svg") />
-  <img align="right" width="150" src="https://raw.githubusercontent.com/insyri/tpy/main/.github/assets/pylon-logo-light.svg" />
-</picture>
+<img align="right" width="150" src=".github/assets/pylon-dicon.webp">
 
 # tpy
 
 A strongly typed Pylon API client. https://pylon.bot/
 
 [![CI](https://github.com/insyri/tpy/actions/workflows/ci.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/ci.yml)
-[![CD](https://github.com/insyri/tpy/actions/workflows/cd.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/cd.yml)
 
 [![](https://shields.io/badge/deno-05122A?logo=deno&style=for-the-badge)](https://deno.land/)
 [![](https://shields.io/badge/node.js-05122A?logo=node.js&style=for-the-badge)](https://nodejs.org/)
