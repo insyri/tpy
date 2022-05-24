@@ -11,13 +11,14 @@ appropriate issue.
 
 1. Fork and clone the repository; verify you are on the `main` branch.
 2. Code it!
-3. Finalize, format, and document your changes in JSDoc.
+3. Finalize, and document your changes in JSDoc. You can perform formatting locally by executing the `precommit` task.
 
 ```bash
 deno task precommit
+# This will automatically be done via CI through remote pushes.
 ```
 
-5. Send in a pull request with a summarized explanation of your changes.
+4. Send in a pull request with a summarized explanation of your changes.
 
 ### Node.js
 
@@ -25,12 +26,10 @@ Tpy uses [`dnt`](https://deno.land/x/dnt) for transforming Deno projects to
 Node.js. By doing the following:
 
 ```bash
-deno task dnt "vx.x.x" # Script requires bumped version
+deno task dnt vx.x.x # Script requires bumped version
 ```
 
-Will generate an `npm` folder with contents in it ready to ship on npm.
-
-On each release, these are automatically built and deployed.
+Will generate an `npm` folder with contents formatted to ship on npm.
 
 ### Notes
 
