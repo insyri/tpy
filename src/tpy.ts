@@ -65,6 +65,10 @@ export default class Tpy {
   getEditableGuilds = async (): Promise<TpyTup<User.GET.Guilds.Guilds>> =>
     await this.httpRaw<User.GET.Guilds.Guilds>(`/guilds`);
 
+  /**
+   * @param id The ID of the deployment to get.
+   * @returns Deployment information.
+   */
   getDeployment = async (
     id: numstr,
   ): Promise<TpyTup<Deployment.GET.Deployments>> =>
