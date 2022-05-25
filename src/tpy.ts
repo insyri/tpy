@@ -9,8 +9,14 @@ import { MaybeArr, numstr, PylonVerbs, TpyTup } from './utils.ts';
  * Tpy class, intialized with a pylon token.
  */
 export default class Tpy {
-  private readonly api_url = 'https://pylon.bot/api';
-  private readonly wss_url = 'wss://workbench.pylon.bot/ws/';
+  /**
+   * The Pylon API base URL.
+   */
+  readonly api_url = 'https://pylon.bot/api';
+  /**
+   * The Pylon workbench websocket URL.
+   */
+  readonly wss_url = 'wss://workbench.pylon.bot/ws';
   private readonly token: string;
 
   /**
@@ -21,9 +27,16 @@ export default class Tpy {
     this.token = token;
   }
 
+  /**
+   * @returns The current logged in user.
+   */
   getUser = async (): Promise<TpyTup<User.GET.User>> =>
-    await this.httpRaw<User.GET.User>('/user', 'GET');
+    await this.httpRaw<User.GET.User>('/user');
 
+  /**
+   * Response can be slow since this endpoint makes a Discord API call.
+   * @returns All guilds a user is in.
+   */
   getAvailableGuilds = async (): Promise<
     TpyTup<User.GET.Guilds.Available>
   > =>
@@ -32,15 +45,38 @@ export default class Tpy {
       'GET',
     );
 
+  /**
+   * @param id The ID of the guild to get.
+   * @returns Raw Discord guild information with deployment information.
+   */
   getGuildInfo = async (id: numstr): Promise<TpyTup<Guild.GET.Guild>> =>
-    await this.httpRaw<Guild.GET.Guild>(`/guilds/${id}`, 'GET');
+    await this.httpRaw<Guild.GET.Guild>(`/guilds/${id}`);
 
+  /**
+   * @param id The ID of the guild to get.
+   * @returns Guild computational statistics.
+   */
   getGuildStats = async (id: numstr): Promise<TpyTup<Guild.GET.Stats>> =>
-    await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`, 'GET');
+    await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`);
 
+  /**
+   * @returns All guilds a user can edit with Pylon. More specifically, all guilds which the user has `manage server` or `administrator` permissions in.
+   */
   getEditableGuilds = async (): Promise<TpyTup<User.GET.Guilds.Guilds>> =>
-    await this.httpRaw<User.GET.Guilds.Guilds>(`/guilds`, 'GET');
+    await this.httpRaw<User.GET.Guilds.Guilds>(`/guilds`);
 
+  getDeployment = async (
+    id: numstr,
+  ): Promise<TpyTup<Deployment.GET.Deployments>> =>
+    await this.httpRaw<Deployment.GET.Deployments>(`/deployments/${id}`);
+
+  /**
+   * Makes a POST request to publish a deployment.
+   *
+   * @param id The ID of the guild publish to.
+   * @param body Project specifications.
+   * @returns Information of the deployment.
+   */
   publishDeployment = async (
     id: numstr,
     body: Deployment.POST.Request<false>,
@@ -54,6 +90,13 @@ export default class Tpy {
     );
   };
 
+  /**
+   * A factory function for organizing HTTP headers.
+   *
+   * @param method HTTP Method.
+   * @param other Other fetch parameters.
+   * @returns Headers with specifics.
+   */
   headers(method: PylonVerbs, other?: RequestInit): RequestInit {
     return {
       method,
@@ -63,27 +106,61 @@ export default class Tpy {
   }
 
   /**
-   * Connects to the websocket with an optional resource.
+   * Connects to the Pylon workbench websocket with an optional resource.
    */
-  connectSocket(ws_ops?: ConstructorParameters<typeof WebSocket>): WebSocket {
-    return new WebSocket(
-      `${this.wss_url}${this.token}/${(ws_ops?.[0] || new String())}`,
-      ws_ops?.[1],
-    );
-  }
+  connectSocket = {
+    fromGuildId: async (
+      id: numstr,
+      ws_ops?: ConstructorParameters<typeof WebSocket>,
+    ): Promise<
+      TpyTup<WebSocket>
+    > => {
+      const [g_err, g] = await this.getGuildInfo(id);
+      if (g_err) {
+        return [g_err, undefined];
+      }
+
+      return await this.connectSocket.fromDeploymentId(
+        g.deployments.id,
+        ws_ops,
+      );
+    },
+
+    fromDeploymentId: async (
+      id: numstr,
+      ws_ops?: ConstructorParameters<typeof WebSocket>,
+    ): Promise<
+      TpyTup<WebSocket>
+    > => {
+      const [d_err, d] = await this.getDeployment(id);
+      if (d_err) {
+        return [d_err, undefined];
+      }
+
+      return [
+        TpyErr.NO_ERR,
+        new WebSocket(
+          `${d.workbench_url}/${(ws_ops?.[0] || new String())}`,
+          ws_ops?.[1],
+        ),
+      ];
+    },
+  };
 
   /**
-   * Makes a request to the API with additional error handling.
+   * Makes a request to the API.
    *
    * @param resource The resource to request that will be concatenated with the api url.
    * @param method HTTP method to use. Currently, the Pylon API only uses GET and POST.
+   * @param other Other fetch parameters.
+   * @returns Type TpyTup. A tuple of the error type and the response. If the error is `NO_ERR`, the response will returned as expected ([TpyErr.NO_ERR, T]), otherwise the response will be the error type and undefined ([Exclude<TpyErr.NO_ERR>, undefined]).
    */
   httpRaw = async <T extends MaybeArr<Record<string, unknown>>>(
     resource: `/${string}`,
     method: PylonVerbs = 'GET',
     other?: RequestInit,
   ): Promise<
-    [TpyErr.NO_ERR, T] | [Exclude<TpyErr, TpyErr.NO_ERR>, undefined]
+    TpyTup<T>
   > => {
     const rawres = await fetch(
       this.api_url + resource,
@@ -129,6 +206,8 @@ export default class Tpy {
           break;
         }
 
+        // Happens when no authentication header is provided
+
         case HttpStatusCode.UNAUTHORIZED: {
           data = [TpyErr.UNAUTHORIZED, undefined];
           break;
@@ -152,6 +231,11 @@ export default class Tpy {
 
         case HttpStatusCode.NOT_FOUND: {
           data = [TpyErr.RESOURCE_NOT_FOUND, undefined];
+          break;
+        }
+
+        case HttpStatusCode.INTERNAL_SERVER_ERROR: {
+          data = [TpyErr.UNAUTHORIZED, undefined];
           break;
         }
       }

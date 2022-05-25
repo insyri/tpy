@@ -11,6 +11,10 @@ export type TpyErrAsStrings =
   | 'Deployment not found'
   | 'Not of type TpyErr';
 
+/**
+ * @param err The error to convert to a string.
+ * @returns An english version of the error.
+ */
 export default function TpyErrToString(
   err: TpyErr,
 ): TpyErrAsStrings {

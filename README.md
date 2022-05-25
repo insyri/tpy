@@ -1,4 +1,4 @@
-<img align="right" width="150" src=".github/assets/pylon-dicon.png">
+<img align="right" width="150" src=".github/assets/pylon.svg">
 
 # tpy
 
@@ -23,7 +23,7 @@ npm install tpy
 <!-- DO NOT EDIT, edit in ./_readme.ts -->
 
 ```ts
-import Tpy, { TpyErrToString } from 'https://deno.land/x/tpy@v0.1.1/mod.ts';
+import Tpy, { TpyErrToString } from 'https://deno.land/x/tpy@v0.1.2/mod.ts';
 // Or use Node
 // import Tpy, { TpyErrToString } from 'tpy';
 
@@ -49,6 +49,6 @@ you'd like to contribute, please read the
 
 ## Legal
 
-Pylon is a copyright (c) of Uplol Inc. All rights reserved to Uplol.
+Pylon is a copyright (c) of Uplol Inc., all rights reserved to Uplol.
 
 Tpy is licensed under the MIT License.

@@ -7,5 +7,9 @@ export type TpyTup<T> = [TpyErr.NO_ERR, T] | [
   Exclude<TpyErr, TpyErr.NO_ERR>,
   undefined,
 ];
-export type TpyDefaultMsg = { tpy: string };
 export type MaybeArr<T> = T | T[];
+export type RequireAtLeastOne<T> = {
+  [K in keyof T]-?:
+    & Required<Pick<T, K>>
+    & Partial<Pick<T, Exclude<keyof T, K>>>;
+}[keyof T];

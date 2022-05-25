@@ -38,14 +38,16 @@ declare namespace Guild {
      *
      * Returns some guild info (everything Discord API normally gives you) as well as a list of deployments.
      */
-    export type Guild = RESTPostAPIGuildsJSONBody & {
-      deployments: Deployments.Structures.Base & {
-        last_updated_at: null;
-        config: Deployments.Structures.Config;
-        disabled: boolean;
+    export type Guild<Raw extends boolean = true> =
+      & RESTPostAPIGuildsJSONBody
+      & {
+        deployments: Deployments.Structures.Base & {
+          last_updated_at: null;
+          config: Raw extends true ? string : Deployments.Structures.Config;
+          disabled: boolean;
+        };
+        reigon: `deprecated`;
       };
-      reigon: `deprecated`;
-    };
 
     /**
      * `GET /guilds/:id/stats`

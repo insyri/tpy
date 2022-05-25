@@ -124,7 +124,7 @@ declare namespace Deployments {
        */
       config: string;
       /**
-       * Pylon Workbench WebSocket URL. Includes the logged in user's authentication token for Pylon.
+       * Pylon Workbench WebSocket URL. Includes a portion the logged in user's authentication token for Pylon.
        */
       workbench_url: `wss://workbench.pylon.bot/ws/${string}`;
       /**

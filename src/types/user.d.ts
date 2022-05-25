@@ -56,8 +56,7 @@ declare namespace User {
       /**
        * `GET /user/guilds/available`
        *
-       * Returns all guilds a user can edit with Pylon.
-       * More specifically, all guilds which the user has `manage server` or `administrator` permissions in.
+       * Returns all guilds a user is in.
        */
       export type Available = Array<
         Guild.Structures.Payload & {
