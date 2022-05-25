@@ -23,7 +23,7 @@ npm install tpy
 <!-- DO NOT EDIT, edit in ./_readme.ts -->
 
 ```ts
-import Tpy from 'https://deno.land/x/tpy@v0.1.1/mod.ts';
+import Tpy, { TpyErrToString } from 'https://deno.land/x/tpy@v0.1.1/mod.ts';
 // Or use Node
 // import Tpy from 'tpy';
 
