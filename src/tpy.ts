@@ -84,14 +84,21 @@ export default class Tpy {
   publishDeployment = async (
     id: numstr,
     body: Deployment.POST.Request<false>,
-  ): Promise<TpyTup<Deployment.POST.Response>> => {
-    return await this.httpRaw<Deployment.POST.Response>(
+  ): Promise<TpyTup<Deployment.POST.Response<false>>> => {
+    const [err, d] = await this.httpRaw<Deployment.POST.Response>(
       `/deployments/${id}`,
       'POST',
       {
         body: JSON.stringify(body),
       },
     );
+
+    if (err) {
+      return [err, undefined];
+    }
+
+    d.script.projects.files = JSON.parse(d.script.projects.files);
+    return [TpyErr.NO_ERR, d as unknown as Deployment.POST.Response<false>];
   };
 
   /**
@@ -157,7 +164,7 @@ export default class Tpy {
    * @param resource The resource to request that will be concatenated with the api url.
    * @param method HTTP method to use. Currently, the Pylon API only uses GET and POST.
    * @param other Other fetch parameters.
-   * @returns Type TpyTup. A tuple of the error type and the response. If the error is `NO_ERR`, the response will returned as expected ([TpyErr.NO_ERR, T]), otherwise the response will be the error type and undefined ([Exclude<TpyErr.NO_ERR>, undefined]).
+   * @returns {TpyErr}
    */
   httpRaw = async <T extends MaybeArr<Record<string, unknown>>>(
     resource: `/${string}`,
