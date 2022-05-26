@@ -28,7 +28,13 @@ declare namespace User {
        * UUID without hyphens.
        */
       avatar: string | null;
+      /**
+       * Logged in user's Discord username
+       */
       displayName: string;
+      /**
+       * Undocumented.
+       */
       hasAccess: boolean;
     };
 

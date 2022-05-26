@@ -118,11 +118,8 @@ declare namespace Deployments {
      *
      * Returns deployment information via ID.
      */
-    export type Deployments = Structures.Base & {
-      /**
-       * Stringified `Deployments.Structures.Config` object.
-       */
-      config: string;
+    export type Deployments<Raw extends boolean = true> = Structures.Base & {
+      config: Raw extends true ? string : Structures.Config;
       /**
        * Pylon Workbench WebSocket URL. Includes a portion the logged in user's authentication token for Pylon.
        */
@@ -141,9 +138,6 @@ declare namespace Deployments {
     export type Request<Raw extends boolean = true> = {
       contents: string;
       projects: {
-        /**
-         * Stringified `Deployments.Structures.File[]` object.
-         */
         files: Raw extends true ? string : Structures.DeploymentFiles[];
       };
     };
@@ -155,9 +149,6 @@ declare namespace Deployments {
         script: {
           id: numstr;
           projects: {
-            /**
-             * Stringified `Deployments.Structures.File[]` object.
-             */
             files: Raw extends true ? string : Structures.DeploymentFiles[];
           };
         };
