@@ -5,7 +5,7 @@ export type TpyErrAsStrings =
   | 'Unidentifiable error'
   | 'Unauthorized'
   | 'Resource not found'
-  | 'Missing JSON body'
+  | 'Missing or invalid JSON body'
   | 'Method not allowed'
   | 'Guild not found'
   | 'Deployment not found'
@@ -28,7 +28,7 @@ export default function TpyErrToString(
     case TpyErr.RESOURCE_NOT_FOUND:
       return 'Resource not found';
     case TpyErr.MISSING_JSON_BODY:
-      return 'Missing JSON body';
+      return 'Missing or invalid JSON body';
     case TpyErr.METHOD_NOT_ALLOWED:
       return 'Method not allowed';
     case TpyErr.GUILD_NOT_FOUND:
