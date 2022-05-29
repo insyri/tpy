@@ -13,5 +13,5 @@ if (err) {
   // deno-fmt-ignore
   // throw `There was an error while fetching the user: ${TpyErrToString(err)}.`; // REPLACE
   console.log(`There was an error while fetching the user: ${TpyErrToString(err)}.`);
-  // user is now !undefined.
+  // user is now for sure our expected type, so we can safely access it.
 } else console.log(`User logged in: ${user.displayName}`);
