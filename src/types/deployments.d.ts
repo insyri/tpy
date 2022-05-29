@@ -54,7 +54,7 @@ declare namespace Deployments {
 
     export type Base = {
       /**
-       * Deployment ID.
+       * Deployment and script ID.
        */
       id: numstr;
       /**
@@ -88,11 +88,8 @@ declare namespace Deployments {
      * @param Extension Default `"ts"`, can override via generic string.
      */
     export type File<Extension extends string = 'ts'> =
-      `./${string}.${Extension}`;
+      `/${string}.${Extension}`;
 
-    /**
-     * The Pylon API returns this in a stringified form.
-     */
     export type DeploymentFiles = {
       path: File;
       /**
@@ -106,6 +103,25 @@ declare namespace Deployments {
      */
     export type Missing = {
       msg: 'missing json body';
+    };
+
+    /**
+     * Pylon uses FastAPI, this is a FastAPI error.
+     */
+    export type Error = {
+      type: string;
+      errors: Array<{
+        /**
+         * Array that incrementally traverses the keys of the given object to the source of the error.
+         * @example ['nested_top', 'nested_second', 'nested_third'];
+         */
+        loc: string[];
+        /**
+         * Error message in english.
+         */
+        msg: string;
+        type: `${string}.${string}`;
+      }>;
     };
   }
 
@@ -136,23 +152,41 @@ declare namespace Deployments {
    */
   export namespace POST {
     export type Request<Raw extends boolean = true> = {
-      contents: string;
-      projects: {
-        files: Raw extends true ? string : Structures.DeploymentFiles[];
+      script: {
+        /**
+         * Compiled script code in JavaScript.
+         */
+        contents: string;
+        project: {
+          /**
+           * File contents in displayable format.
+           */
+          files: Raw extends true ? string : Structures.DeploymentFiles[];
+        };
       };
     };
 
-    export type Response<Raw extends boolean = true> =
+    export type Response<Raw extends boolean = true> = (
       & Deployments.GET.Deployments
       & {
-        errors: unknown[];
-        script: {
+        /**
+         * Fast API error.
+         */
+        errors: [
+          {
+            loc: string[];
+            msg: string;
+            type: string;
+          },
+        ];
+        script?: {
           id: numstr;
           projects: {
             files: Raw extends true ? string : Structures.DeploymentFiles[];
           };
         };
-      };
+      }
+    );
   }
 }
 

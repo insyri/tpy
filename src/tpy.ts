@@ -74,79 +74,102 @@ export default class Tpy {
   ): Promise<TpyTup<Deployment.GET.Deployments>> =>
     await this.httpRaw<Deployment.GET.Deployments>(`/deployments/${id}`);
 
-  /**
-   * Makes a POST request to publish a deployment.
-   *
-   * @param id The ID of the guild publish to.
-   * @param body Project specifications.
-   * @returns Information of the deployment.
-   */
-  publishDeployment = async (
-    id: numstr,
-    body: Deployment.POST.Request<false>,
-  ): Promise<TpyTup<Deployment.POST.Response<false>>> => {
-    const [err, d] = await this.httpRaw<Deployment.POST.Response>(
-      `/deployments/${id}`,
-      'POST',
-      {
-        body: JSON.stringify(body),
-      },
-    );
+  publishDeployment = {
+    /**
+     * Makes a POST request to publish a deployment.
+     *
+     * @param id The script/deployment ID to publish to.
+     * @param body Project specifications.
+     * @returns Information of the deployment.
+     */
+    fromDeploymentID: async (
+      id: numstr,
+      body: Deployment.POST.Request<false>,
+    ): Promise<TpyTup<Deployment.POST.Response<false>>> => {
+      const [err, d] = await this.httpRaw<Deployment.POST.Response>(
+        `/deployments/${id}`,
+        'POST',
+        {
+          body: JSON.stringify(body),
+        },
+      );
 
-    if (err) {
-      return [err, undefined];
-    }
+      if (err) return [err, d as unknown];
 
-    d.script.projects.files = JSON.parse(d.script.projects.files);
-    return [TpyErr.NO_ERR, d as unknown as Deployment.POST.Response<false>];
+      // (d as Omit<typeof d, 'type'>).script.projects.files = JSON.parse(d.script.projects.files);
+      return [
+        TpyErr.NO_ERR,
+        d as unknown as Deployment.POST.Response<false>,
+      ];
+    },
+
+    fromGuildID: async (
+      id: numstr,
+      body: Deployment.POST.Request<false>,
+    ): Promise<TpyTup<Deployment.POST.Response<false>>> => {
+      const [err, g] = await this.getGuildInfo(id);
+      if (err) return [err, g as unknown];
+      return await this.publishDeployment.fromDeploymentID(
+        g.deployments.id,
+        body,
+      );
+    },
   };
 
   /**
-   * A factory function for organizing HTTP headers.
+   * A factory function for organizing HTTP request objects, preset for authorization.
    *
    * @param method HTTP Method.
    * @param other Other fetch parameters.
    * @returns Headers with specifics.
    */
-  headers(method: PylonVerbs, other?: RequestInit): RequestInit {
+  readyRequest(method: PylonVerbs, other?: RequestInit): RequestInit {
     return {
       method,
-      headers: { Authorization: this.token },
+      headers: {
+        Authorization: this.token,
+        'Content-Type': 'application/json',
+      },
       other,
     } as RequestInit;
   }
 
   /**
-   * Connects to the Pylon workbench websocket with an optional resource.
+   * Connects to the Pylon workbench websocket.
    */
   connectSocket = {
-    fromGuildId: async (
+    /**
+     * @param id Guild ID.
+     * @param ws_ops Websocket config options.
+     */
+    fromGuildID: async (
       id: numstr,
       ws_ops?: ConstructorParameters<typeof WebSocket>,
     ): Promise<
       TpyTup<WebSocket>
     > => {
       const [g_err, g] = await this.getGuildInfo(id);
-      if (g_err) {
-        return [g_err, undefined];
-      }
+      if (g_err) return [g_err, g as unknown];
 
-      return await this.connectSocket.fromDeploymentId(
+      return await this.connectSocket.fromDeploymentID(
         g.deployments.id,
         ws_ops,
       );
     },
 
-    fromDeploymentId: async (
+    /**
+     * @param id Deployment ID.
+     * @param ws_ops Websocket config options.
+     * @returns
+     */
+    fromDeploymentID: async (
       id: numstr,
       ws_ops?: ConstructorParameters<typeof WebSocket>,
     ): Promise<
       TpyTup<WebSocket>
     > => {
       const [d_err, d] = await this.getDeployment(id);
-      if (d_err) {
-        return [d_err, undefined];
-      }
+      if (d_err) return [d_err, d as unknown];
 
       return [
         TpyErr.NO_ERR,
@@ -175,7 +198,7 @@ export default class Tpy {
   > => {
     const rawres = await fetch(
       this.api_url + resource,
-      this.headers(method, other),
+      this.readyRequest(method, other),
     );
 
     let res: MaybeArr<Record<string, unknown>> | string = await rawres.text();
@@ -193,21 +216,16 @@ export default class Tpy {
 
     if (typeof res === 'string') {
       // deno-fmt-ignore
-      if (res.startsWith('\u26A0\uFE0F')) return stringresponse = [TpyErr.RESOURCE_NOT_FOUND, undefined];
+      if (res.startsWith('\u26A0\uFE0F')) return stringresponse = [TpyErr.RESOURCE_NOT_FOUND, res];
       // deno-fmt-ignore
-      if (res === "could not find deployment") return stringresponse = [TpyErr.DEPLOYMENT_NOT_FOUND, undefined];
+      if (res === "could not find deployment") return stringresponse = [TpyErr.DEPLOYMENT_NOT_FOUND, res];
       // deno-fmt-ignore
-      if (res === "could not find guild") return stringresponse = [TpyErr.GUILD_NOT_FOUND, undefined];
+      if (res === "could not find guild") return stringresponse = [TpyErr.GUILD_NOT_FOUND, res];
     }
 
     if (stringresponse != null) return stringresponse;
 
-    let data:
-      | [TpyErr.NO_ERR, T]
-      | [Exclude<TpyErr, TpyErr.NO_ERR>, undefined] = [
-        TpyErr.UNIDENTIFIABLE,
-        undefined,
-      ];
+    let data: TpyTup<T> = [TpyErr.UNIDENTIFIABLE, res];
 
     // typeof [] === 'object' -> true
     if (typeof res === 'object') {
@@ -220,12 +238,12 @@ export default class Tpy {
         // Happens when no authentication header is provided
 
         case HttpStatusCode.UNAUTHORIZED: {
-          data = [TpyErr.UNAUTHORIZED, undefined];
+          data = [TpyErr.UNAUTHORIZED, res as unknown];
           break;
         }
 
         case HttpStatusCode.METHOD_NOT_ALLOWED: {
-          data = [TpyErr.METHOD_NOT_ALLOWED, undefined];
+          data = [TpyErr.METHOD_NOT_ALLOWED, res as unknown];
           break;
         }
 
@@ -233,20 +251,20 @@ export default class Tpy {
 
         case HttpStatusCode.BAD_REQUEST: {
           if ('msg' in res && res['msg'] === 'missing json body')
-            data = [TpyErr.MISSING_JSON_BODY, undefined];
+            data = [TpyErr.MISSING_JSON_BODY, res as unknown];
 
           if ('message' in res && res['message'] === 'not authorized')
-            data = [TpyErr.UNAUTHORIZED, undefined];
+            data = [TpyErr.UNAUTHORIZED, res as unknown];
           break;
         }
 
         case HttpStatusCode.NOT_FOUND: {
-          data = [TpyErr.RESOURCE_NOT_FOUND, undefined];
+          data = [TpyErr.RESOURCE_NOT_FOUND, res as unknown];
           break;
         }
 
         case HttpStatusCode.INTERNAL_SERVER_ERROR: {
-          data = [TpyErr.UNAUTHORIZED, undefined];
+          data = [TpyErr.UNAUTHORIZED, res as unknown];
           break;
         }
       }
