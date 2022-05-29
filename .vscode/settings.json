@@ -13,6 +13,7 @@
     "./mod.ts",
     "./_npm.ts",
     "./_readme.ts",
+    "./_playground.ts",
     "./_readme.verify.ts"
   ]
 }

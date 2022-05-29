@@ -1,4 +1,5 @@
 # Local testing
 .env*
+_playground.ts
 
 npm
