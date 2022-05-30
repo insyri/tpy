@@ -36,7 +36,7 @@ declare namespace Guild {
     /**
      * `GET /guilds/:id`
      *
-     * Returns some guild info (everything Discord API normally gives you) as well as a list of deployments.
+     * Returns some guild info (everything the v8 Discord API normally gives you) as well as a list of deployments.
      */
     export type Guild<Raw extends boolean = true> =
       & RESTPostAPIGuildsJSONBody
@@ -47,6 +47,10 @@ declare namespace Guild {
           disabled: boolean;
         };
         reigon: `deprecated`;
+        /**
+         * Undocumented.
+         */
+        unavailable: boolean;
       };
 
     /**
