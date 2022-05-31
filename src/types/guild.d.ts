@@ -2,8 +2,6 @@ import { RESTPostAPIGuildsJSONBody } from 'https://deno.land/x/discord_api_types
 import { numstr } from '../utils.ts';
 import Deployments from './deployments.d.ts';
 
-// TODO: specify Guild.GET.Info["deployments"]["last_updated_at"] type.
-
 /**
  * `/guilds`
  *
@@ -42,6 +40,9 @@ declare namespace Guild {
       & RESTPostAPIGuildsJSONBody
       & {
         deployments: Deployments.Structures.Base & {
+          /**
+           * Unused as of 5/31/2022.
+           */
           last_updated_at: null;
           config: Raw extends true ? string : Deployments.Structures.Config;
           disabled: boolean;
@@ -57,30 +58,46 @@ declare namespace Guild {
      * `GET /guilds/:id/stats`
      *
      * Return some statistics of a script container. Some values are undefined when information is not available.
-     *
-     * Undocumented.
      */
     export type Stats = Array<{
+      /**
+       * Date (Unix timestamp) of when statistics were captured.
+       */
       date: number;
       /**
-       * undefined if no information
+       * Milliseconds of used cpu time.
        */
       cpuMs?: number;
+      /**
+       * Milliseconds of script execution time.
+       */
       executionMs?: number;
+      /**
+       * Function calls across all scripts.
+       */
       hostFunctionCalls?: number;
+      /**
+       * Discord API caches across all scripts.
+       */
       discordCacheRequests?: number;
+      /**
+       * Discord API requests across all scripts.
+       */
       discordApiRequests?: number;
+      /**
+       * Events followed across all scripts.
+       */
       events?: number;
       /**
-       * Float
+       * Calculated average of cpuMs.
        */
       cpuMsAvg?: number;
       /**
-       * Float
+       * Calculated average of executionMs.
        */
       executionMsAvg?: number;
       /**
-       * Float
+       * Total KV store requests across all scripts.
        */
       kvOperations?: number;
     }>;

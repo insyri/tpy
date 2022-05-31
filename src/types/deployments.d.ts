@@ -1,6 +1,6 @@
 import { GatewayDispatchEvents } from 'https://deno.land/x/discord_api_types@0.33.0/gateway/v8.ts';
 import Guild from './guild.d.ts';
-import { numstr } from '../utils.ts';
+import { bigintstrWithDefault, numstr } from '../utils.ts';
 
 // TODO: Find pylon's cron specification and document it Deployments.Structures.CronTask.
 
@@ -15,16 +15,44 @@ declare namespace Deployments {
    */
   export namespace Structures {
     /**
+     * The type of deployment.
+     */
+    export enum DeploymentType {
+      /**
+       * @default
+       */
+      SCRIPT,
+      APP,
+    }
+
+    /**
+     * A deployment's 'up' status.
+     */
+    export enum DeploymentStatus {
+      /**
+       * Can only be disabled by the Pylon admins.
+       */
+      DISABLED,
+      /**
+       * @default
+       */
+      ENABLED,
+    }
+
+    /**
      * Deployment configurations. Recieved stringified.
      */
     export type Config = {
+      /**
+       * This is only false if a deployment is disabled if a Pylon admin disabled it.
+       */
       enabled: boolean;
       /**
        * Script specific discord gateway events it listens to.
        */
       events: GatewayDispatchEvents[];
       /**
-       * Undocumented.
+       * Cron tasks.
        */
       tasks: {
         cronTasks: CronTask[];
@@ -58,25 +86,24 @@ declare namespace Deployments {
        */
       id: numstr;
       /**
-       * Undocumented.
+       * Bot ID the script exists for. Used in BYOB.
        */
-      bot_id: numstr;
+      bot_id: bigintstrWithDefault<270148059269300224n>;
       /**
-       * Undocumented.
+       * Unused as of 5/31/2022.
        */
-      type: number;
+      type: DeploymentType;
       /**
-       * Undocumented.
+       * Unused as of 5/31/2022.
        */
       app_id: numstr | null;
       /**
-       * Undocumented.
+       * Unused as of 5/31/2022.
+       *
+       * Name of the script/app.
        */
       name: string;
-      /**
-       * Undocumented.
-       */
-      status: number;
+      status: DeploymentStatus;
       /**
        * Script revision number. Increments every time a script is published.
        */
