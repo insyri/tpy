@@ -135,7 +135,7 @@ declare namespace Deployments {
     /**
      * Pylon uses FastAPI, this is a FastAPI error.
      */
-    export type Error = {
+    export type FastAPIError = {
       type: string;
       errors: Array<{
         /**
@@ -147,7 +147,7 @@ declare namespace Deployments {
          * Error message in english.
          */
         msg: string;
-        type: `${string}.${string}`;
+        type: string;
       }>;
     };
   }
@@ -199,16 +199,10 @@ declare namespace Deployments {
         /**
          * Fast API error.
          */
-        errors: [
-          {
-            loc: string[];
-            msg: string;
-            type: string;
-          },
-        ];
+        errors: Deployments.Structures.FastAPIError;
         script?: {
           id: numstr;
-          projects: {
+          project: {
             files: Raw extends true ? string : Structures.DeploymentFiles[];
           };
         };

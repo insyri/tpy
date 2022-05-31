@@ -40,14 +40,16 @@ declare namespace Guild {
     export type Guild<Raw extends boolean = true> =
       & RESTPostAPIGuildsJSONBody
       & {
-        deployments: Deployments.Structures.Base & {
-          /**
-           * Unused as of 5/31/2022.
-           */
-          last_updated_at: null;
-          config: Raw extends true ? string : Deployments.Structures.Config;
-          disabled: boolean;
-        };
+        deployments: Array<
+          Deployments.Structures.Base & {
+            /**
+             * Unused as of 5/31/2022.
+             */
+            last_updated_at: null;
+            config: Raw extends true ? string : Deployments.Structures.Config;
+            disabled: boolean;
+          }
+        >;
         reigon: `deprecated`;
         unavailable: APIUnavailableGuild['unavailable'];
       };

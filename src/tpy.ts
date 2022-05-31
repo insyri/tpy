@@ -117,7 +117,7 @@ export default class Tpy {
       const [err, g] = await this.getGuildInfo(id);
       if (err) return [err, g as unknown];
       return await this.publishDeployment.fromDeploymentID(
-        g.deployments.id,
+        g.deployments[0].id,
         body,
       );
     },
@@ -162,7 +162,7 @@ export default class Tpy {
       if (g_err) return [g_err, g as unknown];
 
       return await this.connectSocket.fromDeploymentID(
-        g.deployments.id,
+        g.deployments[0].id,
         ws_ops,
       );
     },
