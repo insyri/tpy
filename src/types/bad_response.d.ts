@@ -36,22 +36,6 @@ declare namespace BadResponse {
     msg: 'missing json body';
   };
 
-  // found this when doing /user/guilds/available/{input} or
-  // found this when doing /user/guilds/{input}
-  // found this when doing /user/{input}
-  // found this when doing /n (nonexistent)
-  export type ResourceNotFound = ErrorMessageBase & {
-    description: 'Not Found';
-    status: 404;
-    message: `Requested URL /${string} not found`;
-  };
-
-  export type MethodNotAllowed = ErrorMessageBase & {
-    description: 'Method Not Allowed';
-    status: 405;
-    message: `Method ${string} not allowed for URL /${string}`;
-  };
-
   export type BadStringResponses =
     | OldResourceNotFound
     | LostGuild

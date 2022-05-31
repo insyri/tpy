@@ -2,8 +2,6 @@ import { GatewayDispatchEvents } from 'https://deno.land/x/discord_api_types@0.3
 import Guild from './guild.d.ts';
 import { bigintstrWithDefault, numstr } from '../utils.ts';
 
-// TODO: Find pylon's cron specification and document it Deployments.Structures.CronTask.
-
 /**
  * `/deployments`
  *
@@ -26,14 +24,16 @@ declare namespace Deployments {
     }
 
     /**
-     * A deployment's 'up' status.
+     * A deployment's 'up' status. Altered by Pylon administrators.
      */
     export enum DeploymentStatus {
       /**
-       * Can only be disabled by the Pylon admins.
+       * Deployment is disabled, it doesn't run and is not active.
        */
       DISABLED,
       /**
+       * Deployment is enabled, it runs and is active.
+       *
        * @default
        */
       ENABLED,
