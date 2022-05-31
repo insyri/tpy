@@ -96,7 +96,6 @@ export default class Tpy {
 
       if (err) return [err, d as unknown];
 
-      // (d as Omit<typeof d, 'type'>).script.projects.files = JSON.parse(d.script.projects.files);
       return [
         TpyErr.NO_ERR,
         d as unknown as Deployment.POST.Response<false>,
@@ -130,7 +129,7 @@ export default class Tpy {
         Authorization: this.token,
         'Content-Type': 'application/json',
       },
-      other,
+      ...other,
     } as RequestInit;
   }
 
@@ -192,7 +191,7 @@ export default class Tpy {
   httpRaw = async <T extends MaybeArr<Record<string, unknown>>>(
     resource: `/${string}`,
     method: PylonVerbs = 'GET',
-    other?: RequestInit,
+    other: RequestInit = {},
   ): Promise<
     TpyTup<T>
   > => {
