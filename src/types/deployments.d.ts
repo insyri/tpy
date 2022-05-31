@@ -20,7 +20,7 @@ declare namespace Deployments {
     export type Config = {
       enabled: boolean;
       /**
-       * Undocumented.
+       * Script specific discord gateway events it listens to.
        */
       events: GatewayDispatchEvents[];
       /**
