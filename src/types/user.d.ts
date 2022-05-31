@@ -33,7 +33,7 @@ declare namespace User {
        */
       displayName: string;
       /**
-       * Undocumented.
+       * If user can use Pylon; if user is in the Pylon discord.
        */
       hasAccess: boolean;
     };
