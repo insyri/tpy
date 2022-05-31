@@ -21,6 +21,8 @@ export default class Tpy {
 
   /**
    * @param token The token to use for the API
+   *
+   * @returns A new Tpy instance.
    */
   constructor(token: string) {
     if (!token) throw new Error('Token is required');
@@ -35,6 +37,7 @@ export default class Tpy {
 
   /**
    * Response can be slow since this endpoint makes a Discord API call.
+   *
    * @returns All guilds a user is in.
    */
   getAvailableGuilds = async (): Promise<
@@ -47,6 +50,7 @@ export default class Tpy {
 
   /**
    * @param id The ID of the guild to get.
+   *
    * @returns Raw Discord guild information with deployment information.
    */
   getGuildInfo = async (id: numstr): Promise<TpyTup<Guild.GET.Guild>> =>
@@ -54,6 +58,7 @@ export default class Tpy {
 
   /**
    * @param id The ID of the guild to get.
+   *
    * @returns Guild computational statistics.
    */
   getGuildStats = async (id: numstr): Promise<TpyTup<Guild.GET.Stats>> =>
@@ -67,6 +72,7 @@ export default class Tpy {
 
   /**
    * @param id The ID of the deployment to get.
+   *
    * @returns Deployment information.
    */
   getDeployment = async (
@@ -79,7 +85,9 @@ export default class Tpy {
      * Makes a POST request to publish a deployment.
      *
      * @param id The script/deployment ID to publish to.
+     *
      * @param body Project specifications.
+     *
      * @returns Information of the deployment.
      */
     fromDeploymentID: async (
@@ -119,7 +127,9 @@ export default class Tpy {
    * A factory function for organizing HTTP request objects, preset for authorization.
    *
    * @param method HTTP Method.
+   *
    * @param other Other fetch parameters.
+   *
    * @returns Headers with specifics.
    */
   readyRequest(method: PylonVerbs, other?: RequestInit): RequestInit {
@@ -139,6 +149,7 @@ export default class Tpy {
   connectSocket = {
     /**
      * @param id Guild ID.
+     *
      * @param ws_ops Websocket config options.
      */
     fromGuildID: async (
@@ -158,7 +169,9 @@ export default class Tpy {
 
     /**
      * @param id Deployment ID.
+     *
      * @param ws_ops Websocket config options.
+     *
      * @returns
      */
     fromDeploymentID: async (
@@ -184,9 +197,12 @@ export default class Tpy {
    * Makes a request to the API.
    *
    * @param resource The resource to request that will be concatenated with the api url.
+   *
    * @param method HTTP method to use. Currently, the Pylon API only uses GET and POST.
+   *
    * @param other Other fetch parameters.
-   * @returns {TpyErr}
+   *
+   * @returns {TpyErr} TpyErr
    */
   httpRaw = async <T extends MaybeArr<Record<string, unknown>>>(
     resource: `/${string}`,
