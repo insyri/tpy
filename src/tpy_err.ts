@@ -12,5 +12,10 @@ export enum TpyErr {
   METHOD_NOT_ALLOWED,
   GUILD_NOT_FOUND,
   DEPLOYMENT_NOT_FOUND,
+  /**
+   * Sometimes this happens when a request is made with the authentication header but it is invalid.
+   *
+   * @see TpyErr.UNAUTHORIZED
+   */
   INTERNAL_SERVER_ERROR,
 }

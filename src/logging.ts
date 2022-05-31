@@ -9,6 +9,7 @@ export type TpyErrAsStrings =
   | 'Method not allowed'
   | 'Guild not found'
   | 'Deployment not found'
+  | 'Internal server error'
   | 'Not of type TpyErr';
 
 /**
@@ -35,6 +36,8 @@ export default function TpyErrToString(
       return 'Guild not found';
     case TpyErr.DEPLOYMENT_NOT_FOUND:
       return 'Deployment not found';
+    case TpyErr.INTERNAL_SERVER_ERROR:
+      return 'Internal server error';
     default:
       return 'Not of type TpyErr';
   }
