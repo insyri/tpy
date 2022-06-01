@@ -21,7 +21,16 @@ deno task precommit
 
 4. Send in a pull request with a summarized explanation of your changes.
 
-### Node.js
+## Testing
+
+You can test your changes locally by creating a `_playground.ts` file and
+running the `pg` task to run the file.
+
+```bash
+deno task pg
+```
+
+## Node.js
 
 Tpy uses [`dnt`](https://deno.land/x/dnt) for transforming Deno projects to
 Node.js. By doing the following:
@@ -32,7 +41,7 @@ deno task dnt vx.x.x # Script requires bumped version
 
 Will generate an `npm` folder with contents formatted to ship on npm.
 
-### Notes
+## Notes
 
 When using the
 [Deno VSCode Extension](https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno),

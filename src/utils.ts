@@ -11,3 +11,4 @@ export type TpyTup<T> =
   | [TpyErr.NO_ERR, T]
   | [Exclude<TpyErr, TpyErr.NO_ERR>, unknown];
 export type MaybeArr<T> = T | T[];
+export type PylonWebSocketResponse = [{ data: string[]; method: string }];

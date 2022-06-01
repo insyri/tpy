@@ -80,6 +80,9 @@ export default class Tpy {
   ): Promise<TpyTup<Deployment.GET.Deployments>> =>
     await this.httpRaw<Deployment.GET.Deployments>(`/deployments/${id}`);
 
+  /**
+   * Publishes a deployment
+   */
   publishDeployment = {
     /**
      * Makes a POST request to publish a deployment.
@@ -144,17 +147,16 @@ export default class Tpy {
   }
 
   /**
-   * Connects to the Pylon workbench websocket.
+   * Connects to the Pylon workbench WebSocket.
    */
   connectSocket = {
     /**
      * @param id Guild ID.
      *
-     * @param ws_ops Websocket config options.
+     * @returns {WebSocket}
      */
     fromGuildID: async (
       id: numstr,
-      ws_ops?: ConstructorParameters<typeof WebSocket>,
     ): Promise<
       TpyTup<WebSocket>
     > => {
@@ -163,20 +165,16 @@ export default class Tpy {
 
       return await this.connectSocket.fromDeploymentID(
         g.deployments[0].id,
-        ws_ops,
       );
     },
 
     /**
      * @param id Deployment ID.
      *
-     * @param ws_ops Websocket config options.
-     *
      * @returns
      */
     fromDeploymentID: async (
       id: numstr,
-      ws_ops?: ConstructorParameters<typeof WebSocket>,
     ): Promise<
       TpyTup<WebSocket>
     > => {
@@ -186,8 +184,7 @@ export default class Tpy {
       return [
         TpyErr.NO_ERR,
         new WebSocket(
-          `${d.workbench_url}/${(ws_ops?.[0] || new String())}`,
-          ws_ops?.[1],
+          d.workbench_url,
         ),
       ];
     },
