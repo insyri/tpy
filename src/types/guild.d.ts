@@ -50,7 +50,7 @@ declare namespace Guild {
             disabled: boolean;
           }
         >;
-        reigon: `deprecated`;
+        region: `deprecated`;
         unavailable: APIUnavailableGuild['unavailable'];
       };
 
