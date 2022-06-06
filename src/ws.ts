@@ -5,27 +5,24 @@ import {
 
 export default class TpyWs {
   private w: WebSocket;
-  reconnectTimeout: number;
-  isDead = false;
+  private reconnectTimeout: number;
 
   constructor(wsUrl: string, reconnectTimeout: number = 0) {
     if (!wsUrl) throw 'Url is required';
     let ws: WebSocket | null = null;
     // deno-fmt-ignore
     try { ws = new WebSocket(wsUrl); }
-    catch { throw 'Invalid URL'; }
+    catch { throw 'Could not connect to WebSocket'; }
     this.w = ws;
-    this.connect();
-    this.w.onclose = (_) =>
-      this.isDead ? setTimeout(() => this.connect(), reconnectTimeout) : void 0;
     this.reconnectTimeout = reconnectTimeout;
   }
 
-  private connect = () => this.w.onopen = (_) => {};
-
-  private checkDeath() {
-    if (this.isDead) throw 'Cannot interact with Tpy WebSocket after close';
-  }
+  private reconnect = () => {
+    setTimeout(
+      () => /* I don't know what to add here. */ () => {},
+      this.reconnectTimeout,
+    );
+  };
 
   private surfacePylonResponse<T = unknown>(
     res: PylonWebSocketResponse,
@@ -33,26 +30,34 @@ export default class TpyWs {
     return { data: res[0].data as unknown as T[], method: res[0].method };
   }
 
-  onMessage = <T = unknown>(
+  onMessage<T = unknown>(
     fn: (msg: ParsedPylonWebSocketResponse<T[]>) => void,
-  ) => {
-    this.checkDeath();
+  ) {
     this.w.onmessage = (ev) =>
       fn(
         this.surfacePylonResponse(
           JSON.parse(ev.data) as PylonWebSocketResponse,
         ),
       );
-  };
+  }
 
-  onError = (fn: (ev: ErrorEvent) => void) =>
-    this.w.onerror = function (err) {
-      if (err instanceof ErrorEvent) fn(err);
+  onOpen(fn: (ev: Event) => void) {
+    this.w.onopen = (m) => fn(m);
+  }
+
+  onError(fn: (ev: ErrorEvent) => void) {
+    this.w.onerror = (err) => {
+      if (err instanceof ErrorEvent) {
+        if (err.message === 'IO error: unexpected end of file') {
+          this.reconnect();
+        } else {
+          fn(err);
+        }
+      }
     };
+  }
 
-  disconnect = () => {
-    this.checkDeath();
+  disconnect() {
     this.w.close();
-    this.isDead = true;
-  };
+  }
 }
