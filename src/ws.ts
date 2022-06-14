@@ -1,28 +1,46 @@
+import TpyErrToString from './logging.ts';
+import Tpy from './tpy.ts';
 import {
+  numstr,
   ParsedPylonWebSocketResponse,
   PylonWebSocketResponse,
 } from './utils.ts';
 
 export default class TpyWs {
-  private w: WebSocket;
-  private reconnectTimeout: number;
+  private w: WebSocket | null = null;
+  private tpyClient: Tpy;
+  private deploymentID: numstr;
 
-  constructor(wsUrl: string, reconnectTimeout: number = 0) {
-    if (!wsUrl) throw 'Url is required';
-    let ws: WebSocket | null = null;
-    // deno-fmt-ignore
-    try { ws = new WebSocket(wsUrl); }
-    catch { throw 'Could not connect to WebSocket'; }
-    this.w = ws;
-    this.reconnectTimeout = reconnectTimeout;
+  constructor(
+    tpyInstance: Tpy,
+    deploymentID: numstr,
+  ) {
+    if (!tpyInstance || !(tpyInstance instanceof Tpy)) {
+      throw new Error('A Tpy instance is required');
+    }
+    this.tpyClient = tpyInstance;
+    if (!deploymentID) throw 'DeploymentID is required';
+    this.deploymentID = deploymentID;
+    // let ws: WebSocket | null = null;
+    // // deno-fmt-ignore
+    // try { ws = new WebSocket(wsUrl); }
+    //   catch { throw 'Could not connect to WebSocket'; }
+    // this.w = ws;
+    // this.w.addEventListener('close', () => {
+    //   this.w = new WebSocket(wsUrl);
+    // });
   }
 
-  private reconnect = () => {
-    setTimeout(
-      () => /* I don't know what to add here. */ () => {},
-      this.reconnectTimeout,
+  async init() {
+    console.log('init');
+    const [err, deployment] = await this.tpyClient.getDeployment(
+      this.deploymentID,
     );
-  };
+    if (err) throw `err: ${TpyErrToString(err)}`;
+    const w = new WebSocket(deployment.workbench_url);
+    this.w = w;
+    this.w.addEventListener('close', async () => await this.init());
+  }
 
   private surfacePylonResponse<T = unknown>(
     res: PylonWebSocketResponse,
@@ -33,6 +51,11 @@ export default class TpyWs {
   onMessage<T = unknown>(
     fn: (msg: ParsedPylonWebSocketResponse<T[]>) => void,
   ) {
+    if (!this.w) {
+      throw 'WebSocket not created, please use the init() method first.';
+    }
+    // let w = new Proxy({}, this.w.url)
+
     this.w.onmessage = (ev) =>
       fn(
         this.surfacePylonResponse(
@@ -41,23 +64,21 @@ export default class TpyWs {
       );
   }
 
-  onOpen(fn: (ev: Event) => void) {
-    this.w.onopen = (m) => fn(m);
-  }
+  onError(fn: (ev: Event | ErrorEvent) => void) {
+    if (!this.w) {
+      throw 'WebSocket not created, please use the init() method first.';
+    }
+    this.w.addEventListener('close', () => this.onError(fn));
 
-  onError(fn: (ev: ErrorEvent) => void) {
-    this.w.onerror = (err) => {
-      if (err instanceof ErrorEvent) {
-        if (err.message === 'IO error: unexpected end of file') {
-          this.reconnect();
-        } else {
-          fn(err);
-        }
-      }
-    };
+    this.w.onerror = (err) => fn(err);
   }
 
   disconnect() {
+    if (!this.w) {
+      throw 'WebSocket not created, please use the init() method first.';
+    }
+
     this.w.close();
+    this.w = null;
   }
 }
