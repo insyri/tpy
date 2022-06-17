@@ -8,6 +8,7 @@ import {
 
 export default class TpyWs {
   private w: WebSocket | null = null;
+  // private proxw = { ws: this.w };
   private tpyClient: Tpy;
   private deploymentID: numstr;
 
@@ -21,14 +22,6 @@ export default class TpyWs {
     this.tpyClient = tpyInstance;
     if (!deploymentID) throw 'DeploymentID is required';
     this.deploymentID = deploymentID;
-    // let ws: WebSocket | null = null;
-    // // deno-fmt-ignore
-    // try { ws = new WebSocket(wsUrl); }
-    //   catch { throw 'Could not connect to WebSocket'; }
-    // this.w = ws;
-    // this.w.addEventListener('close', () => {
-    //   this.w = new WebSocket(wsUrl);
-    // });
   }
 
   async init() {
@@ -54,7 +47,15 @@ export default class TpyWs {
     if (!this.w) {
       throw 'WebSocket not created, please use the init() method first.';
     }
-    // let w = new Proxy({}, this.w.url)
+    // const w = new Proxy(this.proxw, {
+    //   set: (target, key, value) => {
+    //     console.log(target, key, value);
+    //     return true;
+    //   },
+    // });
+    // console.log(w);
+
+    // this.w.addEventListener('close', () => console.log('closeddd'));
 
     this.w.onmessage = (ev) =>
       fn(
@@ -68,7 +69,7 @@ export default class TpyWs {
     if (!this.w) {
       throw 'WebSocket not created, please use the init() method first.';
     }
-    this.w.addEventListener('close', () => this.onError(fn));
+    // this.w.addEventListener('close', () => this.onError(fn));
 
     this.w.onerror = (err) => fn(err);
   }

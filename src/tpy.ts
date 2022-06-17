@@ -4,6 +4,7 @@ import type Deployment from './types/deployments.d.ts';
 import type Guild from './types/guild.d.ts';
 import type User from './types/user.d.ts';
 import { MaybeArr, numstr, PylonVerbs, TpyTup } from './utils.ts';
+import TpyWs from './ws.ts';
 
 /**
  * Tpy class, intialized with a pylon token.
@@ -153,41 +154,30 @@ export default class Tpy {
     /**
      * @param id Guild ID.
      *
-     * @returns {WebSocket}
+     * @returns {TpyWs}
      */
     fromGuildID: async (
       id: numstr,
     ): Promise<
-      TpyTup<WebSocket>
+      TpyTup<TpyWs>
     > => {
       const [g_err, g] = await this.getGuildInfo(id);
       if (g_err) return [g_err, g as unknown];
 
-      return await this.connectSocket.fromDeploymentID(
-        g.deployments[0].id,
-      );
+      return [
+        TpyErr.NO_ERR,
+        new TpyWs(new Tpy(this.token), g.deployments[0].id),
+      ];
     },
 
     /**
      * @param id Deployment ID.
      *
-     * @returns
+     * @returns {TpyWs}
      */
-    fromDeploymentID: async (
+    fromDeploymentID: (
       id: numstr,
-    ): Promise<
-      TpyTup<WebSocket>
-    > => {
-      const [d_err, d] = await this.getDeployment(id);
-      if (d_err) return [d_err, d as unknown];
-
-      return [
-        TpyErr.NO_ERR,
-        new WebSocket(
-          d.workbench_url,
-        ),
-      ];
-    },
+    ): TpyWs => new TpyWs(new Tpy(this.token), id),
   };
 
   /**
