@@ -193,7 +193,7 @@ declare namespace Deployments {
       };
     };
 
-    export type Response<Raw extends boolean = true> = (
+    export type Response<Raw extends boolean = true> =
       & Deployments.GET.Deployments
       & {
         /**
@@ -206,8 +206,7 @@ declare namespace Deployments {
             files: Raw extends true ? string : Structures.DeploymentFiles[];
           };
         };
-      }
-    );
+      };
   }
 }
 
