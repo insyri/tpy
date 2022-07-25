@@ -3,11 +3,11 @@ import { TpyErr } from './tpy_err.ts';
 import type Deployment from './types/deployments.d.ts';
 import type Guild from './types/guild.d.ts';
 import type User from './types/user.d.ts';
-import { MaybeArr, numstr, PylonVerbs, TpyTup } from './utils.ts';
+import type { MaybeArr, numstr, PylonVerbs, TpyTup } from './utils.d.ts';
 import TpyWs from './ws.ts';
 
 /**
- * Tpy class, intialized with a pylon token.
+ * A Tpy class, intialized with a pylon token.
  */
 export default class Tpy {
   /**
