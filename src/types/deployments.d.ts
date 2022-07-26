@@ -1,6 +1,9 @@
-import { GatewayDispatchEvents } from 'https://deno.land/x/discord_api_types@0.33.0/gateway/v8.ts';
-import Guild from './guild.d.ts';
-import { bigintstrWithDefault, numstr } from '../utils.ts';
+import type Guild from './guild.d.ts';
+import type { GatewayDispatchEvents } from 'https://deno.land/x/discord_api_types@0.33.0/gateway/v8.ts';
+import type {
+  StringifiedNumber,
+  StringifiedNumberWithDefault,
+} from '../types/util.d.ts';
 
 /**
  * `/deployments`
@@ -84,11 +87,11 @@ declare namespace Deployments {
       /**
        * Deployment and script ID.
        */
-      id: numstr;
+      id: StringifiedNumber;
       /**
        * Bot ID the script exists for. Used in BYOB.
        */
-      bot_id: bigintstrWithDefault<270148059269300224n>;
+      bot_id: StringifiedNumberWithDefault<270148059269300224n>;
       /**
        * Unused as of 5/31/2022.
        */
@@ -96,7 +99,7 @@ declare namespace Deployments {
       /**
        * Unused as of 5/31/2022.
        */
-      app_id: numstr | null;
+      app_id: StringifiedNumber | null;
       /**
        * Unused as of 5/31/2022.
        *
@@ -201,7 +204,7 @@ declare namespace Deployments {
          */
         errors: Deployments.Structures.FastAPIError;
         script?: {
-          id: numstr;
+          id: StringifiedNumber;
           project: {
             files: Raw extends true ? string : Structures.DeploymentFiles[];
           };

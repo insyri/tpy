@@ -1,6 +1,6 @@
 import { RESTPostAPIGuildsJSONBody } from 'https://deno.land/x/discord_api_types@0.33.0/rest/v8/guild.ts';
 import { APIUnavailableGuild } from 'https://deno.land/x/discord_api_types@0.33.0/payloads/v8/guild.ts';
-import { numstr } from '../utils.ts';
+import { StringifiedNumber } from './util.d.ts';
 import Deployments from './deployments.d.ts';
 
 /**
@@ -17,7 +17,7 @@ declare namespace Guild {
      * Base guild payload.
      */
     export type Payload = {
-      id: numstr;
+      id: StringifiedNumber;
       name: string;
       /**
        * UUID without hyphens.

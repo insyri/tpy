@@ -1,4 +1,4 @@
-import { numstr, Unpacked } from '../utils.ts';
+import { StringifiedNumber, Unpacked } from './util.d.ts';
 import Guild from './guild.d.ts';
 
 /**
@@ -19,7 +19,7 @@ declare namespace User {
      * Gets basic user information.
      */
     export type User = {
-      id: numstr;
+      id: StringifiedNumber;
       /**
        * ISO 8601 / RFC 3339.
        */

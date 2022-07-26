@@ -1,29 +1,34 @@
 import Tpy from './tpy.ts';
-import {
-  numstr,
-  ParsedPylonWebSocketResponse,
-  PylonWebSocketResponse,
-} from './utils.ts';
+import type { StringifiedNumber } from './types/util.d.ts';
+import type Pylon from './types/pylon.d.ts';
 import { EventEmitter } from 'https://deno.land/std@0.148.0/node/events.ts';
 import TpyErrToString from './logging.ts';
 
 interface WSEventMap {
+  /** Emitted on an open event. */
   open: Event;
+  /** Emitted on a close event.
+   * Notice that this will usually always emit on close events. */
   close: CloseEvent;
+  /** Emitted on a error event.
+   * Notice that this will usually always emit on close events. */
   error: Event | ErrorEvent;
-  message: ParsedPylonWebSocketResponse;
+  /**
+   * The message contents
+   */
+  message: Pylon.WebSocketResponse;
 }
 
 type EventType = keyof WSEventMap;
 type Payload<T extends EventType> = WSEventMap[T];
 
 /**
- * A Tpy WebSocket manager.
+ * The Tpy WebSocket manager.
  */
 export default class TpyWs {
   private ws?: WebSocket;
   private tpyc: Tpy;
-  private deploymentID: numstr;
+  private deploymentID: StringifiedNumber;
   private tryToConnect = true;
   private reconnectionTimout: number;
 
@@ -40,7 +45,7 @@ export default class TpyWs {
     /**
      * The deployment ID to follow.
      */
-    deploymentID: numstr,
+    deploymentID: StringifiedNumber,
     /**
      * The reconnection timeout in milliseconds.
      */
@@ -60,6 +65,8 @@ export default class TpyWs {
    * @see rawEventEmitter for internal access to this.
    * @param type The WebSocket event type to listen on.
    * @param callback The function to call when this event is fired.
+   *
+   * @event
    */
   on = <T extends EventType>(type: T, callback: (data: Payload<T>) => void) => {
     this.rawEventEmitter.on(type, callback);
@@ -106,10 +113,11 @@ export default class TpyWs {
     this.rawEventEmitter.emit('message', this.unpack(JSON.parse(event.data)));
   }
 
-  private unpack<T = unknown>(
-    res: PylonWebSocketResponse,
-  ): ParsedPylonWebSocketResponse<T[]> {
-    return { data: res[0].data as unknown as T[], method: res[0].method };
+  private unpack<T extends unknown[] = unknown[]>(
+    res: Pylon.WebSocketResponse<T>,
+  ) {
+    const { method, data } = res[0];
+    return { data, method };
   }
 
   /**

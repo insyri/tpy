@@ -3,7 +3,20 @@ import { TpyErr } from './tpy_err.ts';
 import type Deployment from './types/deployments.d.ts';
 import type Guild from './types/guild.d.ts';
 import type User from './types/user.d.ts';
-import type { MaybeArr, numstr, PylonVerbs, TpyTup } from './utils.d.ts';
+import type Pylon from './types/pylon.d.ts';
+import type {
+  MaybeArr,
+  SafeObject,
+  StringifiedNumber,
+  TpyTup,
+} from './types/util.d.ts';
+import {
+  deploymentNotFound,
+  guildNotFound,
+  isMissingJsonBody,
+  isNotAuthorized,
+  resourceNotFound,
+} from './util.ts';
 import TpyWs from './ws.ts';
 
 /**
@@ -54,7 +67,9 @@ export default class Tpy {
    *
    * @returns Raw Discord guild information with deployment information.
    */
-  getGuildInfo = async (id: numstr): Promise<TpyTup<Guild.GET.Guild>> =>
+  getGuildInfo = async (
+    id: StringifiedNumber,
+  ): Promise<TpyTup<Guild.GET.Guild>> =>
     await this.httpRaw<Guild.GET.Guild>(`/guilds/${id}`);
 
   /**
@@ -62,14 +77,16 @@ export default class Tpy {
    *
    * @returns Guild computational statistics.
    */
-  getGuildStats = async (id: numstr): Promise<TpyTup<Guild.GET.Stats>> =>
+  getGuildStats = async (
+    id: StringifiedNumber,
+  ): Promise<TpyTup<Guild.GET.Stats>> =>
     await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`);
 
   /**
    * @returns All guilds a user can edit with Pylon. More specifically, all guilds which the user has `manage server` or `administrator` permissions in.
    */
   getEditableGuilds = async (): Promise<TpyTup<User.GET.Guilds.Guilds>> =>
-    await this.httpRaw<User.GET.Guilds.Guilds>(`/guilds`);
+    await this.httpRaw<User.GET.Guilds.Guilds>(`/user/guilds`);
 
   /**
    * @param id The ID of the deployment to get.
@@ -77,7 +94,7 @@ export default class Tpy {
    * @returns Deployment information.
    */
   getDeployment = async (
-    id: numstr,
+    id: StringifiedNumber,
   ): Promise<TpyTup<Deployment.GET.Deployments>> =>
     await this.httpRaw<Deployment.GET.Deployments>(`/deployments/${id}`);
 
@@ -95,7 +112,7 @@ export default class Tpy {
      * @returns Information of the deployment.
      */
     fromDeploymentID: async (
-      id: numstr,
+      id: StringifiedNumber,
       body: Deployment.POST.Request<false>,
     ): Promise<TpyTup<Deployment.POST.Response<false>>> => {
       const [err, d] = await this.httpRaw<Deployment.POST.Response>(
@@ -115,7 +132,7 @@ export default class Tpy {
     },
 
     fromGuildID: async (
-      id: numstr,
+      id: StringifiedNumber,
       body: Deployment.POST.Request<false>,
     ): Promise<TpyTup<Deployment.POST.Response<false>>> => {
       const [err, g] = await this.getGuildInfo(id);
@@ -136,7 +153,7 @@ export default class Tpy {
    *
    * @returns Headers with specifics.
    */
-  readyRequest(method: PylonVerbs, other?: RequestInit): RequestInit {
+  readyRequest(method: Pylon.Verbs, other?: RequestInit): RequestInit {
     return {
       method,
       headers: {
@@ -157,7 +174,7 @@ export default class Tpy {
      * @returns {TpyWs}
      */
     fromGuildID: async (
-      id: numstr,
+      id: StringifiedNumber,
     ): Promise<
       TpyTup<TpyWs>
     > => {
@@ -176,7 +193,7 @@ export default class Tpy {
      * @returns {TpyWs}
      */
     fromDeploymentID: (
-      id: numstr,
+      id: StringifiedNumber,
     ): TpyWs => new TpyWs(new Tpy(this.token), id),
   };
 
@@ -191,9 +208,9 @@ export default class Tpy {
    *
    * @returns {TpyErr} TpyErr
    */
-  httpRaw = async <T extends MaybeArr<Record<string, unknown>>>(
+  httpRaw = async <T extends MaybeArr<SafeObject>>(
     resource: `/${string}`,
-    method: PylonVerbs = 'GET',
+    method: Pylon.Verbs = 'GET',
     other: RequestInit = {},
   ): Promise<
     TpyTup<T>
@@ -203,10 +220,11 @@ export default class Tpy {
       this.readyRequest(method, other),
     );
 
-    let res: MaybeArr<Record<string, unknown>> | string = await rawres.text();
+    let res: MaybeArr<SafeObject> | string = await rawres.text();
     try {
-      res = JSON.parse(res) as MaybeArr<Record<string, unknown>>;
-    } catch { /* do nothing */ }
+      res = JSON.parse(res) as MaybeArr<SafeObject>;
+      // deno-lint-ignore no-empty
+    } catch {}
 
     // The only known cases where responses are not JSON are:
     // - 404 * = `⚠️ 404 — Not Found\n==================\nReq`
@@ -218,11 +236,11 @@ export default class Tpy {
 
     if (typeof res === 'string') {
       // deno-fmt-ignore
-      if (res.startsWith('\u26A0\uFE0F')) return stringresponse = [TpyErr.RESOURCE_NOT_FOUND, res];
+      if (resourceNotFound(res)) return stringresponse = [TpyErr.RESOURCE_NOT_FOUND, res];
       // deno-fmt-ignore
-      if (res === "could not find deployment") return stringresponse = [TpyErr.DEPLOYMENT_NOT_FOUND, res];
+      if (deploymentNotFound(res)) return stringresponse = [TpyErr.DEPLOYMENT_NOT_FOUND, res];
       // deno-fmt-ignore
-      if (res === "could not find guild") return stringresponse = [TpyErr.GUILD_NOT_FOUND, res];
+      if (guildNotFound(res)) return stringresponse = [TpyErr.GUILD_NOT_FOUND, res];
     }
 
     if (stringresponse != null) return stringresponse;
@@ -249,14 +267,17 @@ export default class Tpy {
           break;
         }
 
-        // deno-fmt-ignore
-
         case HttpStatusCode.BAD_REQUEST: {
-          if ('msg' in res && res['msg'] === 'missing json body')
+          // The following checks will rely on named based keys,
+          // as arrays don't support these, we will eliminate the possiblity of res being an array.
+          res = <SafeObject> res;
+          if (isMissingJsonBody(res)) {
             data = [TpyErr.MISSING_JSON_BODY, res as unknown];
+          }
 
-          if ('message' in res && res['message'] === 'not authorized')
+          if (isNotAuthorized(res)) {
             data = [TpyErr.UNAUTHORIZED, res as unknown];
+          }
           break;
         }
 
