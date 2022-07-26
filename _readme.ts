@@ -2,8 +2,11 @@
 import Tpy, { TpyErrToString } from './mod.ts';
 // Or use Node
 // import Tpy, { TpyErrToString } from 'tpy';
+// REPLACE
+import 'https://deno.land/x/dotenv@v3.2.0/load.ts';
 
-const client = new Tpy('My.pYl0N_tOKEn');
+// const client = new Tpy('My.pYl0N_tOKEn'); // REPLACE
+const client = new Tpy(Deno.env.get('PYLON_TOKEN')!);
 const [err, user] = await client.getUser();
 
 // Tpy has strongly typed error handling so there are no need for type guards.

@@ -26,7 +26,14 @@ for (const v of file.split('\n')) {
 }
 
 const readme_run = Deno.run({
-  cmd: ['deno', 'run', '--allow-net', '_readme.ts'],
+  cmd: [
+    'deno',
+    'run',
+    '--allow-net',
+    '--allow-read',
+    '--allow-env',
+    '_readme.ts',
+  ],
   stderr: 'piped',
 });
 const status = (await readme_run.status()).success;
@@ -37,13 +44,11 @@ Deno.writeFileSync(
   encode(
     READMEmd.replace(
       /\`\`\`ts\n(.|\n)+\`\`\`/g,
-      `\`\`\`ts\n${new_file.join('\n')}\n${`// README integrity: ${
+      `\`\`\`ts\n${new_file.join('\n')}\n${`// Integrity: ${
         status ? 'passing' : 'failing'
       }`}\n\`\`\``,
     ),
   ),
 );
 
-if (!status) {
-  throw decode(await readme_run.stderrOutput());
-}
+if (!status) throw decode(await readme_run.stderrOutput());
