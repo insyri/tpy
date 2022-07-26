@@ -1,10 +1,10 @@
 import Tpy from './tpy.ts';
-import type { StringifiedNumber } from './types/util.d.ts';
+import type { StringifiedNumber, Unpacked } from './types/util.d.ts';
 import type Pylon from './types/pylon.d.ts';
 import { EventEmitter } from 'https://deno.land/std@0.148.0/node/events.ts';
 import TpyErrToString from './logging.ts';
 
-interface WSEventMap {
+interface WSEventMap<C extends unknown[] = unknown[]> {
   /** Emitted on an open event. */
   open: Event;
   /** Emitted on a close event.
@@ -16,11 +16,13 @@ interface WSEventMap {
   /**
    * The message contents
    */
-  message: Pylon.WebSocketResponse;
+  message: Unpacked<Pylon.WebSocketResponse<C>>;
 }
 
-type EventType = keyof WSEventMap;
-type Payload<T extends EventType> = WSEventMap[T];
+type EventType<C extends unknown[] = unknown[]> = keyof WSEventMap<C>;
+type Payload<T extends EventType, C extends unknown[] = unknown[]> = WSEventMap<
+  C
+>[T];
 
 /**
  * The Tpy WebSocket manager.
@@ -68,9 +70,12 @@ export default class TpyWs {
    *
    * @event
    */
-  on = <T extends EventType>(type: T, callback: (data: Payload<T>) => void) => {
-    this.rawEventEmitter.on(type, callback);
-  };
+  on<T extends EventType>(
+    type: T,
+    callback: <C extends unknown[] = unknown[]>(data: Payload<T, C>) => void,
+  ) {
+    return this.rawEventEmitter.on(type, callback);
+  }
 
   /**
    * Retrieves the workbench URL and ties the WebSocket events to an event emitter.
@@ -115,7 +120,7 @@ export default class TpyWs {
 
   private unpack<T extends unknown[] = unknown[]>(
     res: Pylon.WebSocketResponse<T>,
-  ) {
+  ): Unpacked<Pylon.WebSocketResponse<T>> {
     const { method, data } = res[0];
     return { data, method };
   }

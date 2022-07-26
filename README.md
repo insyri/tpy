@@ -29,17 +29,33 @@ import Tpy, { TpyErrToString } from 'https://deno.land/x/tpy@v0.1.2/mod.ts';
 // 
 
 const client = new Tpy('My.pYl0N_tOKEn');
-const [err, user] = await client.getUser();
+const [user_err, user] = await client.getUser();
 
 // Tpy has strongly typed error handling so there are no need for type guards.
 // If there's an error, the response will return undefined,
 // Otherwise, the response will the requested type as expected.
-if (err) {
-  throw `There was an error while fetching the user: ${TpyErrToString(err)}.`;
-  // user is now for sure our expected type, so we can safely access it.
-} else console.log(`User logged in: ${user.displayName}`);
+if (user_err) {
+  throw `There was an error while fetching the user: ${
+    TpyErrToString(user_err)
+  }.`;
+}
+// user is now for sure our expected type, so we can safely access it.
+console.log(`User logged in: ${user.displayName}`);
 
-// README integrity: passing
+const [ws_err, ws] = await client.connectSocket.fromGuildID('123456789012345');
+  <`${bigint | number}`> Deno.env.get('DISCORD_SERVER_ID')!,
+);
+if (ws_err) {
+  throw `There was an error while fetching the guild: ${
+    TpyErrToString(ws_err)
+  }.`;
+}
+
+ws.on('open', (_) => console.log('The Socket has been opened!'));
+ws.on('message', (payload) => console.log(payload));
+// 
+
+// Integrity: passing
 ```
 
 ## Contributing
