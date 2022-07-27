@@ -5,7 +5,6 @@ import { EventEmitter } from 'https://deno.land/std@0.148.0/node/events.ts';
 import TpyErrToString from './logging.ts';
 
 interface WSEventMap<C extends unknown[] = unknown[]> {
-  /** Emitted on an open event. */
   open: Event;
   /** Emitted on a close event.
    * Notice that this will usually always emit on close events. */
@@ -34,9 +33,6 @@ export default class TpyWs {
   private tryToConnect = true;
   private reconnectionTimout: number;
 
-  /**
-   * The raw event emitter object, used for proxying events while keeping streams on.
-   */
   rawEventEmitter = new EventEmitter();
 
   constructor(
@@ -63,18 +59,54 @@ export default class TpyWs {
   }
 
   /**
-   * Adds an event listener.
+   * Adds an event listener to WebSocket events.
    * @see rawEventEmitter for internal access to this.
-   * @param type The WebSocket event type to listen on.
-   * @param callback The function to call when this event is fired.
+   * @param type Fired when the WebSocket is (re)opened.
+   * @param callback A function to call when this event is fired.
    *
    * @event
    */
-  on<T extends EventType>(
-    type: T,
-    callback: <C extends unknown[] = unknown[]>(data: Payload<T, C>) => void,
-  ) {
-    return this.rawEventEmitter.on(type, callback);
+  on(type: 'open', callback: (data: Event) => void): EventEmitter;
+  /**
+   * Adds an event listener to WebSocket events.
+   * @see rawEventEmitter for internal access to this.
+   * @param type Fired when the WebSocket is closed.
+   * @param callback A function to call when this event is fired.
+   *
+   * @event
+   */
+  on(type: 'close', callback: (data: CloseEvent) => void): EventEmitter;
+  /**
+   * Adds an event listener to WebSocket events.
+   * @see rawEventEmitter for internal access to this.
+   * @param type Fired when the WebSocket captures an error.
+   * @param callback A function to call when this event is fired.
+   *
+   * # Notice!
+   * This event is fired every time the WebSocket is closed. This is
+   * an action of the Pylon backend marking closed connections as errors.
+   *
+   * @event
+   */
+  on(type: 'error', callback: (data: ErrorEvent | Event) => void): EventEmitter;
+  /**
+   * Adds an event listener to WebSocket events.
+   * @see rawEventEmitter for internal access to this.
+   * @param type Fired when the WebSocket recieves a message.
+   * @param callback A function to call when this event is fired.
+   *
+   * @event
+   */
+  on<C extends unknown[] = unknown[]>(
+    type: 'message',
+    callback: (data: Unpacked<Pylon.WebSocketResponse<C>>) => void,
+  ): EventEmitter;
+  on<C extends unknown[] = unknown[]>(type: unknown, callback: unknown) {
+    if (typeof type != 'string' || typeof callback != 'function') throw '';
+    return this.rawEventEmitter.on(
+      type,
+      <(data: Unpacked<Pylon.WebSocketResponse<C>>) => void> callback,
+    );
   }
 
   /**
