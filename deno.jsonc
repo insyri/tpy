@@ -31,8 +31,7 @@
     }
   },
   "tasks": {
-    "precommit": "deno lint && deno fmt && deno task readme",
-    "readme": "deno run --allow-read --allow-write --allow-run --allow-env _readme.verify.ts",
+    "precommit": "deno lint && deno fmt",
     "dnt": "deno run --allow-read --allow-write --allow-run --allow-env --allow-net _npm.ts",
     "pg": "deno run --allow-read --allow-env --allow-net _playground.ts"
   }

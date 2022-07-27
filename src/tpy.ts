@@ -4,12 +4,7 @@ import type Deployment from './types/deployments.d.ts';
 import type Guild from './types/guild.d.ts';
 import type User from './types/user.d.ts';
 import type Pylon from './types/pylon.d.ts';
-import type {
-  MaybeArr,
-  SafeObject,
-  StringifiedNumber,
-  TpyTup,
-} from './types/util.d.ts';
+import type { SafeObject, StringifiedNumber } from './types/util.d.ts';
 import {
   deploymentNotFound,
   guildNotFound,
@@ -18,6 +13,8 @@ import {
   resourceNotFound,
 } from './util.ts';
 import TpyWs from './ws.ts';
+
+type MaybeArr<T> = T | T[];
 
 /**
  * A Tpy class, intialized with a pylon token.
@@ -46,17 +43,14 @@ export default class Tpy {
   /**
    * @returns The current logged in user.
    */
-  getUser = async (): Promise<TpyTup<User.GET.User>> =>
-    await this.httpRaw<User.GET.User>('/user');
+  getUser = async () => await this.httpRaw<User.GET.User>('/user');
 
   /**
    * Response can be slow since this endpoint makes a Discord API call.
    *
    * @returns All guilds a user is in.
    */
-  getAvailableGuilds = async (): Promise<
-    TpyTup<User.GET.Guilds.Available>
-  > =>
+  getAvailableGuilds = async () =>
     await this.httpRaw<User.GET.Guilds.Available>(
       '/user/guilds/available',
       'GET',
@@ -69,8 +63,7 @@ export default class Tpy {
    */
   getGuildInfo = async (
     id: StringifiedNumber,
-  ): Promise<TpyTup<Guild.GET.Guild>> =>
-    await this.httpRaw<Guild.GET.Guild>(`/guilds/${id}`);
+  ) => await this.httpRaw<Guild.GET.Guild>(`/guilds/${id}`);
 
   /**
    * @param id The ID of the guild to get.
@@ -79,13 +72,12 @@ export default class Tpy {
    */
   getGuildStats = async (
     id: StringifiedNumber,
-  ): Promise<TpyTup<Guild.GET.Stats>> =>
-    await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`);
+  ) => await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`);
 
   /**
    * @returns All guilds a user can edit with Pylon. More specifically, all guilds which the user has `manage server` or `administrator` permissions in.
    */
-  getEditableGuilds = async (): Promise<TpyTup<User.GET.Guilds.Guilds>> =>
+  getEditableGuilds = async () =>
     await this.httpRaw<User.GET.Guilds.Guilds>(`/user/guilds`);
 
   /**
@@ -95,8 +87,7 @@ export default class Tpy {
    */
   getDeployment = async (
     id: StringifiedNumber,
-  ): Promise<TpyTup<Deployment.GET.Deployments>> =>
-    await this.httpRaw<Deployment.GET.Deployments>(`/deployments/${id}`);
+  ) => await this.httpRaw<Deployment.GET.Deployments>(`/deployments/${id}`);
 
   /**
    * Publishes a deployment
@@ -114,31 +105,22 @@ export default class Tpy {
     fromDeploymentID: async (
       id: StringifiedNumber,
       body: Deployment.POST.Request<false>,
-    ): Promise<TpyTup<Deployment.POST.Response<false>>> => {
-      const [err, d] = await this.httpRaw<Deployment.POST.Response>(
+    ) => {
+      return await this.httpRaw<Deployment.POST.Response>(
         `/deployments/${id}`,
         'POST',
         {
           body: JSON.stringify(body),
         },
-      );
-
-      if (err) return [err, d as unknown];
-
-      return [
-        TpyErr.NO_ERR,
-        d as unknown as Deployment.POST.Response<false>,
-      ];
+      ) as unknown as Deployment.POST.Response<false>;
     },
 
     fromGuildID: async (
       id: StringifiedNumber,
       body: Deployment.POST.Request<false>,
-    ): Promise<TpyTup<Deployment.POST.Response<false>>> => {
-      const [err, g] = await this.getGuildInfo(id);
-      if (err) return [err, g as unknown];
+    ) => {
       return await this.publishDeployment.fromDeploymentID(
-        g.deployments[0].id,
+        (await this.getGuildInfo(id)).deployments[0].id,
         body,
       );
     },
@@ -176,16 +158,12 @@ export default class Tpy {
     fromGuildID: async (
       id: StringifiedNumber,
     ): Promise<
-      TpyTup<TpyWs>
-    > => {
-      const [g_err, g] = await this.getGuildInfo(id);
-      if (g_err) return [g_err, g as unknown];
-
-      return [
-        TpyErr.NO_ERR,
-        new TpyWs(new Tpy(this.token), g.deployments[0].id),
-      ];
-    },
+      TpyWs
+    > =>
+      new TpyWs(
+        new Tpy(this.token),
+        (await this.getGuildInfo(id)).deployments[0].id,
+      ),
 
     /**
      * @param id Deployment ID.
@@ -213,7 +191,7 @@ export default class Tpy {
     method: Pylon.Verbs = 'GET',
     other: RequestInit = {},
   ): Promise<
-    TpyTup<T>
+    T
   > => {
     const rawres = await fetch(
       this.api_url + resource,
@@ -232,66 +210,47 @@ export default class Tpy {
     // - 404 /deployments/:id = `could not find deployment`
     // So we assume that the response is a failed response.
 
-    let stringresponse: TpyTup<T> | null = null;
-
     if (typeof res === 'string') {
-      // deno-fmt-ignore
-      if (resourceNotFound(res)) return stringresponse = [TpyErr.RESOURCE_NOT_FOUND, res];
-      // deno-fmt-ignore
-      if (deploymentNotFound(res)) return stringresponse = [TpyErr.DEPLOYMENT_NOT_FOUND, res];
-      // deno-fmt-ignore
-      if (guildNotFound(res)) return stringresponse = [TpyErr.GUILD_NOT_FOUND, res];
+      if (resourceNotFound(res)) throw TpyErr.RESOURCE_NOT_FOUND;
+      if (deploymentNotFound(res)) throw TpyErr.DEPLOYMENT_NOT_FOUND;
+      if (guildNotFound(res)) throw TpyErr.GUILD_NOT_FOUND;
     }
 
-    if (stringresponse != null) return stringresponse;
-
-    let data: TpyTup<T> = [TpyErr.UNIDENTIFIABLE, res];
+    let data: T | null = null;
 
     // typeof [] === 'object' -> true
     if (typeof res === 'object') {
       switch (<HttpStatusCode> rawres.status) {
         case HttpStatusCode.OK: {
-          data = [TpyErr.NO_ERR, res as T];
+          data = res as T;
           break;
         }
 
         // Happens when no authentication header is provided
 
-        case HttpStatusCode.UNAUTHORIZED: {
-          data = [TpyErr.UNAUTHORIZED, res as unknown];
-          break;
-        }
+        case HttpStatusCode.UNAUTHORIZED:
+          throw TpyErr.UNAUTHORIZED;
 
-        case HttpStatusCode.METHOD_NOT_ALLOWED: {
-          data = [TpyErr.METHOD_NOT_ALLOWED, res as unknown];
-          break;
-        }
+        case HttpStatusCode.METHOD_NOT_ALLOWED:
+          throw TpyErr.METHOD_NOT_ALLOWED;
 
         case HttpStatusCode.BAD_REQUEST: {
           // The following checks will rely on named based keys,
           // as arrays don't support these, we will eliminate the possiblity of res being an array.
           res = <SafeObject> res;
-          if (isMissingJsonBody(res)) {
-            data = [TpyErr.MISSING_JSON_BODY, res as unknown];
-          }
-
-          if (isNotAuthorized(res)) {
-            data = [TpyErr.UNAUTHORIZED, res as unknown];
-          }
+          if (isMissingJsonBody(res)) throw TpyErr.MISSING_JSON_BODY;
+          if (isNotAuthorized(res)) throw TpyErr.UNAUTHORIZED;
           break;
         }
 
-        case HttpStatusCode.NOT_FOUND: {
-          data = [TpyErr.RESOURCE_NOT_FOUND, res as unknown];
-          break;
-        }
+        case HttpStatusCode.NOT_FOUND:
+          throw TpyErr.RESOURCE_NOT_FOUND;
 
-        case HttpStatusCode.INTERNAL_SERVER_ERROR: {
-          data = [TpyErr.UNAUTHORIZED, res as unknown];
-          break;
-        }
+        case HttpStatusCode.INTERNAL_SERVER_ERROR:
+          throw TpyErr.UNAUTHORIZED;
       }
     }
+    if (!data) throw TpyErr.UNIDENTIFIABLE;
     return data;
   };
 }

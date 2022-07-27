@@ -2,26 +2,6 @@ import Tpy from './tpy.ts';
 import type { StringifiedNumber, Unpacked } from './types/util.d.ts';
 import type Pylon from './types/pylon.d.ts';
 import { EventEmitter } from 'https://deno.land/std@0.148.0/node/events.ts';
-import TpyErrToString from './logging.ts';
-
-interface WSEventMap<C extends unknown[] = unknown[]> {
-  open: Event;
-  /** Emitted on a close event.
-   * Notice that this will usually always emit on close events. */
-  close: CloseEvent;
-  /** Emitted on a error event.
-   * Notice that this will usually always emit on close events. */
-  error: Event | ErrorEvent;
-  /**
-   * The message contents
-   */
-  message: Unpacked<Pylon.WebSocketResponse<C>>;
-}
-
-type EventType<C extends unknown[] = unknown[]> = keyof WSEventMap<C>;
-type Payload<T extends EventType, C extends unknown[] = unknown[]> = WSEventMap<
-  C
->[T];
 
 /**
  * The Tpy WebSocket manager.
@@ -115,9 +95,11 @@ export default class TpyWs {
    */
   async connect() {
     if (!this.tryToConnect) return;
-    const [err, d] = await this.tpyc.getDeployment(this.deploymentID);
-    if (err) throw `err: ${TpyErrToString(err)}`;
-    this.ws = new WebSocket(d.workbench_url);
+    this.ws = new WebSocket(
+      (await this.tpyc.getDeployment(this.deploymentID).catch((r) => {
+        throw r;
+      })).workbench_url,
+    );
     this.ws.onopen = this.onOpen.bind(this);
     this.ws.onclose = this.onClose.bind(this);
     this.ws.onerror = this.onError.bind(this);
