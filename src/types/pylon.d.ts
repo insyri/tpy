@@ -39,7 +39,7 @@ declare namespace Pylon {
        *   console.log("Log test", 27, { Obj: true })
        * ```
        * Would return as:
-       * ```ts
+       * ```json
        * [{ "method": "log", "data": ["Log test", 27, { "Obj": true }] }]
        * ```
        */

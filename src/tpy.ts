@@ -1,17 +1,16 @@
 import HttpStatusCode from 'https://gist.githubusercontent.com/scokmen/f813c904ef79022e84ab2409574d1b45/raw/cd8709a2fccb005bb53e9bfb2461e07d40b4e8d8/HttpStatusCode.ts';
-import { TpyErr } from './tpy_err.ts';
-import type Deployment from './types/deployments.d.ts';
-import type Guild from './types/guild.d.ts';
-import type User from './types/user.d.ts';
-import type Pylon from './types/pylon.d.ts';
-import type { SafeObject, StringifiedNumber } from './types/util.d.ts';
-import {
+import TpyErr, {
   deploymentNotFound,
   guildNotFound,
   isMissingJsonBody,
   isNotAuthorized,
   resourceNotFound,
-} from './util.ts';
+} from './tpy_err.ts';
+import type Deployment from './types/deployments.d.ts';
+import type Guild from './types/guild.d.ts';
+import type User from './types/user.d.ts';
+import type Pylon from './types/pylon.d.ts';
+import type { SafeObject, StringifiedNumber } from './types/util.d.ts';
 import TpyWs from './ws.ts';
 
 type MaybeArr<T> = T | T[];
@@ -43,96 +42,82 @@ export default class Tpy {
   /**
    * @returns The current logged in user.
    */
-  getUser = async () => await this.httpRaw<User.GET.User>('/user');
+  async getUser() {
+    return await this.httpRaw<User.GET.User>('/user');
+  }
 
   /**
    * Response can be slow since this endpoint makes a Discord API call.
    *
    * @returns All guilds a user is in.
    */
-  getAvailableGuilds = async () =>
-    await this.httpRaw<User.GET.Guilds.Available>(
+  async getAvailableGuilds() {
+    return await this.httpRaw<User.GET.Guilds.Available>(
       '/user/guilds/available',
       'GET',
     );
+  }
 
   /**
    * @param id The ID of the guild to get.
    *
    * @returns Raw Discord guild information with deployment information.
    */
-  getGuildInfo = async (
-    id: StringifiedNumber,
-  ) => await this.httpRaw<Guild.GET.Guild>(`/guilds/${id}`);
+  async getGuildInfo(id: StringifiedNumber) {
+    return await this.httpRaw<Guild.GET.Guild>(`/guilds/${id}`);
+  }
 
   /**
    * @param id The ID of the guild to get.
    *
    * @returns Guild computational statistics.
    */
-  getGuildStats = async (
-    id: StringifiedNumber,
-  ) => await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`);
+  async getGuildStats(id: StringifiedNumber) {
+    return await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`);
+  }
 
   /**
    * @returns All guilds a user can edit with Pylon. More specifically, all guilds which the user has `manage server` or `administrator` permissions in.
    */
-  getEditableGuilds = async () =>
-    await this.httpRaw<User.GET.Guilds.Guilds>(`/user/guilds`);
-
+  async getEditableGuilds() {
+    return await this.httpRaw<User.GET.Guilds.Guilds>(`/user/guilds`);
+  }
   /**
    * @param id The ID of the deployment to get.
    *
    * @returns Deployment information.
    */
-  getDeployment = async (
-    id: StringifiedNumber,
-  ) => await this.httpRaw<Deployment.GET.Deployments>(`/deployments/${id}`);
+  async getDeployment(id: StringifiedNumber) {
+    return await this.httpRaw<Deployment.GET.Deployments>(`/deployments/${id}`);
+  }
 
   /**
-   * Publishes a deployment
+   * Makes a POST request to publish a deployment.
+   *
+   * @param id The script/deployment ID to publish to.
+   *
+   * @param body Project specifications.
+   *
+   * @returns Information of the deployment.
    */
-  publishDeployment = {
-    /**
-     * Makes a POST request to publish a deployment.
-     *
-     * @param id The script/deployment ID to publish to.
-     *
-     * @param body Project specifications.
-     *
-     * @returns Information of the deployment.
-     */
-    fromDeploymentID: async (
-      id: StringifiedNumber,
-      body: Deployment.POST.Request<false>,
-    ) => {
-      return await this.httpRaw<Deployment.POST.Response>(
-        `/deployments/${id}`,
-        'POST',
-        {
-          body: JSON.stringify(body),
-        },
-      ) as unknown as Deployment.POST.Response<false>;
-    },
-
-    fromGuildID: async (
-      id: StringifiedNumber,
-      body: Deployment.POST.Request<false>,
-    ) => {
-      return await this.publishDeployment.fromDeploymentID(
-        (await this.getGuildInfo(id)).deployments[0].id,
-        body,
-      );
-    },
-  };
+  async publishDeployment(
+    id: StringifiedNumber,
+    body: Deployment.POST.Request<false>,
+  ) {
+    return await this.httpRaw<Deployment.POST.Response>(
+      `/deployments/${id}`,
+      'POST',
+      {
+        body: JSON.stringify(body),
+      },
+    ) as unknown as Deployment.POST.Response<false>;
+  }
 
   /**
    * A factory function for organizing HTTP request objects, preset for authorization.
    *
    * @param method HTTP Method.
-   *
    * @param other Other fetch parameters.
-   *
    * @returns Headers with specifics.
    */
   readyRequest(method: Pylon.Verbs, other?: RequestInit): RequestInit {
@@ -148,32 +133,12 @@ export default class Tpy {
 
   /**
    * Connects to the Pylon workbench WebSocket.
+   *
+   * @param id The deployment ID to follow the WebSocket when it disconnects.
    */
-  connectSocket = {
-    /**
-     * @param id Guild ID.
-     *
-     * @returns {TpyWs}
-     */
-    fromGuildID: async (
-      id: StringifiedNumber,
-    ): Promise<
-      TpyWs
-    > =>
-      new TpyWs(
-        new Tpy(this.token),
-        (await this.getGuildInfo(id)).deployments[0].id,
-      ),
-
-    /**
-     * @param id Deployment ID.
-     *
-     * @returns {TpyWs}
-     */
-    fromDeploymentID: (
-      id: StringifiedNumber,
-    ): TpyWs => new TpyWs(new Tpy(this.token), id),
-  };
+  connectSocket(id: StringifiedNumber) {
+    return new TpyWs(new Tpy(this.token), id);
+  }
 
   /**
    * Makes a request to the API.
@@ -186,13 +151,13 @@ export default class Tpy {
    *
    * @returns {TpyErr} TpyErr
    */
-  httpRaw = async <T extends MaybeArr<SafeObject>>(
+  async httpRaw<T extends MaybeArr<SafeObject>>(
     resource: `/${string}`,
     method: Pylon.Verbs = 'GET',
     other: RequestInit = {},
   ): Promise<
     T
-  > => {
+  > {
     const rawres = await fetch(
       this.api_url + resource,
       this.readyRequest(method, other),
@@ -252,5 +217,5 @@ export default class Tpy {
     }
     if (!data) throw TpyErr.UNIDENTIFIABLE;
     return data;
-  };
+  }
 }

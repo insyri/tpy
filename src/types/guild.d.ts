@@ -17,10 +17,17 @@ declare namespace Guild {
      * Base guild payload.
      */
     export type Payload = {
+      /**
+       * The guild's ID.
+       */
       id: StringifiedNumber;
+      /**
+       * The guild's username
+       */
       name: string;
       /**
-       * UUID without hyphens.
+       * The guild's icon ID, UUID without hyphens.
+       * Null if non set.
        */
       icon: string | null;
     };
@@ -46,11 +53,20 @@ declare namespace Guild {
              * Unused as of 5/31/2022.
              */
             last_updated_at: null;
+            /**
+             * Deployment configuration.
+             */
             config: Raw extends true ? string : Deployments.Structures.Config;
             disabled: boolean;
           }
         >;
+        /**
+         * Region of the guild, deprecated because the API uses a deprecated version of the Discord API. (v8)
+         */
         region: `deprecated`;
+        /**
+         * `true` if the guild is unavailable due to an outage.
+         */
         unavailable: APIUnavailableGuild['unavailable'];
       };
 

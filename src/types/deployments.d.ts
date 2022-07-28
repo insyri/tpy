@@ -20,9 +20,16 @@ declare namespace Deployments {
      */
     export enum DeploymentType {
       /**
+       * This deployment is a collection of scripts.
+       *
        * @default
        */
       SCRIPT,
+      /**
+       * This deployment is an app.
+       *
+       * Currently not used in the API.
+       */
       APP,
     }
 
@@ -55,34 +62,35 @@ declare namespace Deployments {
        */
       events: GatewayDispatchEvents[];
       /**
-       * Cron tasks.
+       * Array of cron tasks.
        */
       tasks: {
-        cronTasks: CronTask[];
+        /**
+         * Cron task specifications.
+         *
+         * > Note: The current minimum interval cron tasks can run at are once every 5 minutes. You may schedule up to 5 cron handlers.
+         * @link https://pylon.bot/docs/pylon-tasks
+         * @link https://pylon.bot/docs/reference/modules/pylon.tasks.html#cron
+         */
+        cronTasks: Array<{
+          /**
+           * Cron identifier. Identified like so:
+           * ```ts
+           * pylon.tasks.cron('cron_identifier', '0 0/5 * * * * *', () => {});
+           * ```
+           */
+          name: string;
+          /**
+           * The cron instructions.
+           */
+          cronString: string;
+        }>;
       };
     };
 
     /**
-     * Cron task specifications. Recieved stringified.
-     *
-     * > Note: The current minimum interval cron tasks can run at are once every 5 minutes. You may schedule up to 5 cron handlers.
-     * @link https://pylon.bot/docs/pylon-tasks
-     * @link https://pylon.bot/docs/reference/modules/pylon.tasks.html#cron
+     * The base structure of some deployment related responses.
      */
-    export type CronTask = {
-      /**
-       * Cron identifier. Identified like so:
-       * ```ts
-       * pylon.tasks.cron('cron_identifier', '0 0/5 * * * * *', () => {});
-       * ```
-       */
-      name: string;
-      /**
-       * Follows cron specification [to be documented].
-       */
-      cronString: string;
-    };
-
     export type Base = {
       /**
        * Deployment and script ID.
@@ -106,6 +114,9 @@ declare namespace Deployments {
        * Name of the script/app.
        */
       name: string;
+      /**
+       * A deployment's 'up' status. Altered by Pylon administrators.
+       */
       status: DeploymentStatus;
       /**
        * Script revision number. Increments every time a script is published.
@@ -114,14 +125,14 @@ declare namespace Deployments {
     };
 
     /**
-     * Path to file, usually `.ts`.
-     * @param Extension Default `"ts"`, can override via generic string.
+     * The current project's files and information.
      */
-    export type File<Extension extends string = 'ts'> =
-      `/${string}.${Extension}`;
-
     export type DeploymentFiles = {
-      path: File;
+      /**
+       * Path to the file, probably ends in `.ts`.
+       * Follows pattern: `/*.*`.
+       */
+      path: string;
       /**
        * File contents.
        */
@@ -129,34 +140,47 @@ declare namespace Deployments {
     };
 
     /**
-     * Return when a deployment POST body is invalid.
-     */
-    export type Missing = {
-      msg: 'missing json body';
-    };
-
-    /**
      * Pylon uses FastAPI, this is a FastAPI error.
      */
     export type FastAPIError = {
+      /**
+       * The type of error in general, like `validation`.
+       */
       type: string;
+      /**
+       * The reported errors.
+       */
       errors: Array<{
         /**
          * Array that incrementally traverses the keys of the given object to the source of the error.
-         * @example ['nested_top', 'nested_second', 'nested_third'];
+         * @example
+         * ```json
+         * {
+         *   "nested_top": {
+         *     "nested_second": {
+         *       "nested_third": ...
+         *     }
+         *   }
+         * };
+         * // would be represented as:
+         * ['nested_top', 'nested_second', 'nested_third'];
+         * ```
          */
         loc: string[];
         /**
          * Error message in english.
          */
         msg: string;
+        /**
+         * An identifiable token of the kind of error, like `value_error`.
+         */
         type: string;
       }>;
     };
   }
 
   /**
-   * `GET /deployments`
+   * `GET /deployments/*`
    */
   export namespace GET {
     /**
@@ -178,15 +202,23 @@ declare namespace Deployments {
   }
 
   /**
-   * `POST /deployments/:id`
+   * `POST /deployments/*`
    */
   export namespace POST {
+    /**
+     * `POST /deployments/:id` Request
+     *
+     * The request schema for the POST deployment resource.
+     */
     export type Request<Raw extends boolean = true> = {
       script: {
         /**
          * Compiled script code in JavaScript.
          */
         contents: string;
+        /**
+         * The Pylon project.
+         */
         project: {
           /**
            * File contents in displayable format.
@@ -196,16 +228,30 @@ declare namespace Deployments {
       };
     };
 
+    /**
+     * `POST /deployments/:id` Response
+     *
+     * The response schema for the POST deployment resource.
+     */
     export type Response<Raw extends boolean = true> =
       & Deployments.GET.Deployments
       & {
         /**
-         * Fast API error.
+         * FastAPI error.
          */
         errors: Deployments.Structures.FastAPIError;
         script?: {
+          /**
+           * The Deployment ID.
+           */
           id: StringifiedNumber;
+          /**
+           * The Pylon project.
+           */
           project: {
+            /**
+             * File contents in displayable format.
+             */
             files: Raw extends true ? string : Structures.DeploymentFiles[];
           };
         };

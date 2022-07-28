@@ -19,17 +19,26 @@ declare namespace User {
      * Gets basic user information.
      */
     export type User = {
+      /**
+       * The user's ID.
+       */
       id: StringifiedNumber;
       /**
-       * ISO 8601 / RFC 3339.
+       * A timestamp of the last seen time a user was ..?
+       * (unknown as of 7/28/2022)
+       * Currently the account creation date.
+       *
+       * Follows the ISO 8601 / RFC 3339 specification.
        */
       lastSeenAt: string;
       /**
+       * The user's avatar ID. Null if none set.
+       *
        * UUID without hyphens.
        */
       avatar: string | null;
       /**
-       * Logged in user's Discord username
+       * The logged in user's username.
        */
       displayName: string;
       /**

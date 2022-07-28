@@ -24,10 +24,9 @@ npm install tpy
 import Tpy, {
   TpyErrToString,
   TypeUtil,
-} from 'https://deno.land/x/tpy@v0.1.3/mod.ts';
+} from 'https://deno.land/x/tpy@v1.0.0/mod.ts';
 // Or use Node
 // import Tpy, { TpyErrToString, TypeUtil } from 'tpy';
-import 'https://deno.land/x/dotenv@v3.2.0/load.ts';
 
 const client = new Tpy('My.pYl0N_tOKEn');
 const user = await client.getUser().catch((r) => {

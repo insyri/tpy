@@ -132,7 +132,12 @@ export default class TpyWs {
     this.rawEventEmitter.emit('message', this.unpack(JSON.parse(event.data)));
   }
 
-  private unpack<T extends unknown[] = unknown[]>(
+  /**
+   * Unpacks the WebSocket response to a less nested level.
+   * @param res
+   * @returns
+   */
+  unpack<T extends unknown[] = unknown[]>(
     res: Pylon.WebSocketResponse<T>,
   ): Unpacked<Pylon.WebSocketResponse<T>> {
     const { method, data } = res[0];
