@@ -21,6 +21,8 @@ async function npm() {
       },
     },
     shims: {
+      // This project uses ws event types, this only exports the default WebSocket.
+      // webSocket: true,
       custom: [
         {
           package: {
@@ -39,12 +41,48 @@ async function npm() {
           ],
         },
         {
-          package: {
-            name: '@types/node',
-            version: '17.0.35',
+          typesPackage: {
+            name: '@types/ws',
+            version: '8.5.3',
           },
-          globalNames: [],
+          package: {
+            name: 'ws',
+            version: '8.5',
+          },
+          globalNames: [
+            {
+              name: 'WebSocket',
+              exportName: 'default',
+            },
+            {
+              name: 'CloseEvent',
+              typeOnly: true,
+            },
+            {
+              name: 'Event',
+              typeOnly: true,
+            },
+            {
+              name: 'ErrorEvent',
+              typeOnly: true,
+            },
+            {
+              name: 'MessageEvent',
+              typeOnly: true,
+            },
+          ],
         },
+        // {
+        //   package: {
+        //     name: '@types/ws',
+        //     version: '8.5.3',
+        //   },
+        //   globalNames: [{
+        //     name: 'WebSocket',
+        //     exportName: 'default',
+        //     typeOnly: true,
+        //   }],
+        // },
       ],
     },
   });
