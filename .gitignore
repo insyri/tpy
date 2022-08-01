@@ -7,3 +7,5 @@ node/src
 node/LICENSE
 node/mod.ts
 node/README.md
+node/lib
+node/package-lock.json
