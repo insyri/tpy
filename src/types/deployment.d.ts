@@ -1,5 +1,5 @@
 import type Guild from './guild.d.ts';
-import type { GatewayDispatchEvents } from 'https://deno.land/x/discord_api_types@0.33.0/gateway/v8.ts';
+import type { GatewayDispatchEvents } from 'discord_api_types/gateway/v8.ts';
 import type {
   StringifiedNumber,
   StringifiedNumberWithDefault,
@@ -10,7 +10,7 @@ import type {
  *
  * Deployment related resources.
  */
-declare namespace Deployments {
+declare namespace Deployment {
   /**
    * Not an API resource, this namespace behaves as templates and other base types.
    */
@@ -188,7 +188,7 @@ declare namespace Deployments {
      *
      * Returns deployment information via ID.
      */
-    export type Deployments<Raw extends boolean = true> = Structures.Base & {
+    export type Deployment<Raw extends boolean = true> = Structures.Base & {
       config: Raw extends true ? string : Structures.Config;
       /**
        * Pylon Workbench WebSocket URL. Includes a portion the logged in user's authentication token for Pylon.
@@ -234,12 +234,12 @@ declare namespace Deployments {
      * The response schema for the POST deployment resource.
      */
     export type Response<Raw extends boolean = true> =
-      & Deployments.GET.Deployments
+      & Deployment.GET.Deployment
       & {
         /**
          * FastAPI error.
          */
-        errors: Deployments.Structures.FastAPIError;
+        errors: Deployment.Structures.FastAPIError;
         script?: {
           /**
            * The Deployment ID.
@@ -259,4 +259,4 @@ declare namespace Deployments {
   }
 }
 
-export default Deployments;
+export default Deployment;

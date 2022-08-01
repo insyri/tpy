@@ -2,4 +2,8 @@
 .env*
 _playground.ts
 
-npm
+node/node_modules
+node/src
+node/LICENSE
+node/mod.ts
+node/README.md

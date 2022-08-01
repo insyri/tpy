@@ -1,4 +1,3 @@
-import HttpStatusCode from 'https://gist.githubusercontent.com/scokmen/f813c904ef79022e84ab2409574d1b45/raw/cd8709a2fccb005bb53e9bfb2461e07d40b4e8d8/HttpStatusCode.ts';
 import TpyErr, {
   deploymentNotFound,
   guildNotFound,
@@ -6,7 +5,7 @@ import TpyErr, {
   isNotAuthorized,
   resourceNotFound,
 } from './tpy_err.ts';
-import type Deployment from './types/deployments.d.ts';
+import type Deployment from './types/deployment.d.ts';
 import type Guild from './types/guild.d.ts';
 import type User from './types/user.d.ts';
 import type Pylon from './types/pylon.d.ts';
@@ -88,7 +87,7 @@ export default class Tpy {
    * @returns Deployment information.
    */
   async getDeployment(id: StringifiedNumber) {
-    return await this.httpRaw<Deployment.GET.Deployments>(`/deployments/${id}`);
+    return await this.httpRaw<Deployment.GET.Deployment>(`/deployments/${id}`);
   }
 
   /**
@@ -185,21 +184,28 @@ export default class Tpy {
 
     // typeof [] === 'object' -> true
     if (typeof res === 'object') {
-      switch (<HttpStatusCode> rawres.status) {
-        case HttpStatusCode.OK: {
+      switch (rawres.status) {
+        // OK
+        case 200: {
           data = res as T;
           break;
         }
 
         // Happens when no authentication header is provided
 
-        case HttpStatusCode.UNAUTHORIZED:
+        // UNAUTHORIZED
+
+        case 401:
           throw TpyErr.UNAUTHORIZED;
 
-        case HttpStatusCode.METHOD_NOT_ALLOWED:
+        // METHOD_NOT_ALLOWED
+
+        case 405:
           throw TpyErr.METHOD_NOT_ALLOWED;
 
-        case HttpStatusCode.BAD_REQUEST: {
+        // BAD_REQUEST
+
+        case 400: {
           // The following checks will rely on named based keys,
           // as arrays don't support these, we will eliminate the possiblity of res being an array.
           res = <SafeObject> res;
@@ -208,10 +214,14 @@ export default class Tpy {
           break;
         }
 
-        case HttpStatusCode.NOT_FOUND:
+        // NOT_FOUND
+
+        case 404:
           throw TpyErr.RESOURCE_NOT_FOUND;
 
-        case HttpStatusCode.INTERNAL_SERVER_ERROR:
+          // INTERNAL_SERVER_ERROR
+
+        case 500:
           throw TpyErr.UNAUTHORIZED;
       }
     }

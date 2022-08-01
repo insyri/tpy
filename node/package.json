@@ -1,0 +1,17 @@
+{
+  "name": "tpy",
+  "version": "x",
+  "description": "🔑 A strongly typed Pylon API client.",
+  "license": "MIT",
+  "keywords": [
+    "pylon",
+    "pylonbot"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/insyri/tpy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/insyri/tpy/issues"
+  }
+}

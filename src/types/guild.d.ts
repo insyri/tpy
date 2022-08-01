@@ -1,7 +1,7 @@
-import { RESTPostAPIGuildsJSONBody } from 'https://deno.land/x/discord_api_types@0.33.0/rest/v8/guild.ts';
-import { APIUnavailableGuild } from 'https://deno.land/x/discord_api_types@0.33.0/payloads/v8/guild.ts';
+import { RESTPostAPIGuildsJSONBody } from 'discord_api_types/rest/v8/guild.ts';
+import { APIUnavailableGuild } from 'discord_api_types/payloads/v8/guild.ts';
 import { StringifiedNumber } from './util.d.ts';
-import Deployments from './deployments.d.ts';
+import Deployment from './deployment.d.ts';
 
 /**
  * `/guilds`
@@ -48,7 +48,7 @@ declare namespace Guild {
       & RESTPostAPIGuildsJSONBody
       & {
         deployments: Array<
-          Deployments.Structures.Base & {
+          Deployment.Structures.Base & {
             /**
              * Unused as of 5/31/2022.
              */
@@ -56,7 +56,7 @@ declare namespace Guild {
             /**
              * Deployment configuration.
              */
-            config: Raw extends true ? string : Deployments.Structures.Config;
+            config: Raw extends true ? string : Deployment.Structures.Config;
             disabled: boolean;
           }
         >;

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": false,
     "allowUnreachableCode": false,
     "lib": [
       "deno.window"
@@ -27,12 +26,12 @@
       "include": ["no-inferrable-types"]
     },
     "files": {
-      "exclude": ["npm"]
+      "exclude": ["src/types/deployments.node.d.ts", "src/types/guild.node.d.ts"]
     }
   },
+  "importMap": "import_map.json",
   "tasks": {
     "precommit": "deno lint && deno fmt",
-    "dnt": "deno run --allow-read --allow-write --allow-run --allow-env --allow-net _npm.ts",
     "pg": "deno run --allow-read --allow-env --allow-net _playground.ts"
   }
 }
