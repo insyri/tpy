@@ -18,7 +18,7 @@
       "lineWidth": 80
     },
     "files": {
-      "exclude": ["npm"]
+      "exclude": ["node"]
     }
   },
   "lint": {
@@ -27,8 +27,7 @@
     },
     "files": {
       "exclude": [
-        "src/types/deployments.node.d.ts",
-        "src/types/guild.node.d.ts"
+        "node"
       ]
     }
   },

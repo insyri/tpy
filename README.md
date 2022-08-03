@@ -35,12 +35,10 @@ const user = await client.getUser().catch((r) => {
 
 console.log(`User logged in: ${user.displayName}`);
 
-const ws = await client.connectSocket.fromGuildID(
-  <TypeUtil.StringifiedNumber> '530557949098065930',
-).catch((r) => {
-  throw 'There was an error while trying to create a WebSocket: ' +
-    TpyErrToString(r);
-});
+const ws = client.connectSocket(
+  <TypeUtil.StringifiedNumber> (await client.getGuildInfo('530557949098065930'))
+    .deployments[0].id,
+);
 
 // Dynamically finds the workbench URL to connect to.
 await ws.connect();
@@ -52,16 +50,23 @@ ws.on('message', (payload) => console.log(payload.data));
 
 // Typing out the message data is also allowed.
 // See expansion below this codeblock to see code that can provide this log format.
-const MessageLogTypes = ['Create', 'Delete'] as const;
-ws.on<[typeof MessageLogTypes[number], string | null]>(
+type Attachments = {
+  name: string;
+  url: string;
+}[];
+
+ws.on<[
+  string,
+  Attachments,
+]>(
   'message',
   (payload) => {
-    const LogType = payload.data[0];
-    const Message = payload.data[1];
+    const Content = payload.data[0];
+    const Attachments = payload.data[1];
     console.log(
-      `Message Event: ${LogType} -> ${
-        Message || '(The message did not have text content)'
-      }`,
+      `New Message: "${Content}"\n`,
+      `Attachments:\n`,
+      ...Attachments.map((a) => `${a.name} (${a.url})\n`),
     );
   },
 );
@@ -71,17 +76,17 @@ ws.on<[typeof MessageLogTypes[number], string | null]>(
   <summary>Pylon Code</summary>
 
 ```ts
-const MessageLogTypes = ['Create', 'Delete'];
+type Attachments = {
+  name: string;
+  url: string;
+}[];
 
-discord.on(
-  'MESSAGE_CREATE',
-  async (m) => console.log(MessageLogTypes[0], m.content),
-);
-
-discord.on(
-  'MESSAGE_DELETE',
-  async (_, m) => console.log(MessageLogTypes[1], m!.content),
-);
+discord.on('MESSAGE_CREATE', async (m) => {
+  let attachments: Attachments = m.attachments.map((v) => {
+    return { name: v.filename, url: v.proxyUrl };
+  });
+  console.log(m.content, attachments);
+});
 ```
 
 </details>

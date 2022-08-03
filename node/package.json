@@ -1,6 +1,6 @@
 {
   "name": "tpy",
-  "version": "x",
+  "version": "1.0.0-pre-release",
   "description": "🔑 A strongly typed Pylon API client.",
   "license": "MIT",
   "keywords": [
@@ -15,8 +15,8 @@
     "url": "https://github.com/insyri/tpy/issues"
   },
   "devDependencies": {
-    "discord-api-types": "0.37.0",
     "@types/node": "18.6.3",
+    "discord-api-types": "0.37.0",
     "typescript": "4.7.4"
   }
 }

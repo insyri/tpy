@@ -7,6 +7,14 @@ on:
 permissions: write-all
 
 jobs:
+  Node-Transformation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
+      - uses: actions/setup-node@v3
+      - run: ./node-tranform.ps1 -Version "x"
+        shell: pwsh
   Cleaning:
     runs-on: ubuntu-latest
     steps:

@@ -1,7 +1,8 @@
 Param(
   [Parameter(Mandatory = $false, Position = 0)]
-  [ValidatePattern("v(\d\.){2}\d")]
-  [string] $Version
+  [string] $Version,
+
+  [switch] $Publish
 )
 
 If ($PSVersionTable.PSVersion.Major -lt 7) {
@@ -16,21 +17,18 @@ If ((Get-Location).Path -notlike '*tpy') {
 
 # Injection
 
-$ItemList = "src", "mod.ts", "README.md", "LICENSE"
+$ItemList = "src", "README.md", "LICENSE"
 $DeleteList = "lib", "node_modules", "package-lock.json"
 $Destination = "node"
-$NodePackageLocation = "$Destination\package.json"
+$NodePackageLocation = "$Destination/package.json"
 $ImportRegex = "(?<=(?<=\n|^)import(?:(?!(\.d)?\.ts).|\n)*)(\.d)?\.ts"
 
 [string[]]$PresentFiles = @()
-$ItemList | ForEach-Object {
-  If (Test-Path "$Destination\$_") {
-    $PresentFiles += "$Destination\$_"
+$ItemList + $DeleteList | ForEach-Object {
+  $F = "$Destination/$_"
+  If (Test-Path $F) {
+    $PresentFiles += $F
   }
-}
-
-$DeleteList | ForEach-Object {
-  $PresentFiles += "$Destination\$_"
 }
 
 $PresentFilesFormated = [String]::Join(", ", $PresentFiles)
@@ -48,7 +46,6 @@ If ($PresentFiles.Length -ne 0) {
   }
 }
 
-
 ForEach ($Item in $ItemList) {
   If (Test-Path $Item -PathType Container) {
     Copy-Item "$Item" "$Destination" -Recurse
@@ -60,7 +57,7 @@ ForEach ($Item in $ItemList) {
 
 # Package Setup
 
-$NodePackage = (Get-Content "$NodePackageLocation" | ConvertFrom-Json)
+$NodePackage = (Get-Content "$NodePackageLocation" -Raw | ConvertFrom-Json)
 $NodePackage.version = $Version
 $NodePackage | ConvertTo-Json > $NodePackageLocation
 
@@ -68,7 +65,7 @@ $NodePackage | ConvertTo-Json > $NodePackageLocation
 
 # Per File
 Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
-  $Content = Get-Content $_.FullName
+  $Content = Get-Content $_.FullName -Raw
   $Content -replace "$ImportRegex", "" > $_.FullName
 }
 
@@ -78,3 +75,11 @@ Set-Location "$Destination"
 
 npm install
 npx tsc
+
+If ($Publish) { 
+  If ($Version -eq "x") {
+    npm publish --dry-run
+  } else {
+    npm publish
+  }
+}
