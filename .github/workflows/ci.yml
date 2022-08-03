@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
       - uses: actions/setup-node@v3
-      - run: ./node-tranform.ps1 -Version "x"
+      - run: ./node-transform.ps1 -Version "x"
         shell: pwsh
   Cleaning:
     runs-on: ubuntu-latest
