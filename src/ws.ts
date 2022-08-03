@@ -1,7 +1,7 @@
 import Tpy from './tpy.ts';
 import type { StringifiedNumber, Unpacked } from './types/util.d.ts';
 import type Pylon from './types/pylon.d.ts';
-import { EventEmitter } from 'https://deno.land/std@0.148.0/node/events.ts';
+import { EventEmitter } from 'events';
 
 /**
  * The Tpy WebSocket manager.

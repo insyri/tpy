@@ -1,5 +1,5 @@
 import type Guild from './src/types/guild.d.ts';
-import type Deployment from './src/types/deployments.d.ts';
+import type Deployment from './src/types/deployment.d.ts';
 import type User from './src/types/user.d.ts';
 import type * as TypeUtil from './src/types/util.d.ts';
 import type * as Util from './src/types/util.d.ts';
