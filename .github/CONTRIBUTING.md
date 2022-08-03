@@ -32,19 +32,13 @@ deno task pg
 
 ## Node.js
 
-Tpy uses [`dnt`](https://deno.land/x/dnt) for transforming Deno projects to
-Node.js. By doing the following:
+As Tpy is a Deno project, Tpy does not use Deno's built solution [`dnt`](https://deno.land/x/dnt),
+instead, Tpy uses a PowerShell Core script [`node-transform.ps1`](./../node-transform.ps1).
 
-```bash
-deno task dnt vx.x.x # Script requires bumped version
+You can use it like this:
+
+```ps1
+./node-transform.ps1 -Version vx.x.x
 ```
 
 Will generate an `npm` folder with contents formatted to ship on npm.
-
-## Notes
-
-When using the
-[Deno VSCode Extension](https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno),
-it is encouraged to manually disable the
-[TypeScript VSCode Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript)
-as the language server standards are different and often break each other.

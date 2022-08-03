@@ -1,4 +1,4 @@
-<img align="right" width="150" src=".github/assets/pylon.svg">
+<img align="right" width="150" alt="pylon" src="https://raw.githubusercontent.com/insyri/tpy/main/.github/assets/pylon.svg">
 
 # tpy
 
@@ -24,7 +24,7 @@ npm install tpy
 import Tpy, {
   TpyErrToString,
   TypeUtil,
-} from 'https://deno.land/x/tpy@v1.0.0/mod.ts';
+} from 'https://deno.land/x/tpy@v1.0.0-pre-release/mod.ts';
 // Or use Node
 // import Tpy, { TpyErrToString, TypeUtil } from 'tpy';
 

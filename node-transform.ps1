@@ -1,8 +1,6 @@
 Param(
   [Parameter(Mandatory = $false, Position = 0)]
-  [string] $Version,
-
-  [switch] $Publish
+  [string] $Version
 )
 
 If ($PSVersionTable.PSVersion.Major -lt 7) {
@@ -63,7 +61,6 @@ $NodePackage | ConvertTo-Json > $NodePackageLocation
 
 # Node Import Syntax Fix
 
-# Per File
 Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
   $Content = Get-Content $_.FullName -Raw
   $Content -replace "$ImportRegex", "" > $_.FullName
@@ -75,11 +72,3 @@ Set-Location "$Destination"
 
 npm install
 npx tsc
-
-If ($Publish) { 
-  If ($Version -eq "x") {
-    npm publish --dry-run
-  } else {
-    npm publish
-  }
-}
