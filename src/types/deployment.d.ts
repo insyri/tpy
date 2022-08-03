@@ -1,5 +1,5 @@
 import type Guild from './guild.d.ts';
-import type { GatewayDispatchEvents } from 'discord_api_types/gateway/v8.ts';
+import type { GatewayDispatchEvents } from 'discord-api-types/gateway/v8.ts';
 import type {
   StringifiedNumber,
   StringifiedNumberWithDefault,

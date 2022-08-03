@@ -4,6 +4,11 @@ Param(
   [string] $Version
 )
 
+If ($PSVersionTable.PSVersion.Major -lt 7) {
+  Write-Error "Incompatible version of PowerShell. Use version 7+."
+  Exit
+}
+
 If ((Get-Location).Path -notlike '*tpy') {
   Write-Error "Not in project root"
   Exit
@@ -12,15 +17,20 @@ If ((Get-Location).Path -notlike '*tpy') {
 # Injection
 
 $ItemList = "src", "mod.ts", "README.md", "LICENSE"
+$DeleteList = "lib", "node_modules", "package-lock.json"
 $Destination = "node"
 $NodePackageLocation = "$Destination\package.json"
-$ImportRegex = "(?g)(?(?<=(?<=\n|^)import(?:(?!(\.d)?\.ts).|\n)*)(\.d)?\.ts"
+$ImportRegex = "(?<=(?<=\n|^)import(?:(?!(\.d)?\.ts).|\n)*)(\.d)?\.ts"
 
 [string[]]$PresentFiles = @()
 $ItemList | ForEach-Object {
   If (Test-Path "$Destination\$_") {
     $PresentFiles += "$Destination\$_"
   }
+}
+
+$DeleteList | ForEach-Object {
+  $PresentFiles += "$Destination\$_"
 }
 
 $PresentFilesFormated = [String]::Join(", ", $PresentFiles)
@@ -47,10 +57,11 @@ ForEach ($Item in $ItemList) {
     Copy-Item "$Item" "$Destination"
   }
 }
+
 # Package Setup
 
 $NodePackage = (Get-Content "$NodePackageLocation" | ConvertFrom-Json)
-$NodePackage.version = $Version 
+$NodePackage.version = $Version
 $NodePackage | ConvertTo-Json > $NodePackageLocation
 
 # Node Import Syntax Fix

@@ -1,5 +1,5 @@
-import { RESTPostAPIGuildsJSONBody } from 'discord_api_types/rest/v8/guild.ts';
-import { APIUnavailableGuild } from 'discord_api_types/payloads/v8/guild.ts';
+import { RESTPostAPIGuildsJSONBody } from 'discord-api-types/rest/v8/guild.ts';
+import { APIUnavailableGuild } from 'discord-api-types/payloads/v8/guild.ts';
 import { StringifiedNumber } from './util.d.ts';
 import Deployment from './deployment.d.ts';
 
