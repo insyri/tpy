@@ -10,8 +10,8 @@
     "noImplicitAny": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "allowUnreachableCode": false,
+    "allowUnreachableCode": false
   },
   "include": ["src"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules"]
 }

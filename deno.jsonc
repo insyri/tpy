@@ -26,7 +26,10 @@
       "include": ["no-inferrable-types"]
     },
     "files": {
-      "exclude": ["src/types/deployments.node.d.ts", "src/types/guild.node.d.ts"]
+      "exclude": [
+        "src/types/deployments.node.d.ts",
+        "src/types/guild.node.d.ts"
+      ]
     }
   },
   "importMap": "import_map.json",
