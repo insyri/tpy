@@ -32,8 +32,9 @@ deno task pg
 
 ## Node.js
 
-As Tpy is a Deno project, Tpy does not use Deno's built solution [`dnt`](https://deno.land/x/dnt),
-instead, Tpy uses a PowerShell Core script [`node-transform.ps1`](./../node-transform.ps1).
+As Tpy is a Deno project, Tpy does not use Deno's built solution
+[`dnt`](https://deno.land/x/dnt), instead, Tpy uses a PowerShell Core script
+[`node-transform.ps1`](./../node-transform.ps1).
 
 You can use it like this:
 
