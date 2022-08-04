@@ -6,6 +6,9 @@ A strongly typed Pylon API client. https://pylon.bot/
 
 [![CI](https://github.com/insyri/tpy/actions/workflows/ci.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/ci.yml)
 
+[![](https://shields.io/badge/deno.land/x-05122A?logo=deno&style=for-the-badge)](https://deno.land/x/tpy)
+[![](https://shields.io/badge/npmjs.com-05122A?logo=npm&style=for-the-badge)](https://nodejs.org/packages/tpy)
+
 The Pylon API does not have a standardized response, meaning there are alot of
 edge cases and can result sometimes in unexpected responses. Tpy aims to resolve
 this by providing type safe interaction along with optional specification if you
@@ -15,10 +18,6 @@ documentation on almost all used endpoints.
 ```bash
 npm install tpy
 ```
-
-[![](https://shields.io/badge/deno-05122A?logo=deno&style=for-the-badge)](https://deno.land/)
-[![](https://shields.io/badge/node.js-05122A?logo=node.js&style=for-the-badge)](https://nodejs.org/)
-[![](https://shields.io/badge/typescript-05122A?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org/)
 
 ```ts
 import Tpy, {
