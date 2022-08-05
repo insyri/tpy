@@ -3,6 +3,8 @@
   "version": "1.0.0-pre-release",
   "description": "🔑 A strongly typed Pylon API client.",
   "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "keywords": [
     "pylon",
     "pylonbot"
