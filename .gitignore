@@ -1,7 +1,6 @@
 # Local testing
 .env*
-_playground.ts
-.vscode
+_playground.*
 
 node/node_modules
 node/src

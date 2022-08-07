@@ -12,11 +12,11 @@ appropriate issue.
 1. Fork and clone the repository; verify you are on the `main` branch.
 2. Code it!
 3. Finalize, and document your changes in JSDoc. You can perform formatting
-   locally by executing the `precommit` task.
+   locally by executing the `precommit` task. This will automatically be done
+   via CI through remote pushes.
 
 ```bash
 deno task precommit
-# This will automatically be done via CI through remote pushes.
 ```
 
 4. Send in a pull request with a summarized explanation of your changes.
