@@ -5,7 +5,7 @@ _playground.*
 node/node_modules
 node/src
 node/LICENSE
-node/mod.ts
+node/mod.*
 node/README.md
 node/lib
 node/package-lock.json

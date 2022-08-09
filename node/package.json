@@ -1,14 +1,21 @@
 {
   "name": "tpy",
-  "version": "1.0.0-pre-release",
+  "version": "1.0.0-pre-release-2",
   "description": "🔑 A strongly typed Pylon API client.",
   "license": "MIT",
   "type": "commonjs",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "lib/mod.js",
+  "types": "lib/mod.d.ts",
+  "files": [
+    "lib",
+    "LICENSE",
+    "README.md",
+    "package.json",
+    "mod.js",
+    "mod.d.ts"
+  ],
   "scripts": {
-    "build":"tsc && npm run postbuild",
-    "build:win":"tsc && npm run postbuild --script-shell bash.exe",
+    "build": "tsc && tsc ./mod.ts --outdir . -d",
     "postbuild": "cp -r ./src/types/ ./lib/"
   },
   "keywords": [

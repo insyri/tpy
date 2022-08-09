@@ -12,8 +12,8 @@ If ((Get-Location).Path -notlike '*tpy') {
 
 # Injection
 
-$ItemList = "src", "README.md", "LICENSE"
-$DeleteList = "lib", "node_modules", "package-lock.json"
+$ItemList = "src", "README.md", "LICENSE", "mod.ts"
+$DeleteList = "lib", "node_modules", "package-lock.json", "mod.js", "mod.d.ts"
 $Destination = "node"
 $NodePackageLocation = "$Destination/package.json"
 $ImportRegex = "(?<=(?<=\n|^)import(?:(?!(\.d)?\.ts).|\n)*)(\.d)?\.ts"
@@ -68,9 +68,4 @@ Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
 Set-Location "$Destination"
 
 npm install
-
-If ("$OS" -eq "Windows_NT") {
-  npm run build:win
-} else {
-  npm run build
-}
+npm run build
