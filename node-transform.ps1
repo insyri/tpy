@@ -1,12 +1,9 @@
+#Requires -Version 6.0
+
 Param(
   [Parameter(Mandatory = $false, Position = 0)]
   [string] $Version
 )
-
-If ($PSVersionTable.PSVersion.Major -lt 7) {
-  Write-Error "Incompatible version of PowerShell. Use version 7+."
-  Exit
-}
 
 If ((Get-Location).Path -notlike '*tpy') {
   Write-Error "Not in project root"
@@ -71,4 +68,9 @@ Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
 Set-Location "$Destination"
 
 npm install
-npx tsc
+
+If ("$OS" -eq "Windows_NT") {
+  npm run build:win
+} else {
+  npm run build
+}

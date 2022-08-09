@@ -3,8 +3,14 @@
   "version": "1.0.0-pre-release",
   "description": "🔑 A strongly typed Pylon API client.",
   "license": "MIT",
+  "type": "commonjs",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "scripts": {
+    "build":"tsc && npm run postbuild",
+    "build:win":"tsc && npm run postbuild --script-shell bash.exe",
+    "postbuild": "cp -r ./src/types/ ./lib/"
+  },
   "keywords": [
     "pylon",
     "pylonbot"
