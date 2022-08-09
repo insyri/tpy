@@ -1,6 +1,12 @@
 {
   "deno.enable": true,
-  "deno.enablePaths": ["src", "_playground.ts", "_playground.js", "_playground.mjs", "_playground.cjs"],
+  "deno.enablePaths": [
+    "src",
+    "_playground.ts",
+    "_playground.js",
+    "_playground.mjs",
+    "_playground.cjs"
+  ],
   "[typescript][json][markdown]": {
     "editor.defaultFormatter": "denoland.vscode-deno",
     "editor.formatOnSave": true
