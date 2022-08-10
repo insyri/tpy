@@ -69,3 +69,12 @@ Set-Location "$Destination"
 
 npm install
 npm run build
+
+Copy-Item -Recurse "src/types" "lib"
+
+"mod.d.ts", "mod.js" | ForEach-Object {
+  $K = "$(Get-Content "$_" -Raw)" -replace "src", "lib"
+  "$K" > "$_"
+}
+
+Set-Location ".."
