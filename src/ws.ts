@@ -79,13 +79,13 @@ export default class TpyWs {
    */
   on<C extends unknown[] = unknown[]>(
     type: 'message',
-    callback: (data: Unpacked<Pylon.WebSocketResponse<C>>) => void,
+    callback: (data: Unpacked<Pylon.WebSocket.Response<C>>) => void,
   ): EventEmitter;
   on<C extends unknown[] = unknown[]>(type: unknown, callback: unknown) {
     if (typeof type != 'string' || typeof callback != 'function') throw '';
     return this.rawEventEmitter.on(
       type,
-      <(data: Unpacked<Pylon.WebSocketResponse<C>>) => void> callback,
+      <(data: Unpacked<Pylon.WebSocket.Response<C>>) => void> callback,
     );
   }
 
@@ -138,8 +138,8 @@ export default class TpyWs {
    * @returns
    */
   unpack<T extends unknown[] = unknown[]>(
-    res: Pylon.WebSocketResponse<T>,
-  ): Unpacked<Pylon.WebSocketResponse<T>> {
+    res: Pylon.WebSocket.Response<T>,
+  ): Unpacked<Pylon.WebSocket.Response<T>> {
     const { method, data } = res[0];
     return { data, method };
   }

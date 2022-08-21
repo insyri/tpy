@@ -34,7 +34,7 @@ declare namespace Guild {
   }
 
   /**
-   * GET /guilds
+   * `GET /guilds`
    *
    * Returns guilds of the respective user.
    */

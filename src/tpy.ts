@@ -11,6 +11,7 @@ import type User from './types/user.d.ts';
 import type Pylon from './types/pylon.d.ts';
 import type { SafeObject, StringifiedNumber } from './types/util.d.ts';
 import TpyWs from './ws.ts';
+import KVNamespace from './kv.ts';
 
 type MaybeArr<T> = T | T[];
 
@@ -119,7 +120,7 @@ export default class Tpy {
    * @param other Other fetch parameters.
    * @returns Headers with specifics.
    */
-  readyRequest(method: Pylon.Verbs, other?: RequestInit): RequestInit {
+  readyRequest(method: Pylon.HTTPVerbs, other?: RequestInit): RequestInit {
     return {
       method,
       headers: {
@@ -140,6 +141,55 @@ export default class Tpy {
   }
 
   /**
+   * Gets all the namespaces under the given deployment ID.
+   * @param deploymentID The deployment ID to look under.
+   */
+  async getNamespaces(deploymentID: StringifiedNumber) {
+    return await this.httpRaw<Pylon.KV.GET.Namespace>(
+      `/deployments/${deploymentID}/kv/namespaces`,
+    );
+  }
+
+  /**
+   * Gets all the namespace items under the given deployment ID.
+   * @param deploymentID The deployment ID to look under.
+   * @param namespace The namespace to look under.
+   */
+  async getNamespaceItems<T>(
+    deploymentID: StringifiedNumber,
+    namespace: string,
+  ): Promise<{
+    key: string;
+    value: T;
+  }[]> {
+    const response = await this.httpRaw<Pylon.KV.GET.Items<T>>(
+      `/deployments/${deploymentID}/kv/namespaces/${namespace}/items`,
+    );
+    for (const p of response) {
+      p.value = JSON.parse(p.value.string);
+    }
+
+    return response as unknown as {
+      key: string;
+      value: T;
+    }[];
+  }
+
+  /**
+   * Creates a new KVNamespace instance,
+   * much like the Pylon SDK's KVNamespace class.
+   * @param deploymentID The deployment ID to look under.
+   * @param namespace The namespace to look under.
+   */
+  // deno-lint-ignore no-explicit-any
+  newKVNamespace<T = any>(
+    deploymentID: StringifiedNumber,
+    namespace: string,
+  ) {
+    return new KVNamespace<T>(this, deploymentID, namespace);
+  }
+
+  /**
    * Makes a request to the API.
    *
    * @param resource The resource to request that will be concatenated with the api url.
@@ -148,15 +198,13 @@ export default class Tpy {
    *
    * @param other Other fetch parameters.
    *
-   * @returns {TpyErr} TpyErr
+   * @throws {TpyErr} TpyErr
    */
   async httpRaw<T extends MaybeArr<SafeObject>>(
     resource: `/${string}`,
-    method: Pylon.Verbs = 'GET',
+    method: Pylon.HTTPVerbs = 'GET',
     other: RequestInit = {},
-  ): Promise<
-    T
-  > {
+  ): Promise<T> {
     const rawres = await fetch(
       this.api_url + resource,
       this.readyRequest(method, other),
@@ -186,7 +234,7 @@ export default class Tpy {
     if (typeof res === 'object') {
       switch (rawres.status) {
         // OK
-        case 200: {
+        case 200 || 204: {
           data = res as T;
           break;
         }
@@ -195,7 +243,7 @@ export default class Tpy {
 
         // UNAUTHORIZED
 
-        case 401:
+        case 401 || 403:
           throw TpyErr.UNAUTHORIZED;
 
         // METHOD_NOT_ALLOWED

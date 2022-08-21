@@ -6,7 +6,8 @@ import type * as Util from './src/types/util.d.ts';
 import TpyErr, { type TpyErrAsStrings, TpyErrToString } from './src/tpy_err.ts';
 import TpyWs from './src/ws.ts';
 import Tpy from './src/tpy.ts';
+import KVNamespace from './src/kv.ts';
 
 export default Tpy;
 export type { Deployment, Guild, TpyErrAsStrings, TypeUtil, User, Util };
-export { TpyErr, TpyErrToString, TpyWs };
+export { KVNamespace, TpyErr, TpyErrToString, TpyWs };
