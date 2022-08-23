@@ -181,12 +181,11 @@ export default class Tpy {
    * @param deploymentID The deployment ID to look under.
    * @param namespace The namespace to look under.
    */
-  // deno-lint-ignore no-explicit-any
-  newKVNamespace<T = any>(
+  newKVNamespace(
     deploymentID: StringifiedNumber,
     namespace: string,
   ) {
-    return new KVNamespace<T>(this, deploymentID, namespace);
+    return new KVNamespace(this, deploymentID, namespace);
   }
 
   /**
@@ -215,6 +214,8 @@ export default class Tpy {
       res = JSON.parse(res) as MaybeArr<SafeObject>;
       // deno-lint-ignore no-empty
     } catch {}
+
+    if (rawres.ok) return res as T;
 
     // The only known cases where responses are not JSON are:
     // - 404 * = `⚠️ 404 — Not Found\n==================\nReq`
@@ -273,7 +274,7 @@ export default class Tpy {
           throw TpyErr.UNAUTHORIZED;
       }
     }
-    if (!data) throw TpyErr.UNIDENTIFIABLE;
+    if (!data) throw rawres;
     return data;
   }
 }

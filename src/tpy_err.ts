@@ -100,8 +100,12 @@ export type TpyErrAsStrings =
  * @returns An english version of the error.
  */
 export function TpyErrToString(
-  err: TpyErr,
+  err: TpyErr | Response,
 ): TpyErrAsStrings {
+  if (err instanceof Response) {
+    return 'Unidentifiable error';
+  }
+
   switch (err) {
     case TpyErr.NO_ERR:
       return '';
