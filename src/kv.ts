@@ -100,7 +100,9 @@ export default class KVNamespace {
    *
    * The maximum limit is 100, however.
    */
-  async items(options?: Pylon.KV.OperationOptions.Items) {
+  async items<T>(
+    options?: Pylon.KV.OperationOptions.Items,
+  ): Promise<Pylon.KV.GET.ItemsFlattened<T, true>[]> {
     const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
     );
@@ -114,10 +116,14 @@ export default class KVNamespace {
       );
     }
 
+    console.log('httpraw');
+    console.log(response);
+
     return response.map((i) => {
       return {
         key: i.key,
-        value: JSON.parse(i.value.string),
+        value: JSON.parse(i.value.string) as T,
+        expiresAt: i.value.expiresAt,
       };
     });
   }
