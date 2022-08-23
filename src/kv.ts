@@ -5,7 +5,7 @@ import type Pylon from './types/pylon.d.ts';
 /**
  * A KVNamespace interface that matches the Pylon KVNamespace class.
  */
-export default class KVNamespace<T = Pylon.Json> {
+export default class KVNamespace {
   /**
    * The namespace that this KVNamespace was constructed with.
    */
@@ -35,11 +35,11 @@ export default class KVNamespace<T = Pylon.Json> {
    */
   async put(
     key: string,
-    value: T,
+    value: Pylon.Json,
     options?: Pylon.KV.OperationOptions.Put,
   ) {
     if (options?.ifNotExists) {
-      if (await this.get<T>(key)) throw 'Key exists already';
+      if (await this.get(key)) throw 'Key exists already';
       // TODO: add better message and use tpyerr
     }
 
@@ -55,7 +55,7 @@ export default class KVNamespace<T = Pylon.Json> {
    * in order to cast the return type of the function to a given Json type.
    * @param key The Key to get
    */
-  async get<K = T>(key: string): Promise<K | undefined> {
+  async get<K>(key: string): Promise<K | undefined> {
     const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items<K>>(
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
     );
