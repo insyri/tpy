@@ -158,21 +158,19 @@ export default class Tpy {
   async getNamespaceItems<T>(
     deploymentID: StringifiedNumber,
     namespace: string,
-  ): Promise<{
-    key: string;
-    value: T;
-  }[]> {
+  ): Promise<Pylon.KV.GET.ItemsFlattened> {
     const response = await this.httpRaw<Pylon.KV.GET.Items<T>>(
       `/deployments/${deploymentID}/kv/namespaces/${namespace}/items`,
     );
-    for (const p of response) {
-      p.value = JSON.parse(p.value.string);
+    const a: Pylon.KV.GET.ItemsFlattened = [];
+    for (let i = 0; i < response.length; i++) {
+      const p = response[i];
+      if (!p.value.string) throw TpyErr.UNEXPECTED_OR_MISSING_VALUE;
+      a[i].key = p.key;
+      a[i].value = JSON.parse(p.value.string);
     }
 
-    return response as unknown as {
-      key: string;
-      value: T;
-    }[];
+    return response;
   }
 
   /**

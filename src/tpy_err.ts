@@ -81,6 +81,11 @@ enum TpyErr {
    * @see TpyErr.UNAUTHORIZED
    */
   INTERNAL_SERVER_ERROR,
+  /**
+   * This has to do with verifying an API request's structure.
+   * If a given value is missing or has unexpected behavior, this is thrown.
+   */
+  UNEXPECTED_OR_MISSING_VALUE,
 }
 
 export type TpyErrAsStrings =

@@ -81,7 +81,10 @@ export default class TpyWs {
     type: 'message',
     callback: (data: Unpacked<Pylon.WebSocket.Response<C>>) => void,
   ): EventEmitter;
-  on<C extends unknown[] = unknown[]>(type: unknown, callback: unknown) {
+  on<C extends unknown[] = unknown[]>(
+    type: unknown,
+    callback: unknown,
+  ) {
     if (typeof type != 'string' || typeof callback != 'function') throw '';
     return this.rawEventEmitter.on(
       type,

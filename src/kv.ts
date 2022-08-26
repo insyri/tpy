@@ -1,6 +1,7 @@
 import Tpy from './tpy.ts';
 import type { StringifiedNumber } from './types/util.d.ts';
 import type Pylon from './types/pylon.d.ts';
+import TpyErr from './tpy_err.ts';
 
 /**
  * A KVNamespace interface that matches the Pylon KVNamespace class.
@@ -51,23 +52,63 @@ export default class KVNamespace {
   }
 
   /**
+   * Sets the value of a given key within the key-value store.
+   * @param key The key to set.
+   * @param value The value to set.
+   * @param options
+   */
+  async putArrayBuffer(
+    key: string,
+    value: ArrayBuffer,
+    options?: Pylon.KV.OperationOptions.Put,
+  ) {
+    if (options?.ifNotExists) {
+      if (await this.get(key)) throw 'Key exists already';
+      // TODO: add better message and use tpyerr
+    }
+
+    await this.tpyc.httpRaw(
+      `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items/${key}`,
+      'PUT',
+      { body: JSON.stringify({ 'bytes': value }) },
+    );
+  }
+
+  /**
    * Gets a key's value - returning the value or undefined. Type `T` can be provided,
    * in order to cast the return type of the function to a given Json type.
    * @param key The Key to get
    */
-  async get<K>(key: string): Promise<K | undefined> {
-    const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items<K>>(
+  async get<T extends Pylon.Json = Pylon.Json>(
+    key: string,
+  ): Promise<T | undefined> {
+    const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items<T>>(
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
     );
-    let item: K | undefined;
+    let item: T | undefined;
     for (const p of response) {
       if (p.key !== key) continue;
-      let j = p.value.string as unknown as K;
-      try {
-        j = JSON.parse(p.value.string);
-        // deno-lint-ignore no-empty
-      } catch {}
-      item = j;
+      if (!p.value.string) throw TpyErr.UNEXPECTED_OR_MISSING_VALUE;
+      item = JSON.parse(p.value.string);
+      break;
+    }
+    return item;
+  }
+
+  /**
+   * Gets a key's value - returning the value or undefined. Type `T` can be provided,
+   * in order to cast the return type of the function to a given Json type.
+   * @param key The Key to get
+   */
+  async getArrayBuffer(key: string): Promise<ArrayBuffer | undefined> {
+    const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
+      `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
+    );
+    let item: ArrayBuffer | undefined;
+    for (const p of response) {
+      if (p.key !== key) continue;
+      const arr = new TextEncoder().encode(p.value.bytes);
+      item = arr.buffer.slice(arr.byteOffset, arr.byteLength + arr.byteOffset);
       break;
     }
     return item;
@@ -102,7 +143,7 @@ export default class KVNamespace {
    */
   async items<T>(
     options?: Pylon.KV.OperationOptions.Items,
-  ): Promise<Pylon.KV.GET.ItemsFlattened<T, true>[]> {
+  ): Promise<Pylon.KV.GET.ItemsFlattened<T>> {
     const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
     );
@@ -116,13 +157,14 @@ export default class KVNamespace {
       );
     }
 
-    console.log('httpraw');
-    console.log(response);
-
     return response.map((i) => {
+      const j = i.value.string
+        ? JSON.parse(i.value.string) as T
+        : i.value.bytes;
+      if (!j) throw TpyErr.UNEXPECTED_OR_MISSING_VALUE;
       return {
         key: i.key,
-        value: JSON.parse(i.value.string) as T,
+        value: j,
         expiresAt: i.value.expiresAt,
       };
     });

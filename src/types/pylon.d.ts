@@ -11,6 +11,9 @@ declare namespace Pylon {
    * HTTP Verbs supported by the Pylon API.
    */
   export type HTTPVerbs = 'GET' | 'POST' | 'PUT' | 'DELETE';
+  /**
+   * Types parsable by ES5's `JSON.parse` function.
+   */
   export type Json =
     | string
     | number
@@ -18,6 +21,9 @@ declare namespace Pylon {
     | null
     | SafeObject
     | JsonArray[];
+  /**
+   * An array of types parsable by ES5's `JSON.parse` function.
+   */
   export type JsonArray = Json[];
   /**
    * Structures regarding Pylon KV operations.
@@ -41,17 +47,17 @@ declare namespace Pylon {
       export type Items<T = unknown, Raw extends boolean = true> = Array<{
         key: string;
         value: {
-          string: Raw extends true ? string : T;
+          string?: Raw extends true ? string : T;
+          bytes?: Raw extends true ? string : T;
           expiresAt?: string;
         };
       }>;
 
-      export type ItemsFlattened<T = unknown, Raw extends boolean = true> =
-        Array<{
-          key: string;
-          value: Raw extends true ? string : T;
-          expiresAt?: string;
-        }>;
+      export type ItemsFlattened<T = unknown> = Array<{
+        key: string;
+        value: T;
+        expiresAt?: string;
+      }>;
     }
 
     export namespace DELETE {
