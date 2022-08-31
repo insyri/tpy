@@ -27,16 +27,21 @@ export default class Tpy {
    * The Pylon workbench websocket URL.
    */
   readonly wss_url = 'wss://workbench.pylon.bot/ws';
+  /**
+   * The specified deployment ID used for deployment ID entries as a default.
+   */
+  readonly deploymentID?: StringifiedNumber;
   private readonly token: string;
 
   /**
    * @param token The token to use for the API
-   *
+   * @param deploymentID A default deployment ID.
    * @returns A new Tpy instance.
    */
-  constructor(token: string) {
+  constructor(token: string, deploymentID?: StringifiedNumber) {
     if (!token) throw new Error('Token is required');
     this.token = token;
+    if (deploymentID) this.deploymentID = deploymentID;
   }
 
   /**
@@ -144,9 +149,12 @@ export default class Tpy {
    * Gets all the namespaces under the given deployment ID.
    * @param deploymentID The deployment ID to look under.
    */
-  async getNamespaces(deploymentID: StringifiedNumber) {
+  async getNamespaces(deploymentID?: StringifiedNumber) {
+    if (!(deploymentID || this.deploymentID)) {
+      throw TpyErr.UNEXPECTED_OR_MISSING_VALUE;
+    }
     return await this.httpRaw<Pylon.KV.GET.Namespace>(
-      `/deployments/${deploymentID}/kv/namespaces`,
+      `/deployments/${deploymentID || this.deploymentID}/kv/namespaces`,
     );
   }
 
@@ -156,11 +164,16 @@ export default class Tpy {
    * @param namespace The namespace to look under.
    */
   async getNamespaceItems<T>(
-    deploymentID: StringifiedNumber,
     namespace: string,
+    deploymentID?: StringifiedNumber,
   ): Promise<Pylon.KV.GET.ItemsFlattened> {
+    if (!(deploymentID || this.deploymentID)) {
+      throw 'Deployment ID is required';
+    }
     const response = await this.httpRaw<Pylon.KV.GET.Items<T>>(
-      `/deployments/${deploymentID}/kv/namespaces/${namespace}/items`,
+      `/deployments/${
+        deploymentID || this.deploymentID
+      }/kv/namespaces/${namespace}/items`,
     );
     const a: Pylon.KV.GET.ItemsFlattened = [];
     for (let i = 0; i < response.length; i++) {
@@ -180,10 +193,17 @@ export default class Tpy {
    * @param namespace The namespace to look under.
    */
   newKVNamespace(
-    deploymentID: StringifiedNumber,
     namespace: string,
+    deploymentID?: StringifiedNumber,
   ) {
-    return new KVNamespace(this, deploymentID, namespace);
+    if (!(deploymentID || this.deploymentID)) {
+      throw 'Deployment ID is required';
+    }
+    return new KVNamespace(
+      this,
+      (deploymentID || this.deploymentID)!,
+      namespace,
+    );
   }
 
   /**
