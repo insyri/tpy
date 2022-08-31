@@ -193,7 +193,7 @@ export default class KVNamespace {
     return (await this.tpyc.httpRaw<Pylon.KV.DELETE.Namespace>(
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}`,
       'DELETE',
-    )).keys_delted;
+    )).keys_deleted;
   }
 
   /**

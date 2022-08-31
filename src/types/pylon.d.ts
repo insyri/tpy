@@ -62,7 +62,7 @@ declare namespace Pylon {
 
     export namespace DELETE {
       export type Namespace = {
-        keys_delted: number;
+        keys_deleted: number;
       };
     }
 
