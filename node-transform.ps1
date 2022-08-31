@@ -33,7 +33,7 @@ If ($PresentFiles.Length -ne 0) {
     "Item(s) in the specified destination location already exists. ($PresentFilesFormated)",
     "Do you want to delete these items and continue?",
     ('&Yes', '&No'), 1)
-  If ($decision -eq 0) {
+  If (($decision -eq 0) -or ($env:CI -ne $null)) {
     $PresentFiles | Remove-Item -Recurse -Force
   }
   Else {
@@ -67,8 +67,8 @@ Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
 
 Set-Location "$Destination"
 
-npm install
-npm run build
+npm install -Wait
+npm run build -Wait
 
 Copy-Item -Recurse "src/types" "lib"
 

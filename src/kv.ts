@@ -144,17 +144,19 @@ export default class KVNamespace {
   async items<T>(
     options?: Pylon.KV.OperationOptions.Items,
   ): Promise<Pylon.KV.GET.ItemsFlattened<T>> {
-    const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
+    let response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
     );
 
-    if (options?.limit) response.splice(0, options.limit);
-
     if (options?.from) {
-      response.splice(
+      response = response.slice(
         response.findIndex((i) => i.key === options.from) + 1,
         response.length,
       );
+    }
+
+    if (options?.limit) {
+      response = response.slice(0, options.limit);
     }
 
     return response.map((i) => {
@@ -164,7 +166,7 @@ export default class KVNamespace {
       if (!j) throw TpyErr.UNEXPECTED_OR_MISSING_VALUE;
       return {
         key: i.key,
-        value: j,
+        value: j as unknown as T,
         expiresAt: i.value.expiresAt,
       };
     });
