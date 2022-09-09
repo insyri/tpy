@@ -1,10 +1,11 @@
-import TpyErr, {
+import TpyError, {
   deploymentNotFound,
   guildNotFound,
   isMissingJsonBody,
   isNotAuthorized,
+  noErrorTpyError,
   resourceNotFound,
-} from './tpy_err.ts';
+} from './error.ts';
 import type Deployment from './types/deployment.d.ts';
 import type Guild from './types/guild.d.ts';
 import type User from './types/user.d.ts';
@@ -151,7 +152,7 @@ export default class Tpy {
    */
   async getNamespaces(deploymentID?: StringifiedNumber) {
     if (!(deploymentID || this.deploymentID)) {
-      throw TpyErr.UNEXPECTED_OR_MISSING_VALUE;
+      throw TpyErrEnum.UNEXPECTED_OR_MISSING_VALUE;
     }
     return await this.httpRaw<Pylon.KV.GET.Namespace>(
       `/deployments/${deploymentID || this.deploymentID}/kv/namespaces`,
@@ -178,7 +179,7 @@ export default class Tpy {
     const a: Pylon.KV.GET.ItemsFlattened = [];
     for (let i = 0; i < response.length; i++) {
       const p = response[i];
-      if (!p.value.string) throw TpyErr.UNEXPECTED_OR_MISSING_VALUE;
+      if (!p.value.string) throw TpyErrEnum.UNEXPECTED_OR_MISSING_VALUE;
       a[i].key = p.key;
       a[i].value = JSON.parse(p.value.string);
     }
@@ -215,13 +216,13 @@ export default class Tpy {
    *
    * @param other Other fetch parameters.
    *
-   * @throws {TpyErr} TpyErr
+   * @throws {TpyErrEnum} TpyErrEnum
    */
   async httpRaw<T extends MaybeArr<SafeObject>>(
     resource: `/${string}`,
     method: Pylon.HTTPVerbs = 'GET',
     other: RequestInit = {},
-  ): Promise<T> {
+  ): Promise<TpyError<T | Response>> {
     const rawres = await fetch(
       this.api_url + resource,
       this.readyRequest(method, other),
@@ -233,7 +234,7 @@ export default class Tpy {
       // deno-lint-ignore no-empty
     } catch {}
 
-    if (rawres.ok) return res as T;
+    if (rawres.ok) return noErrorTpyError(res as T);
 
     // The only known cases where responses are not JSON are:
     // - 404 * = `⚠️ 404 — Not Found\n==================\nReq`
@@ -242,9 +243,11 @@ export default class Tpy {
     // So we assume that the response is a failed response.
 
     if (typeof res === 'string') {
-      if (resourceNotFound(res)) throw TpyErr.RESOURCE_NOT_FOUND;
-      if (deploymentNotFound(res)) throw TpyErr.DEPLOYMENT_NOT_FOUND;
-      if (guildNotFound(res)) throw TpyErr.GUILD_NOT_FOUND;
+      if (resourceNotFound(res)) {
+        throw new TpyError<Response>(false, new Error(), rawres);
+      }
+      if (deploymentNotFound(res)) throw TpyErrEnum.DEPLOYMENT_NOT_FOUND;
+      if (guildNotFound(res)) throw TpyErrEnum.GUILD_NOT_FOUND;
     }
 
     let data: T | null = null;
@@ -263,12 +266,12 @@ export default class Tpy {
         // UNAUTHORIZED
 
         case 401 || 403:
-          throw TpyErr.UNAUTHORIZED;
+          throw TpyErrEnum.UNAUTHORIZED;
 
         // METHOD_NOT_ALLOWED
 
         case 405:
-          throw TpyErr.METHOD_NOT_ALLOWED;
+          throw TpyErrEnum.METHOD_NOT_ALLOWED;
 
         // BAD_REQUEST
 
@@ -276,20 +279,20 @@ export default class Tpy {
           // The following checks will rely on named based keys,
           // as arrays don't support these, we will eliminate the possiblity of res being an array.
           res = <SafeObject> res;
-          if (isMissingJsonBody(res)) throw TpyErr.MISSING_JSON_BODY;
-          if (isNotAuthorized(res)) throw TpyErr.UNAUTHORIZED;
+          if (isMissingJsonBody(res)) throw TpyErrEnum.MISSING_JSON_BODY;
+          if (isNotAuthorized(res)) throw TpyErrEnum.UNAUTHORIZED;
           break;
         }
 
         // NOT_FOUND
 
         case 404:
-          throw TpyErr.RESOURCE_NOT_FOUND;
+          throw TpyErrEnum.RESOURCE_NOT_FOUND;
 
           // INTERNAL_SERVER_ERROR
 
         case 500:
-          throw TpyErr.UNAUTHORIZED;
+          throw TpyErrEnum.UNAUTHORIZED;
       }
     }
     if (!data) throw rawres;
