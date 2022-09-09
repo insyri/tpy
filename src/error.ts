@@ -10,6 +10,10 @@ export function noErrorTpyError<T>(rawinfo: T): TpyError<T> {
   return new TpyError<T>(true, new Error(), rawinfo);
 }
 
+export function mapTpyErrorToError(t: keyof typeof TpyErrorsAsObjects) {
+  return new Error(t);
+}
+
 class TpyError<T> implements TpyErrorBase {
   ok: boolean;
   name: string;
@@ -35,7 +39,7 @@ const auth_graph = [
   '| Correct Input         | 200      |',
 ].join('\n');
 
-export const TpyErrors: TpyErrorBase[] = [{
+export const TpyErrors = [{
   ok: false,
   name: 'Internal Server Error',
   message:
@@ -66,25 +70,27 @@ export const TpyErrors: TpyErrorBase[] = [{
   ok: false,
   name: 'Unidentifiable Error',
   message: 'The error was unidentifiable, see the raw information.',
-}];
+}] as const;
 
-type TpyErrsAsObjectsType = {
-  [index: typeof TpyErrors[number]['name']]: {
-    ok: typeof TpyErrors[number]['ok'];
-    message: typeof TpyErrors[number]['message'];
-  };
+type TpyErrorsAsObjectsType = ParseTpyErrors<typeof TpyErrors>;
+
+// Thanks Arcs/Clancy/Mina (all same person btw)
+type ParseTpyErrors<T extends ReadonlyArray<TpyErrorBase>> = {
+  [P in keyof T as P extends number ? T[P]['name'] : never]: P extends number
+    ? { ok: T[P]['ok']; message: T[P]['message'] }
+    : never;
 };
 
-export const TpyErrsAsObjects: TpyErrsAsObjectsType = Object.assign(
+export const TpyErrorsAsObjects: TpyErrorsAsObjectsType = Object.assign(
   {},
   ...TpyErrors.map(
     function (v) {
-      const o: TpyErrsAsObjectsType = {};
-      o[v.name] = {
-        ok: v.ok,
-        message: v.message,
+      return {
+        [v.name]: {
+          ok: v.ok,
+          message: v.message,
+        },
       };
-      return o;
     },
   ),
 );
@@ -115,12 +121,5 @@ export const deploymentNotFound = (res: string) =>
  * @param res The HTTP response
  */
 export const guildNotFound = (res: string) => res === 'could not find guild';
-
-/**
- * Checks if the API errors with a resource not found, but only checks the
- * first two characters as this is a unique response.
- * @param res The HTTP response
- */
-export const resourceNotFound = (res: string) => res.startsWith('\u26A0\uFE0F');
 
 export default TpyError;
