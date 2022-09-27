@@ -1,11 +1,4 @@
-import TpyError, {
-  deploymentNotFound,
-  guildNotFound,
-  isMissingJsonBody,
-  isNotAuthorized,
-  noErrorTpyError,
-  resourceNotFound,
-} from './error.ts';
+import TpyError, { isMissingJsonBody } from './error.ts';
 import type Deployment from './types/deployment.d.ts';
 import type Guild from './types/guild.d.ts';
 import type User from './types/user.d.ts';
@@ -152,7 +145,8 @@ export default class Tpy {
    */
   async getNamespaces(deploymentID?: StringifiedNumber) {
     if (!(deploymentID || this.deploymentID)) {
-      throw TpyErrEnum.UNEXPECTED_OR_MISSING_VALUE;
+      // throw new TpyError('Unexpected or Missing Value in Response')
+      // this is about the lib, not the api;
     }
     return await this.httpRaw<Pylon.KV.GET.Namespace>(
       `/deployments/${deploymentID || this.deploymentID}/kv/namespaces`,
@@ -179,7 +173,9 @@ export default class Tpy {
     const a: Pylon.KV.GET.ItemsFlattened = [];
     for (let i = 0; i < response.length; i++) {
       const p = response[i];
-      if (!p.value.string) throw TpyErrEnum.UNEXPECTED_OR_MISSING_VALUE;
+      if (!p.value.string) {
+        throw new TpyError('Unexpected or Missing Value in Response', response);
+      }
       a[i].key = p.key;
       a[i].value = JSON.parse(p.value.string);
     }
@@ -216,13 +212,13 @@ export default class Tpy {
    *
    * @param other Other fetch parameters.
    *
-   * @throws {TpyErrEnum} TpyErrEnum
+   * @throws {TpyError<Rseponse>}
    */
   async httpRaw<T extends MaybeArr<SafeObject>>(
     resource: `/${string}`,
     method: Pylon.HTTPVerbs = 'GET',
     other: RequestInit = {},
-  ): Promise<TpyError<T | Response>> {
+  ): Promise<T> {
     const rawres = await fetch(
       this.api_url + resource,
       this.readyRequest(method, other),
@@ -234,68 +230,58 @@ export default class Tpy {
       // deno-lint-ignore no-empty
     } catch {}
 
-    if (rawres.ok) return noErrorTpyError(res as T);
+    if (rawres.ok) return res as T;
 
-    // The only known cases where responses are not JSON are:
-    // - 404 * = `⚠️ 404 — Not Found\n==================\nReq`
-    // - 404 /guilds/:id = `could not find guild`
-    // - 404 /deployments/:id = `could not find deployment`
-    // So we assume that the response is a failed response.
-
-    if (typeof res === 'string') {
-      if (resourceNotFound(res)) {
-        throw new TpyError<Response>(false, new Error(), rawres);
+    switch (rawres.status) {
+      case 200 || 204: {
+        return res as T;
       }
-      if (deploymentNotFound(res)) throw TpyErrEnum.DEPLOYMENT_NOT_FOUND;
-      if (guildNotFound(res)) throw TpyErrEnum.GUILD_NOT_FOUND;
-    }
 
-    let data: T | null = null;
-
-    // typeof [] === 'object' -> true
-    if (typeof res === 'object') {
-      switch (rawres.status) {
-        // OK
-        case 200 || 204: {
-          data = res as T;
-          break;
+      case 404: {
+        const r = await rawres.text();
+        if (r.startsWith('\u26A0\uFE0F')) {
+          throw new TpyError<Response>('URL Resource Not Found', rawres);
         }
 
-        // Happens when no authentication header is provided
-
-        // UNAUTHORIZED
-
-        case 401 || 403:
-          throw TpyErrEnum.UNAUTHORIZED;
-
-        // METHOD_NOT_ALLOWED
-
-        case 405:
-          throw TpyErrEnum.METHOD_NOT_ALLOWED;
-
-        // BAD_REQUEST
-
-        case 400: {
-          // The following checks will rely on named based keys,
-          // as arrays don't support these, we will eliminate the possiblity of res being an array.
-          res = <SafeObject> res;
-          if (isMissingJsonBody(res)) throw TpyErrEnum.MISSING_JSON_BODY;
-          if (isNotAuthorized(res)) throw TpyErrEnum.UNAUTHORIZED;
-          break;
+        if (r === 'could not find deployment') {
+          throw new TpyError<Response>('Deployment Could Not be Found', rawres);
         }
 
-        // NOT_FOUND
-
-        case 404:
-          throw TpyErrEnum.RESOURCE_NOT_FOUND;
-
-          // INTERNAL_SERVER_ERROR
-
-        case 500:
-          throw TpyErrEnum.UNAUTHORIZED;
+        if (r === 'could not find guild') {
+          throw new TpyError<Response>('Guild Could Not be Found', rawres);
+        }
+        break;
       }
+
+      case 401:
+        throw new TpyError<Response>('Unauthorized', rawres);
+
+      case 403:
+        throw new TpyError<Response>('Forbidden', rawres);
+
+      case 405:
+        throw new TpyError<Response>('HTTP Method Not Allowed', rawres);
+
+        // this is bad
+
+      case 400: {
+        // The following checks will rely on named based keys,
+        // as arrays don't support these, we will eliminate the possiblity of res being an array.
+        res = <SafeObject> res;
+        if (isMissingJsonBody(res)) {
+          throw new TpyError<Response>(
+            'Missing or Invalid JSON in Request Body',
+            rawres,
+          );
+        }
+        // if (isNotAuthorized(res)) throw new TpyError<Response>('Unauthorized', rawres);
+        break;
+      }
+
+      case 500:
+        throw new TpyError<Response>('Internal Server Error', rawres);
     }
-    if (!data) throw rawres;
-    return data;
+
+    throw new TpyError<Response>('Unidentifiable Error', rawres);
   }
 }
