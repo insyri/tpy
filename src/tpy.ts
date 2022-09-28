@@ -1,4 +1,4 @@
-import TpyError, { isMissingJsonBody } from './error.ts';
+import TpyError from './error.ts';
 import type Deployment from './types/deployment.d.ts';
 import type Guild from './types/guild.d.ts';
 import type User from './types/user.d.ts';
@@ -268,7 +268,7 @@ export default class Tpy {
         // The following checks will rely on named based keys,
         // as arrays don't support these, we will eliminate the possiblity of res being an array.
         res = <SafeObject> res;
-        if (isMissingJsonBody(res)) {
+        if ('msg' in res && res['msg'] === 'missing json body') {
           throw new TpyError<Response>(
             'Missing or Invalid JSON in Request Body',
             rawres,

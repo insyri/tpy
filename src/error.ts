@@ -40,7 +40,7 @@ export const TpyErrors = [{
 }, {
   name: 'Missing or Invalid JSON in Request Body',
   message:
-    `The fetch contents sent were did not have the required JSON body. ${api_tells}`,
+    `The fetch contents sent were did not have the required JSON body. (Server-side validated) ${api_tells}`,
 }, {
   name: 'Guild Could Not be Found',
   message: `The guild specified was not found. ${api_tells}`,
@@ -64,6 +64,10 @@ export const TpyErrors = [{
   name: 'Forbidden',
   message:
     'Access to the resource with the given authentication credentials is denied.',
+}, {
+  name: 'Response Validation Error',
+  message:
+    'There was a validation error in the response. (Client-side validation)',
 }] as const;
 
 // Thanks Arcs/Clancy/Mina (all same person btw)
@@ -86,13 +90,6 @@ export const TpyErrorsAsObjects: ParseTpyErrors<typeof TpyErrors> = Object
       },
     ),
   );
-
-/**
- * Checks if the API errors with `missing json body`.
- * @param res The HTTP response
- */
-export const isMissingJsonBody = (res: SafeObject) =>
-  'msg' in res && res['msg'] === 'missing json body';
 
 /**
  * Checks if the API errors with an unauthorization.

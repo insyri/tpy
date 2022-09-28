@@ -1,7 +1,7 @@
 import Tpy from './tpy.ts';
 import type { StringifiedNumber } from './types/util.d.ts';
 import type Pylon from './types/pylon.d.ts';
-import TpyErr from './tpy_err.ts';
+import TpyError from './error.ts';
 
 /**
  * A KVNamespace interface that matches the Pylon KVNamespace class.
@@ -88,7 +88,9 @@ export default class KVNamespace {
     let item: T | undefined;
     for (const p of response) {
       if (p.key !== key) continue;
-      if (!p.value.string) throw TpyErr.UNEXPECTED_OR_MISSING_VALUE;
+      if (!p.value.string) {
+        throw new TpyError('Unexpected or Missing Value in Response', response);
+      }
       item = JSON.parse(p.value.string);
       break;
     }
@@ -163,7 +165,9 @@ export default class KVNamespace {
       const j = i.value.string
         ? JSON.parse(i.value.string) as T
         : i.value.bytes;
-      if (!j) throw TpyErr.UNEXPECTED_OR_MISSING_VALUE;
+      if (!j) {
+        throw new TpyError('Unexpected or Missing Value in Response', response);
+      }
       return {
         key: i.key,
         value: j as unknown as T,
@@ -187,7 +191,7 @@ export default class KVNamespace {
    * This operation will delete all the data in the namespace.
    * The data is irrecoverably deleted.
    *
-   * Use with caution!
+   * **Use with caution!**
    */
   async clear() {
     return (await this.tpyc.httpRaw<Pylon.KV.DELETE.Namespace>(
