@@ -1,79 +1,95 @@
-import type { SafeObject } from './types/util.d.ts';
-
 interface TpyErrorBase {
   name: keyof ParseTpyErrors<typeof TpyErrors>;
-  message: string;
+  description: string;
 }
 
 class TpyError<T> extends Error implements TpyErrorBase {
   name: keyof ParseTpyErrors<typeof TpyErrors>;
+  description: string;
+  context: string;
   rawInfo: T;
 
   constructor(
-    name: keyof ParseTpyErrors<typeof TpyErrors>,
+    name: TpyErrorBase['name'],
+    context: string,
     rawinfo: T,
     ...errorOptions: ErrorOptions[]
   ) {
-    super(TpyErrorsAsObjects[name].message, ...errorOptions);
+    super(TpyErrorsAsObjects[name].message(context), ...errorOptions);
+    this.context = context;
+    this.description = TpyErrorsAsObjects[name].description;
     this.name = name;
     this.rawInfo = rawinfo;
   }
 }
 
-const api_tells = 'The API will directly tell you this.';
-const auth_graph = [
-  '| Input                 | Response |',
-  '|-----------------------|----------|',
-  '| (No Input)            | 403      |',
-  '| Incorrect Credentials | 500      |',
-  '| Correct Input         | 200      |',
-].join('\n');
+const serverRespondedWith = (s: string) =>
+  `Server responded with HTTP status code ${s}.`;
+const couldNotBeFound = (sub: string, s: string) =>
+  `${sub} ${s} could not be found.`;
 
 export const TpyErrors = [{
   name: 'Internal Server Error',
-  message:
-    `Sometimes this happens when a request is made with the authorization header but it is invalid.\n${auth_graph}`,
+  message: (s: string) => serverRespondedWith(s),
+  description:
+    `Sometimes this happens when a request is made with the authorization header but it is invalid.`,
 }, {
-  name: 'Unexpected or Missing Value in Response',
-  message:
-    'This has to do with verifying an API request\'s structure. If a given value is missing or has unexpected behavior, this is thrown.',
+  name: 'Missing or Unexpected Value in Response',
+  message: (s: string) => `Response structure validation failed: ${s}.`,
+  description:
+    'This has to do with verifying an API response \'s structure. If a given value is missing or has unexpected behavior, this is thrown.',
 }, {
   name: 'Missing or Invalid JSON in Request Body',
-  message:
-    `The fetch contents sent were did not have the required JSON body. (Server-side validated) ${api_tells}`,
+  // TODO: make sure this makes sense as `s` here would be a syntaxerror message from JSON.parse
+  message: (s: string) =>
+    `With given field(s) ${s} were unsatisfactory; contains invalid JSON.`,
+  description:
+    `The fetch contents sent were did not have the required JSON body.`,
 }, {
   name: 'Guild Could Not be Found',
-  message: `The guild specified was not found. ${api_tells}`,
+  message: (s: string) => couldNotBeFound('Guild ID', s),
+  description: `The guild specified was not found.`,
 }, {
   name: 'Deployment Could Not be Found',
-  message: `The deployment specified was not found. ${api_tells}`,
+  message: (s: string) => couldNotBeFound('Deployment ID', s),
+  description: `The deployment specified was not found.`,
 }, {
   name: 'HTTP Method Not Allowed',
-  message: 'The HTTP method is not allowed.',
+  message: (s: string) => serverRespondedWith(s),
+  description: 'The HTTP method is not allowed.',
 }, {
   name: 'Unidentifiable Error',
-  message:
+  message: (s: string) =>
+    `Unidentifiable error caught, deterministic via fields:\n${s}`,
+  description:
     'The error was unidentifiable, see the raw information via <TpyError>.rawInfo.',
 }, {
   name: 'URL Resource Not Found',
-  message: 'The URL resource on the web server was not found.',
+  message: (s: string) => serverRespondedWith(s),
+  description: 'The URL resource on the web server was not found.',
 }, {
   name: 'Unauthorized',
-  message: 'Authentication credentials in the request were not populated.',
+  message: (s: string) => serverRespondedWith(s),
+  description: 'Authentication credentials in the request were not populated.',
 }, {
   name: 'Forbidden',
-  message:
+  message: (s: string) => serverRespondedWith(s),
+  description:
     'Access to the resource with the given authentication credentials is denied.',
 }, {
-  name: 'Response Validation Error',
-  message:
-    'There was a validation error in the response. (Client-side validation)',
+  name: 'Missing or Invalid Required Parameter',
+  message: (s: string) =>
+    `Required parameter(s) ${s} were not populated or is incompatible.`,
+  description:
+    'A parameter was not populated where required or is not compatible.',
 }] as const;
 
-// Thanks Arcs/Clancy/Mina (all same person btw)
 type ParseTpyErrors<T extends ReadonlyArray<TpyErrorBase>> = {
   [P in keyof T as P extends number ? T[P]['name'] : never]: P extends number
-    ? { message: T[P]['message'] }
+    ? {
+      message(context: string): string;
+      description: T[P]['description'];
+    }
     : never;
 };
 
@@ -84,6 +100,7 @@ export const TpyErrorsAsObjects: ParseTpyErrors<typeof TpyErrors> = Object
       function (v) {
         return {
           [v.name]: {
+            description: v.description,
             message: v.message,
           },
         };
@@ -91,11 +108,21 @@ export const TpyErrorsAsObjects: ParseTpyErrors<typeof TpyErrors> = Object
     ),
   );
 
-/**
- * Checks if the API errors with an unauthorization.
- * @param res The HTTP response
- */
-export const isNotAuthorized = (res: SafeObject) =>
-  'message' in res && res['message'] === 'not authorized';
+export function parametersPrompt(
+  issue: 'missing' | 'incompatible',
+  params: string | string[],
+) {
+  return `Parameter(s) are ${issue}: ${
+    Array.isArray(params) ? params.join(', ') : params
+  }`;
+}
+
+export function responseBody(s: string) {
+  return `Response Body: "${s}"`;
+}
+
+export function responseHTTP(s: string) {
+  return `Response HTTP status code: ${s}`;
+}
 
 export default TpyError;

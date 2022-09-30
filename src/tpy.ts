@@ -1,13 +1,15 @@
-import TpyError from './error.ts';
+import TpyError, {
+  parametersPrompt,
+  responseBody,
+  responseHTTP,
+} from './error.ts';
 import type Deployment from './types/deployment.d.ts';
 import type Guild from './types/guild.d.ts';
 import type User from './types/user.d.ts';
 import type Pylon from './types/pylon.d.ts';
-import type { SafeObject, StringifiedNumber } from './types/util.d.ts';
+import type { StringifiedNumber } from './types/util.d.ts';
 import TpyWs from './ws.ts';
 import KVNamespace from './kv.ts';
-
-type MaybeArr<T> = T | T[];
 
 /**
  * A Tpy class, intialized with a pylon token.
@@ -33,7 +35,13 @@ export default class Tpy {
    * @returns A new Tpy instance.
    */
   constructor(token: string, deploymentID?: StringifiedNumber) {
-    if (!token) throw new Error('Token is required');
+    if (!token) {
+      throw new TpyError(
+        'Missing or Unexpected Value in Response',
+        parametersPrompt('missing', 'token'),
+        token,
+      );
+    }
     this.token = token;
     if (deploymentID) this.deploymentID = deploymentID;
   }
@@ -145,8 +153,11 @@ export default class Tpy {
    */
   async getNamespaces(deploymentID?: StringifiedNumber) {
     if (!(deploymentID || this.deploymentID)) {
-      // throw new TpyError('Unexpected or Missing Value in Response')
-      // this is about the lib, not the api;
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
+        deploymentID || this.deploymentID,
+      );
     }
     return await this.httpRaw<Pylon.KV.GET.Namespace>(
       `/deployments/${deploymentID || this.deploymentID}/kv/namespaces`,
@@ -163,7 +174,11 @@ export default class Tpy {
     deploymentID?: StringifiedNumber,
   ): Promise<Pylon.KV.GET.ItemsFlattened> {
     if (!(deploymentID || this.deploymentID)) {
-      throw 'Deployment ID is required';
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
+        deploymentID || this.deploymentID,
+      );
     }
     const response = await this.httpRaw<Pylon.KV.GET.Items<T>>(
       `/deployments/${
@@ -174,7 +189,11 @@ export default class Tpy {
     for (let i = 0; i < response.length; i++) {
       const p = response[i];
       if (!p.value.string) {
-        throw new TpyError('Unexpected or Missing Value in Response', response);
+        throw new TpyError(
+          'Missing or Unexpected Value in Response',
+          `response[${i}\].value.string`,
+          response,
+        );
       }
       a[i].key = p.key;
       a[i].value = JSON.parse(p.value.string);
@@ -194,8 +213,13 @@ export default class Tpy {
     deploymentID?: StringifiedNumber,
   ) {
     if (!(deploymentID || this.deploymentID)) {
-      throw 'Deployment ID is required';
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
+        deploymentID || this.deploymentID,
+      );
     }
+
     return new KVNamespace(
       this,
       (deploymentID || this.deploymentID)!,
@@ -212,9 +236,9 @@ export default class Tpy {
    *
    * @param other Other fetch parameters.
    *
-   * @throws {TpyError<Rseponse>}
+   * @throws {TpyError<Response>}
    */
-  async httpRaw<T extends MaybeArr<SafeObject>>(
+  async httpRaw<T>(
     resource: `/${string}`,
     method: Pylon.HTTPVerbs = 'GET',
     other: RequestInit = {},
@@ -224,64 +248,82 @@ export default class Tpy {
       this.readyRequest(method, other),
     );
 
-    let res: MaybeArr<SafeObject> | string = await rawres.text();
-    try {
-      res = JSON.parse(res) as MaybeArr<SafeObject>;
-      // deno-lint-ignore no-empty
-    } catch {}
-
-    if (rawres.ok) return res as T;
+    if (rawres.ok) return await rawres.json() as T;
 
     switch (rawres.status) {
-      case 200 || 204: {
-        return res as T;
-      }
-
       case 404: {
         const r = await rawres.text();
         if (r.startsWith('\u26A0\uFE0F')) {
-          throw new TpyError<Response>('URL Resource Not Found', rawres);
+          throw new TpyError<Response>(
+            'URL Resource Not Found',
+            responseBody(r),
+            rawres,
+          );
         }
 
         if (r === 'could not find deployment') {
-          throw new TpyError<Response>('Deployment Could Not be Found', rawres);
+          throw new TpyError<Response>(
+            'Deployment Could Not be Found',
+            responseBody(r),
+            rawres,
+          );
         }
 
         if (r === 'could not find guild') {
-          throw new TpyError<Response>('Guild Could Not be Found', rawres);
+          throw new TpyError<Response>(
+            'Guild Could Not be Found',
+            responseBody(r),
+            rawres,
+          );
         }
         break;
       }
 
       case 401:
-        throw new TpyError<Response>('Unauthorized', rawres);
+        throw new TpyError<Response>(
+          'Unauthorized',
+          responseHTTP(rawres.statusText),
+          rawres,
+        );
 
       case 403:
-        throw new TpyError<Response>('Forbidden', rawres);
+        throw new TpyError<Response>(
+          'Forbidden',
+          responseHTTP(rawres.statusText),
+          rawres,
+        );
 
       case 405:
-        throw new TpyError<Response>('HTTP Method Not Allowed', rawres);
-
-        // this is bad
+        throw new TpyError<Response>(
+          'HTTP Method Not Allowed',
+          responseHTTP(rawres.statusText),
+          rawres,
+        );
 
       case 400: {
-        // The following checks will rely on named based keys,
-        // as arrays don't support these, we will eliminate the possiblity of res being an array.
-        res = <SafeObject> res;
+        const res = await rawres.json();
         if ('msg' in res && res['msg'] === 'missing json body') {
           throw new TpyError<Response>(
             'Missing or Invalid JSON in Request Body',
+            responseHTTP(rawres.statusText),
             rawres,
           );
         }
-        // if (isNotAuthorized(res)) throw new TpyError<Response>('Unauthorized', rawres);
         break;
       }
 
       case 500:
-        throw new TpyError<Response>('Internal Server Error', rawres);
+        throw new TpyError<Response>(
+          'Internal Server Error',
+          responseHTTP(rawres.statusText),
+          rawres,
+        );
     }
 
-    throw new TpyError<Response>('Unidentifiable Error', rawres);
+    throw new TpyError<Response>(
+      'Unidentifiable Error',
+      `Response is ok: ${rawres.ok}`,
+      rawres,
+    );
   }
 }

@@ -5,7 +5,8 @@
     "_playground.ts",
     "_playground.js",
     "_playground.mjs",
-    "_playground.cjs"
+    "_playground.cjs",
+    "mod.ts"
   ],
   "[typescript][json][markdown]": {
     "editor.defaultFormatter": "denoland.vscode-deno",

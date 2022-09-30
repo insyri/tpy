@@ -1,7 +1,7 @@
 import Tpy from './tpy.ts';
 import type { StringifiedNumber } from './types/util.d.ts';
 import type Pylon from './types/pylon.d.ts';
-import TpyError from './error.ts';
+import TpyError, { parametersPrompt } from './error.ts';
 
 /**
  * A KVNamespace interface that matches the Pylon KVNamespace class.
@@ -20,9 +20,22 @@ export default class KVNamespace {
     namespace: string,
   ) {
     if (!tpyInstance || !(tpyInstance instanceof Tpy)) {
-      throw new Error('A Tpy instance is required');
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt(
+          tpyInstance === undefined ? 'missing' : 'incompatible',
+          'tpyInstance',
+        ),
+        tpyInstance,
+      );
     }
-    if (!deploymentID) throw 'A deployment ID is required';
+    if (!deploymentID) {
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt('missing', 'deploymentID'),
+        deploymentID,
+      );
+    }
     this.tpyc = tpyInstance;
     this.deploymentID = deploymentID;
     this.namespace = namespace;
@@ -89,7 +102,11 @@ export default class KVNamespace {
     for (const p of response) {
       if (p.key !== key) continue;
       if (!p.value.string) {
-        throw new TpyError('Unexpected or Missing Value in Response', response);
+        throw new TpyError(
+          'Missing or Unexpected Value in Response',
+          `response[number].value.string is undefined`,
+          response,
+        );
       }
       item = JSON.parse(p.value.string);
       break;
@@ -166,7 +183,11 @@ export default class KVNamespace {
         ? JSON.parse(i.value.string) as T
         : i.value.bytes;
       if (!j) {
-        throw new TpyError('Unexpected or Missing Value in Response', response);
+        throw new TpyError(
+          'Missing or Unexpected Value in Response',
+          `response[${i}].value.string and .bytes are undefined`,
+          response,
+        );
       }
       return {
         key: i.key,
@@ -216,7 +237,7 @@ export default class KVNamespace {
     if (!options?.prevValue) await del();
     else {
       if (await this.get(key) == options.prevValue) await del();
-      else throw 'Previous value does not match API recieved value';
+      // else throw new TpyError('Missing or Unexpected Value in Response', ``);
     }
   }
 }
