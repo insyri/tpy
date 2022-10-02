@@ -33,7 +33,7 @@ If ($PresentFiles.Length -ne 0) {
     "Item(s) in the specified destination location already exists. ($PresentFilesFormated)",
     "Do you want to delete these items and continue?",
     ('&Yes', '&No'), 1)
-  If (($decision -eq 0) -or ($env:CI -ne $null)) {
+  If (($decision -eq 0) -or ($null -ne $env:CI)) {
     $PresentFiles | Remove-Item -Recurse -Force
   }
   Else {

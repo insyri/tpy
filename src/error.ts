@@ -13,9 +13,8 @@ class TpyError<T> extends Error implements TpyErrorBase {
     name: TpyErrorBase['name'],
     context: string,
     rawinfo: T,
-    ...errorOptions: ErrorOptions[]
   ) {
-    super(TpyErrorsAsObjects[name].message(context), ...errorOptions);
+    super(TpyErrorsAsObjects[name].message(context));
     this.context = context;
     this.description = TpyErrorsAsObjects[name].description;
     this.name = name;
