@@ -89,13 +89,23 @@ export default class Tpy {
   async getEditableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Guilds>(`/user/guilds`);
   }
+
   /**
-   * @param id The ID of the deployment to get.
+   * @param deploymentID The ID of the deployment to get. If empty, the function will use the set deploymentID in the class. (`this.deploymentID`)
    *
    * @returns Deployment information.
    */
-  async getDeployment(id: StringifiedNumber) {
-    return await this.httpRaw<Deployment.GET.Deployment>(`/deployments/${id}`);
+  async getDeployment(deploymentID?: StringifiedNumber) {
+    if (!(deploymentID || this.deploymentID)) {
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
+        deploymentID || this.deploymentID,
+      );
+    }
+    return await this.httpRaw<Deployment.GET.Deployment>(
+      `/deployments/${deploymentID}`,
+    );
   }
 
   /**

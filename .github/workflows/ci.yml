@@ -4,8 +4,6 @@ on:
   push:
   pull_request:
 
-permissions: write-all
-
 jobs:
   Node-Transformation:
     runs-on: ubuntu-latest
