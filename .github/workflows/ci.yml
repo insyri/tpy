@@ -6,7 +6,6 @@ on:
 
 jobs:
   Node-Transformation:
-    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -15,6 +14,7 @@ jobs:
       - run: ./node-transform.ps1 -Version "x"
         shell: pwsh
   Cleaning:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
