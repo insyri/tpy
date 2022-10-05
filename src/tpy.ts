@@ -10,6 +10,7 @@ import type Pylon from './types/pylon.d.ts';
 import type { StringifiedNumber } from './types/util.d.ts';
 import TpyWs from './ws.ts';
 import KVNamespace from './kv.ts';
+import Context, { emptyContext, IContext } from './context.ts';
 
 /**
  * A Tpy class, intialized with a pylon token.
@@ -39,6 +40,7 @@ export default class Tpy {
       throw new TpyError(
         'Missing or Unexpected Value in Response',
         parametersPrompt('missing', 'token'),
+        'token',
         token,
       );
     }
@@ -50,7 +52,7 @@ export default class Tpy {
    * @returns The current logged in user.
    */
   async getUser() {
-    return await this.httpRaw<User.GET.User>('/user');
+    return await this.httpRaw<User.GET.User>(emptyContext, '/user');
   }
 
   /**
@@ -60,8 +62,8 @@ export default class Tpy {
    */
   async getAvailableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Available>(
+      emptyContext,
       '/user/guilds/available',
-      'GET',
     );
   }
 
@@ -71,7 +73,10 @@ export default class Tpy {
    * @returns Raw Discord guild information with deployment information.
    */
   async getGuildInfo(id: StringifiedNumber) {
-    return await this.httpRaw<Guild.GET.Guild>(`/guilds/${id}`);
+    return await this.httpRaw<Guild.GET.Guild>(
+      Context({ guild: id }),
+      `/guilds/${id}`,
+    );
   }
 
   /**
@@ -80,14 +85,20 @@ export default class Tpy {
    * @returns Guild computational statistics.
    */
   async getGuildStats(id: StringifiedNumber) {
-    return await this.httpRaw<Guild.GET.Stats>(`/guilds/${id}/stats`);
+    return await this.httpRaw<Guild.GET.Stats>(
+      Context({ guild: id }),
+      `/guilds/${id}/stats`,
+    );
   }
 
   /**
    * @returns All guilds a user can edit with Pylon. More specifically, all guilds which the user has `manage server` or `administrator` permissions in.
    */
   async getEditableGuilds() {
-    return await this.httpRaw<User.GET.Guilds.Guilds>(`/user/guilds`);
+    return await this.httpRaw<User.GET.Guilds.Guilds>(
+      emptyContext,
+      `/user/guilds`,
+    );
   }
 
   /**
@@ -96,15 +107,18 @@ export default class Tpy {
    * @returns Deployment information.
    */
   async getDeployment(deploymentID?: StringifiedNumber) {
-    if (!(deploymentID || this.deploymentID)) {
+    const dID = deploymentID || this.deploymentID;
+    if (!(dID)) {
       throw new TpyError(
         'Missing or Invalid Required Parameter',
         parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
-        deploymentID || this.deploymentID,
+        ['deploymentID', 'this.deploymentID'].join(', '),
+        dID,
       );
     }
     return await this.httpRaw<Deployment.GET.Deployment>(
-      `/deployments/${deploymentID}`,
+      Context({ deployment: dID }),
+      `/deployments/${dID}`,
     );
   }
 
@@ -122,6 +136,7 @@ export default class Tpy {
     body: Deployment.POST.Request<false>,
   ) {
     return await this.httpRaw<Deployment.POST.Response>(
+      Context({ deployment: id }),
       `/deployments/${id}`,
       'POST',
       {
@@ -162,15 +177,18 @@ export default class Tpy {
    * @param deploymentID The deployment ID to look under.
    */
   async getNamespaces(deploymentID?: StringifiedNumber) {
-    if (!(deploymentID || this.deploymentID)) {
+    const dID = deploymentID || this.deploymentID;
+    if (!dID) {
       throw new TpyError(
         'Missing or Invalid Required Parameter',
         parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
-        deploymentID || this.deploymentID,
+        ['deploymentID', 'this.deploymentID'].join(', '),
+        dID,
       );
     }
     return await this.httpRaw<Pylon.KV.GET.Namespace>(
-      `/deployments/${deploymentID || this.deploymentID}/kv/namespaces`,
+      Context({ deployment: dID }),
+      `/deployments/${dID}/kv/namespaces`,
     );
   }
 
@@ -179,37 +197,42 @@ export default class Tpy {
    * @param deploymentID The deployment ID to look under.
    * @param namespace The namespace to look under.
    */
-  async getNamespaceItems<T>(
+  async getNamespaceItems(
     namespace: string,
     deploymentID?: StringifiedNumber,
-  ): Promise<Pylon.KV.GET.ItemsFlattened> {
-    if (!(deploymentID || this.deploymentID)) {
+  ): Promise<Pylon.KV.GET.ItemsFlattened | undefined> {
+    const dID = deploymentID || this.deploymentID;
+    if (!dID) {
       throw new TpyError(
         'Missing or Invalid Required Parameter',
         parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
-        deploymentID || this.deploymentID,
+        ['deploymentID', 'this.deploymentID'].join(', '),
+        dID,
       );
     }
-    const response = await this.httpRaw<Pylon.KV.GET.Items<T>>(
-      `/deployments/${
-        deploymentID || this.deploymentID
-      }/kv/namespaces/${namespace}/items`,
+    const response = await this.httpRaw<Pylon.KV.GET.Items>(
+      Context({ deployment: dID }),
+      `/deployments/${dID}/kv/namespaces/${namespace}/items`,
     );
-    const a: Pylon.KV.GET.ItemsFlattened = [];
+
+    const a: Pylon.KV.GET.ItemsFlattened = new Array(response.length);
     for (let i = 0; i < response.length; i++) {
       const p = response[i];
       if (!p.value.string) {
         throw new TpyError(
           'Missing or Unexpected Value in Response',
+          `response[${i}\].value.string is undefined`,
           `response[${i}\].value.string`,
           response,
         );
       }
-      a[i].key = p.key;
-      a[i].value = JSON.parse(p.value.string);
+      a[i] = {
+        key: p.key,
+        value: JSON.parse(p.value.string),
+      };
     }
 
-    return response;
+    return a;
   }
 
   /**
@@ -222,19 +245,17 @@ export default class Tpy {
     namespace: string,
     deploymentID?: StringifiedNumber,
   ) {
-    if (!(deploymentID || this.deploymentID)) {
+    const dID = deploymentID || this.deploymentID;
+    if (!dID) {
       throw new TpyError(
         'Missing or Invalid Required Parameter',
         parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
-        deploymentID || this.deploymentID,
+        ['deploymentID', 'this.deploymentID'].join(', '),
+        dID,
       );
     }
 
-    return new KVNamespace(
-      this,
-      (deploymentID || this.deploymentID)!,
-      namespace,
-    );
+    return new KVNamespace(this, dID, namespace);
   }
 
   /**
@@ -249,25 +270,27 @@ export default class Tpy {
    * @throws {TpyError<Response>}
    */
   async httpRaw<T>(
+    context: IContext,
     resource: `/${string}`,
     method: Pylon.HTTPVerbs = 'GET',
     other: RequestInit = {},
   ): Promise<T> {
-    const rawres = await fetch(
+    const response = await fetch(
       this.api_url + resource,
       this.readyRequest(method, other),
     );
 
-    if (rawres.ok) return await rawres.json() as T;
+    if (response.ok) return await response.json() as T;
 
-    switch (rawres.status) {
+    switch (response.status) {
       case 404: {
-        const r = await rawres.text();
+        const r = await response.text();
         if (r.startsWith('\u26A0\uFE0F')) {
           throw new TpyError<Response>(
             'URL Resource Not Found',
             responseBody(r),
-            rawres,
+            response.statusText,
+            response,
           );
         }
 
@@ -275,7 +298,8 @@ export default class Tpy {
           throw new TpyError<Response>(
             'Deployment Could Not be Found',
             responseBody(r),
-            rawres,
+            context.deployment,
+            response,
           );
         }
 
@@ -283,7 +307,8 @@ export default class Tpy {
           throw new TpyError<Response>(
             'Guild Could Not be Found',
             responseBody(r),
-            rawres,
+            context.guild,
+            response,
           );
         }
         break;
@@ -292,31 +317,35 @@ export default class Tpy {
       case 401:
         throw new TpyError<Response>(
           'Unauthorized',
-          responseHTTP(rawres.statusText),
-          rawres,
+          responseHTTP(response.statusText),
+          response.statusText,
+          response,
         );
 
       case 403:
         throw new TpyError<Response>(
           'Forbidden',
-          responseHTTP(rawres.statusText),
-          rawres,
+          responseHTTP(response.statusText),
+          response.statusText,
+          response,
         );
 
       case 405:
         throw new TpyError<Response>(
           'HTTP Method Not Allowed',
-          responseHTTP(rawres.statusText),
-          rawres,
+          responseHTTP(response.statusText),
+          response.statusText,
+          response,
         );
 
       case 400: {
-        const res = await rawres.json();
+        const res = await response.json();
         if ('msg' in res && res['msg'] === 'missing json body') {
           throw new TpyError<Response>(
             'Missing or Invalid JSON in Request Body',
-            responseHTTP(rawres.statusText),
-            rawres,
+            responseHTTP(response.statusText),
+            JSON.stringify(res['msg']),
+            response,
           );
         }
         break;
@@ -325,15 +354,19 @@ export default class Tpy {
       case 500:
         throw new TpyError<Response>(
           'Internal Server Error',
-          responseHTTP(rawres.statusText),
-          rawres,
+          responseHTTP(response.statusText),
+          response.statusText,
+          response,
         );
     }
 
     throw new TpyError<Response>(
       'Unidentifiable Error',
-      `Response is ok: ${rawres.ok}`,
-      rawres,
+      `Response is ok: ${response.ok}`,
+      JSON.stringify({
+        'response.ok': response.ok,
+      }),
+      response,
     );
   }
 }

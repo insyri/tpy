@@ -10,6 +10,8 @@
   ],
   "[typescript][json][markdown]": {
     "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
   }
 }

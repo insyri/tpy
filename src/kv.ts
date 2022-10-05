@@ -2,6 +2,7 @@ import Tpy from './tpy.ts';
 import type { StringifiedNumber } from './types/util.d.ts';
 import type Pylon from './types/pylon.d.ts';
 import TpyError, { parametersPrompt } from './error.ts';
+import Context from './context.ts';
 
 /**
  * A KVNamespace interface that matches the Pylon KVNamespace class.
@@ -23,9 +24,10 @@ export default class KVNamespace {
       throw new TpyError(
         'Missing or Invalid Required Parameter',
         parametersPrompt(
-          tpyInstance === undefined ? 'missing' : 'incompatible',
+          !tpyInstance ? 'missing' : 'incompatible',
           'tpyInstance',
         ),
+        'tpyInstance',
         tpyInstance,
       );
     }
@@ -33,6 +35,7 @@ export default class KVNamespace {
       throw new TpyError(
         'Missing or Invalid Required Parameter',
         parametersPrompt('missing', 'deploymentID'),
+        'deploymentID',
         deploymentID,
       );
     }
@@ -58,6 +61,7 @@ export default class KVNamespace {
     }
 
     await this.tpyc.httpRaw(
+      Context({ deployment: this.deploymentID }),
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items/${key}`,
       'PUT',
       { body: JSON.stringify({ 'string': value }) },
@@ -81,6 +85,7 @@ export default class KVNamespace {
     }
 
     await this.tpyc.httpRaw(
+      Context({ deployment: this.deploymentID }),
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items/${key}`,
       'PUT',
       { body: JSON.stringify({ 'bytes': value }) },
@@ -96,15 +101,18 @@ export default class KVNamespace {
     key: string,
   ): Promise<T | undefined> {
     const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items<T>>(
+      Context({ deployment: this.deploymentID, namespace: this.namespace }),
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
     );
     let item: T | undefined;
-    for (const p of response) {
+    for (let i = 0; i < response.length; i++) {
+      const p = response[i];
       if (p.key !== key) continue;
       if (!p.value.string) {
         throw new TpyError(
           'Missing or Unexpected Value in Response',
-          `response[number].value.string is undefined`,
+          `response[${i}].value.string is undefined`,
+          `response[${i}].value.string`,
           response,
         );
       }
@@ -121,6 +129,7 @@ export default class KVNamespace {
    */
   async getArrayBuffer(key: string): Promise<ArrayBuffer | undefined> {
     const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
+      Context({ deployment: this.deploymentID }),
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
     );
     let item: ArrayBuffer | undefined;
@@ -140,6 +149,7 @@ export default class KVNamespace {
    */
   async list(options?: Pylon.KV.OperationOptions.List) {
     const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
+      Context({ deployment: this.deploymentID }),
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
     );
 
@@ -164,6 +174,7 @@ export default class KVNamespace {
     options?: Pylon.KV.OperationOptions.Items,
   ): Promise<Pylon.KV.GET.ItemsFlattened<T>> {
     let response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
+      Context({ deployment: this.deploymentID }),
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
     );
 
@@ -185,7 +196,11 @@ export default class KVNamespace {
       if (!j) {
         throw new TpyError(
           'Missing or Unexpected Value in Response',
-          `response[${i}].value.string and .bytes are undefined`,
+          `response[${i}].value.string and/or response[${i}].value.bytes are undefined`,
+          [
+            `response[${i}].value.string`,
+            `response[${i}].value.bytes`,
+          ].join(', '),
           response,
         );
       }
@@ -202,6 +217,7 @@ export default class KVNamespace {
    */
   async count() {
     return (await this.tpyc.httpRaw<Pylon.KV.GET.Namespace>(
+      Context({ deployment: this.deploymentID }),
       `/deployments/${this.deploymentID}/kv/namespaces`,
     )).find((n) => n.namespace == this.namespace)?.count || 0;
   }
@@ -216,6 +232,7 @@ export default class KVNamespace {
    */
   async clear() {
     return (await this.tpyc.httpRaw<Pylon.KV.DELETE.Namespace>(
+      Context({ deployment: this.deploymentID }),
       `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}`,
       'DELETE',
     )).keys_deleted;
@@ -231,6 +248,7 @@ export default class KVNamespace {
   async delete(key: string, options?: Pylon.KV.OperationOptions.Delete) {
     const del = async () =>
       await this.tpyc.httpRaw(
+        Context({ deployment: this.deploymentID, key }),
         `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items/${key}`,
         'DELETE',
       );

@@ -4,20 +4,38 @@ interface TpyErrorBase {
 }
 
 class TpyError<T> extends Error implements TpyErrorBase {
+  /**
+   * The name of the Tpy error.
+   */
   name: keyof ParseTpyErrors<typeof TpyErrors>;
+  /**
+   * An explanation of what might have happened.
+   */
   description: string;
-  context: string;
+  /**
+   * Context to pass into the message function.
+   */
+  messageContext: string;
+  /**
+   * The determining factor of creating this error. The cause.
+   */
+  determination: string;
+  /**
+   * Raw information.
+   */
   rawInfo: T;
 
   constructor(
     name: TpyErrorBase['name'],
-    context: string,
+    determination: string,
+    messageContext: string,
     rawinfo: T,
   ) {
-    super(TpyErrorsAsObjects[name].message(context));
-    this.context = context;
-    this.description = TpyErrorsAsObjects[name].description;
+    super(TpyErrorsAsObjects[name].message(messageContext));
     this.name = name;
+    this.description = TpyErrorsAsObjects[name].description;
+    this.messageContext = messageContext;
+    this.determination = determination;
     this.rawInfo = rawinfo;
   }
 }
@@ -59,7 +77,7 @@ export const TpyErrors = [{
 }, {
   name: 'Unidentifiable Error',
   message: (s: string) =>
-    `Unidentifiable error caught, deterministic via fields:\n${s}`,
+    `Unidentifiable error caught, deterministic via fields: ${s}`,
   description:
     'The error was unidentifiable, see the raw information via <TpyError>.rawInfo.',
 }, {
@@ -80,7 +98,7 @@ export const TpyErrors = [{
   message: (s: string) =>
     `Required parameter(s) ${s} were not populated or is incompatible.`,
   description:
-    'A parameter was not populated where required or is not compatible.',
+    'Parameter(s) were not populated where required or are incompatible.',
 }] as const;
 
 type ParseTpyErrors<T extends ReadonlyArray<TpyErrorBase>> = {
