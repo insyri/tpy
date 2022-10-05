@@ -7,7 +7,8 @@ import TpyError, { TpyErrors, TpyErrorsAsObjects } from './src/error.ts';
 import TpyWs from './src/ws.ts';
 import Tpy from './src/tpy.ts';
 import KVNamespace from './src/kv.ts';
+import Context, { IContext } from "./src/context.ts";
 
 export default Tpy;
-export type { Deployment, Guild, TypeUtil, User, Util };
-export { KVNamespace, TpyError, TpyErrors, TpyErrorsAsObjects, TpyWs };
+export type { Deployment, Guild, TypeUtil, User, Util, IContext };
+export { KVNamespace, TpyError, TpyErrors, TpyErrorsAsObjects, TpyWs, Context };
