@@ -3,6 +3,9 @@ interface TpyErrorBase {
   description: string;
 }
 
+/**
+ * @template T The type of the {@link rawInfo raw information}
+ */
 class TpyError<T> extends Error implements TpyErrorBase {
   /**
    * The name of the Tpy error.
@@ -13,7 +16,8 @@ class TpyError<T> extends Error implements TpyErrorBase {
    */
   description: string;
   /**
-   * Context to pass into the message function.
+   * Context passed into the `.message()` method of the matching
+   * index of {@link TpyErrors}.
    */
   messageContext: string;
   /**
@@ -21,14 +25,27 @@ class TpyError<T> extends Error implements TpyErrorBase {
    */
   determination: string;
   /**
-   * Raw information.
+   * Raw information collected that was used to formulate the error.
    */
   rawInfo: T;
 
   constructor(
+    /**
+     * The name of the Tpy error.
+     */
     name: TpyErrorBase['name'],
+    /**
+     * The determinating factor of why this error was thrown.
+     */
     determination: string,
+    /**
+     * Context passed into the `.message()` method of the matching
+     * index of {@link TpyErrors}.
+     */
     messageContext: string,
+    /**
+     * Raw information used to formulate the error.
+     */
     rawinfo: T,
   ) {
     super(TpyErrorsAsObjects[name].message(messageContext));
@@ -57,7 +74,6 @@ export const TpyErrors = [{
     'This has to do with verifying an API response \'s structure. If a given value is missing or has unexpected behavior, this is thrown.',
 }, {
   name: 'Missing or Invalid JSON in Request Body',
-  // TODO: make sure this makes sense as `s` here would be a syntaxerror message from JSON.parse
   message: (s: string) =>
     `With given field(s) ${s} were unsatisfactory; contains invalid JSON.`,
   description:

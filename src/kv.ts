@@ -11,14 +11,14 @@ export default class KVNamespace {
   /**
    * The namespace that this KVNamespace was constructed with.
    */
-  readonly namespace: string;
+  readonly kvnamespace: string;
   private tpyc: Tpy;
   private deploymentID: StringifiedNumber;
 
   constructor(
     tpyInstance: Tpy,
     deploymentID: StringifiedNumber,
-    namespace: string,
+    kvnamespace: string,
   ) {
     if (!tpyInstance || !(tpyInstance instanceof Tpy)) {
       throw new TpyError(
@@ -41,7 +41,7 @@ export default class KVNamespace {
     }
     this.tpyc = tpyInstance;
     this.deploymentID = deploymentID;
-    this.namespace = namespace;
+    this.kvnamespace = kvnamespace;
   }
 
   /**
@@ -60,9 +60,10 @@ export default class KVNamespace {
       // TODO: add better message and use tpyerr
     }
 
+    const { deploymentID, kvnamespace } = this;
     await this.tpyc.httpRaw(
-      Context({ deployment: this.deploymentID }),
-      `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items/${key}`,
+      new Context({ deploymentID }),
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
       'PUT',
       { body: JSON.stringify({ 'string': value }) },
     );
@@ -84,9 +85,10 @@ export default class KVNamespace {
       // TODO: add better message and use tpyerr
     }
 
+    const { deploymentID, kvnamespace } = this;
     await this.tpyc.httpRaw(
-      Context({ deployment: this.deploymentID }),
-      `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items/${key}`,
+      new Context({ deploymentID, kvnamespace }),
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
       'PUT',
       { body: JSON.stringify({ 'bytes': value }) },
     );
@@ -100,9 +102,10 @@ export default class KVNamespace {
   async get<T extends Pylon.Json = Pylon.Json>(
     key: string,
   ): Promise<T | undefined> {
+    const { deploymentID, kvnamespace } = this;
     const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items<T>>(
-      Context({ deployment: this.deploymentID, namespace: this.namespace }),
-      `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
+      new Context({ deploymentID, kvnamespace }),
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
     let item: T | undefined;
     for (let i = 0; i < response.length; i++) {
@@ -128,9 +131,10 @@ export default class KVNamespace {
    * @param key The Key to get
    */
   async getArrayBuffer(key: string): Promise<ArrayBuffer | undefined> {
+    const { deploymentID, kvnamespace } = this;
     const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
-      Context({ deployment: this.deploymentID }),
-      `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
+      new Context({ deploymentID, kvnamespace }),
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
     let item: ArrayBuffer | undefined;
     for (const p of response) {
@@ -148,9 +152,10 @@ export default class KVNamespace {
    * @returns
    */
   async list(options?: Pylon.KV.OperationOptions.List) {
+    const { deploymentID, kvnamespace } = this;
     const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
-      Context({ deployment: this.deploymentID }),
-      `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
+      new Context({ deploymentID, kvnamespace }),
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
 
     if (options?.limit) response.splice(0, options.limit);
@@ -173,9 +178,10 @@ export default class KVNamespace {
   async items<T>(
     options?: Pylon.KV.OperationOptions.Items,
   ): Promise<Pylon.KV.GET.ItemsFlattened<T>> {
+    const { deploymentID, kvnamespace } = this;
     let response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
-      Context({ deployment: this.deploymentID }),
-      `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items`,
+      new Context({ deploymentID, kvnamespace }),
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
 
     if (options?.from) {
@@ -216,10 +222,11 @@ export default class KVNamespace {
    * Returns the number of keys present in this namespace.
    */
   async count() {
+    const { deploymentID, kvnamespace } = this;
     return (await this.tpyc.httpRaw<Pylon.KV.GET.Namespace>(
-      Context({ deployment: this.deploymentID }),
-      `/deployments/${this.deploymentID}/kv/namespaces`,
-    )).find((n) => n.namespace == this.namespace)?.count || 0;
+      new Context({ deploymentID, kvnamespace }),
+      `/deployments/${deploymentID}/kv/namespaces`,
+    )).find((n) => n.namespace == kvnamespace)?.count || 0;
   }
 
   /**
@@ -231,9 +238,10 @@ export default class KVNamespace {
    * **Use with caution!**
    */
   async clear() {
+    const { deploymentID, kvnamespace } = this;
     return (await this.tpyc.httpRaw<Pylon.KV.DELETE.Namespace>(
-      Context({ deployment: this.deploymentID }),
-      `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}`,
+      new Context({ deploymentID, kvnamespace }),
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}`,
       'DELETE',
     )).keys_deleted;
   }
@@ -246,12 +254,14 @@ export default class KVNamespace {
    * @param options Options, which can provide a delete if equals.
    */
   async delete(key: string, options?: Pylon.KV.OperationOptions.Delete) {
+    const { deploymentID, kvnamespace } = this;
     const del = async () =>
       await this.tpyc.httpRaw(
-        Context({ deployment: this.deploymentID, key }),
-        `/deployments/${this.deploymentID}/kv/namespaces/${this.namespace}/items/${key}`,
+        new Context({ deploymentID, kvnamespace }),
+        `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
         'DELETE',
       );
+
     if (!options?.prevValue) await del();
     else {
       if (await this.get(key) == options.prevValue) await del();
