@@ -13,7 +13,7 @@
 import type Guild from './src/types/guild.d.ts';
 import type Deployment from './src/types/deployment.d.ts';
 import type User from './src/types/user.d.ts';
-import TpyError, { TpyErrors, TpyErrorsAsObjects } from './src/error.ts';
+import TpyError, { TpyErrors } from './src/error.ts';
 import TpyWs from './src/ws.ts';
 import Tpy from './src/tpy.ts';
 import KVNamespace from './src/kv.ts';
@@ -21,4 +21,4 @@ import Context from './src/context.ts';
 
 export default Tpy;
 export type { Deployment, Guild, User };
-export { Context, KVNamespace, TpyError, TpyErrors, TpyErrorsAsObjects, TpyWs };
+export { Context, KVNamespace, TpyError, TpyErrors, TpyWs };
