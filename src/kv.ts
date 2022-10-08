@@ -5,16 +5,28 @@ import TpyError, { parametersPrompt } from './error.ts';
 import Context from './context.ts';
 
 /**
- * A KVNamespace interface that matches the Pylon KVNamespace class.
+ * Pylon uses an internal Key-Value persistence that can
+ * be used via the {@link https://pylon.bot/docs/reference/classes/pylon.kvnamespace.html Pylon KVNamespace SDK}.
+ *
+ * @module
+ */
+
+/**
+ * A KVNamespace interface that (almost) matches the Pylon KVNamespace SDK class.
  */
 export default class KVNamespace {
   /**
-   * The namespace that this KVNamespace was constructed with.
+   * The KV namespace title.
    */
   readonly kvnamespace: string;
   private tpyc: Tpy;
   private deploymentID: StringifiedNumber;
 
+  /**
+   * @param tpyInstance An instantiation of the {@link Tpy} class.
+   * @param deploymentID The deployment ID to find the KV namespace on.
+   * @param kvnamespace The KV namespace title.
+   */
   constructor(
     tpyInstance: Tpy,
     deploymentID: StringifiedNumber,
@@ -95,9 +107,9 @@ export default class KVNamespace {
   }
 
   /**
-   * Gets a key's value - returning the value or undefined. Type `T` can be provided,
-   * in order to cast the return type of the function to a given Json type.
-   * @param key The Key to get
+   * Gets a key's value - returning the value or undefined.
+   * @param key The Key to get.
+   * @template T The return type of the function to a given Json type.
    */
   async get<T extends Pylon.Json = Pylon.Json>(
     key: string,
@@ -126,9 +138,8 @@ export default class KVNamespace {
   }
 
   /**
-   * Gets a key's value - returning the value or undefined. Type `T` can be provided,
-   * in order to cast the return type of the function to a given Json type.
-   * @param key The Key to get
+   * Gets a key's value - returning the value or undefined.
+   * @param key The Key to get.
    */
   async getArrayBuffer(key: string): Promise<ArrayBuffer | undefined> {
     const { deploymentID, kvnamespace } = this;
@@ -149,7 +160,6 @@ export default class KVNamespace {
   /**
    * Lists the keys that are set within the namespace.
    * @param options
-   * @returns
    */
   async list(options?: Pylon.KV.OperationOptions.List) {
     const { deploymentID, kvnamespace } = this;
@@ -171,9 +181,11 @@ export default class KVNamespace {
   }
 
   /**
-   * Exactly like `KVNamespace.list`, except that it returns the key + value pairs instead.
+   * Exactly like {@linkcode KVNamespace.list}, except that it returns the key + value pairs instead.
    *
    * The maximum limit is 100, however.
+   *
+   * @template T The type of the value.
    */
   async items<T>(
     options?: Pylon.KV.OperationOptions.Items,
@@ -248,9 +260,9 @@ export default class KVNamespace {
 
   /**
    * Deletes a given key from the namespace. Throwing if the key does not exist,
-   * or if `options.prevValue` is set, the previous value is not equal to the
+   * or if {@linkcode Pylon.KV.OperationOptions.Delete options.prevValue} is set, the previous value is not equal to the
    * value provided.
-   * @param key The key to delete
+   * @param key The key to delete.
    * @param options Options, which can provide a delete if equals.
    */
   async delete(key: string, options?: Pylon.KV.OperationOptions.Delete) {

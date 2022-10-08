@@ -35,7 +35,14 @@ export interface ITpyErrors {
 }
 
 export interface ITpyErrorsProperty {
+  /**
+   * A function that returns a string with an input regarding environment
+   * contextual details.
+   */
   message: (s: string) => string;
+  /**
+   * An explanation of what might have happened.
+   */
   description: string;
 }
 
@@ -45,8 +52,7 @@ export interface ITpyErrorsProperty {
  *
  * @template T The type of {@linkcode rawInfo}.
  */
-class TpyError<T> extends Error
-  implements Omit<typeof TpyErrors[keyof typeof TpyErrors], 'message'> {
+class TpyError<T> extends Error implements Omit<ITpyErrorsProperty, 'message'> {
   /**
    * A short description of the Tpy error.
    */
@@ -69,23 +75,19 @@ class TpyError<T> extends Error
    */
   rawInfo: T;
 
+  /**
+   * @param name A short description of the Tpy error.
+   * @param determination An explanation of what might have happened.
+   * @param rawinfo Raw information collected that was used to formulate the error.
+   */
   constructor(
-    /**
-     * A short description of the Tpy error.
-     */
     name: keyof typeof TpyErrors,
-    /**
-     * An explanation of what might have happened.
-     */
     determination: string,
     /**
      * Context passed into the `.message()` method of the matching
      * name index of {@linkcode TpyErrors}.
      */
     messageContext: string,
-    /**
-     * Raw information collected that was used to formulate the error.
-     */
     rawinfo: T,
   ) {
     super(TpyErrors[name].message(messageContext));
@@ -173,10 +175,20 @@ function couldNotBeFound(sub: string, s: string) {
 
 // General util template functions
 
+/**
+ * Clarifies that the parameter `s` is the response body.
+ * @param s The response body information as a string.
+ */
 export function responseBody(s: string) {
   return `Response Body: "${s}"`;
 }
 
+/**
+ * Creates a string that describes the parameter(s) are
+ * either missing or incompatible.
+ * @param issue The issue with the parameters.
+ * @param params The parameter(s) in this context.
+ */
 export function parametersPrompt(
   issue: 'missing' | 'incompatible',
   params: string | string[],
@@ -186,6 +198,10 @@ export function parametersPrompt(
   }`;
 }
 
+/**
+ * Clarifies that the parameter `s` is the HTTP response code.
+ * @param s The HTTP response code information as a string.
+ */
 export function responseHTTP(s: string) {
   return `Response HTTP status code: ${s}`;
 }

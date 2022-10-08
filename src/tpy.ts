@@ -10,7 +10,7 @@ import type Pylon from './types/pylon.d.ts';
 import type { StringifiedNumber } from './types/util.d.ts';
 import TpyWs from './ws.ts';
 import KVNamespace from './kv.ts';
-import Context, { emptyContext, IContext } from './context.ts';
+import Context from './context.ts';
 
 /**
  * A Tpy class, intialized with a pylon token.
@@ -52,7 +52,7 @@ export default class Tpy {
    * @returns The current logged in user.
    */
   async getUser() {
-    return await this.httpRaw<User.GET.User>(emptyContext, '/user');
+    return await this.httpRaw<User.GET.User>(new Context({}), '/user');
   }
 
   /**
@@ -62,32 +62,32 @@ export default class Tpy {
    */
   async getAvailableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Available>(
-      emptyContext,
+      new Context({}),
       '/user/guilds/available',
     );
   }
 
   /**
-   * @param id The ID of the guild to get.
+   * @param guildID The ID of the guild to get.
    *
    * @returns Raw Discord guild information with deployment information.
    */
-  async getGuildInfo(id: StringifiedNumber) {
+  async getGuildInfo(guildID: StringifiedNumber) {
     return await this.httpRaw<Guild.GET.Guild>(
-      Context({ guild: id }),
-      `/guilds/${id}`,
+      new Context({ guildID }),
+      `/guilds/${guildID}`,
     );
   }
 
   /**
-   * @param id The ID of the guild to get.
+   * @param guildID The ID of the guild to get.
    *
    * @returns Guild computational statistics.
    */
-  async getGuildStats(id: StringifiedNumber) {
+  async getGuildStats(guildID: StringifiedNumber) {
     return await this.httpRaw<Guild.GET.Stats>(
-      Context({ guild: id }),
-      `/guilds/${id}/stats`,
+      new Context({ guildID }),
+      `/guilds/${guildID}/stats`,
     );
   }
 
@@ -96,7 +96,7 @@ export default class Tpy {
    */
   async getEditableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Guilds>(
-      emptyContext,
+      new Context({}),
       `/user/guilds`,
     );
   }
@@ -117,7 +117,7 @@ export default class Tpy {
       );
     }
     return await this.httpRaw<Deployment.GET.Deployment>(
-      Context({ deployment: dID }),
+      new Context({ deploymentID: dID }),
       `/deployments/${dID}`,
     );
   }
@@ -136,7 +136,7 @@ export default class Tpy {
     body: Deployment.POST.Request<false>,
   ) {
     return await this.httpRaw<Deployment.POST.Response>(
-      Context({ deployment: id }),
+      new Context({ deploymentID: id }),
       `/deployments/${id}`,
       'POST',
       {
@@ -187,7 +187,7 @@ export default class Tpy {
       );
     }
     return await this.httpRaw<Pylon.KV.GET.Namespace>(
-      Context({ deployment: dID }),
+      new Context({ deploymentID: dID }),
       `/deployments/${dID}/kv/namespaces`,
     );
   }
@@ -211,7 +211,7 @@ export default class Tpy {
       );
     }
     const response = await this.httpRaw<Pylon.KV.GET.Items>(
-      Context({ deployment: dID }),
+      new Context({ deploymentID: dID }),
       `/deployments/${dID}/kv/namespaces/${namespace}/items`,
     );
 
@@ -270,7 +270,7 @@ export default class Tpy {
    * @throws {TpyError<Response>}
    */
   async httpRaw<T>(
-    context: IContext,
+    context: Context,
     resource: `/${string}`,
     method: Pylon.HTTPVerbs = 'GET',
     other: RequestInit = {},
@@ -298,7 +298,7 @@ export default class Tpy {
           throw new TpyError<Response>(
             'Deployment Could Not be Found',
             responseBody(r),
-            context.deployment,
+            context.deploymentID,
             response,
           );
         }
@@ -307,7 +307,7 @@ export default class Tpy {
           throw new TpyError<Response>(
             'Guild Could Not be Found',
             responseBody(r),
-            context.guild,
+            context.guildID,
             response,
           );
         }
