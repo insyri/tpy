@@ -2,31 +2,25 @@ import { StringifiedNumber, Unpacked } from './util.d.ts';
 import Guild from './guild.d.ts';
 
 /**
- * `/user`
- *
- * User related resources.
+ * Request and response structures related to the `/user` resource.
  */
 declare namespace User {
   /**
-   * `GET /user`
-   *
-   * Returns information based on the currently authenticated user.
+   * Schemas for `GET /user`.
    */
   export namespace GET {
     /**
-     * `GET /user`
+     * Response schema for `GET /user`.
      *
-     * Gets basic user information.
+     * Returns information based on the currently authenticated user.
      */
     export type User = {
       /**
-       * The user's ID.
+       * The user's Discord ID.
        */
       id: StringifiedNumber;
       /**
-       * A timestamp of the last seen time a user was ..?
-       * (unknown as of 7/28/2022)
-       * Currently the account creation date.
+       * The user's join date of the Pylon Discord Server.
        *
        * Follows the ISO 8601 / RFC 3339 specification.
        */
@@ -34,11 +28,11 @@ declare namespace User {
       /**
        * The user's avatar ID. Null if none set.
        *
-       * UUID without hyphens.
+       * `https://cdn.discordapp.com/avatars/{userId}/{avatar}.webp`
        */
       avatar: string | null;
       /**
-       * The logged in user's username.
+       * The user's name.
        */
       displayName: string;
       /**
@@ -48,18 +42,23 @@ declare namespace User {
     };
 
     /**
-     * `GET /user/guilds`
+     * Response schema for `GET /user/guilds`.
      *
      * User's guild related resources.
      */
     export namespace Guilds {
       /**
-       * `GET /user/guilds`
+       * Response schema for `GET /user/guilds`.
        *
-       * Returns all guilds the respective user can edit with Pylon.
-       * More specifically, all guilds which the user has `manage server` or `administrator` permissions in.
+       * Returns all guilds where the user can edit with Pylon.
+       * More specifically, all guilds which the user has `manage
+       * server` or `administrator` permissions in. The site says this
+       * directly when {@link https://pylon.bot/studio/add-guild adding a guild}
+       * and scrolling all the way down:
+       *
+       * > Don’t see the guild you’re looking for? Ensure you have the “Administrator” or “Manage Server” permission!
        */
-      export type Guilds = Array<
+      export type Allowed = Array<
         Unpacked<Available> & {
           /**
            * The user's nickname in the guild.
@@ -69,15 +68,14 @@ declare namespace User {
       >;
 
       /**
-       * `GET /user/guilds/available`
+       * Response schema for `GET /user/guilds/available`.
        *
-       * Returns all guilds a user is in.
+       * Returns all guilds the user is in.
        */
       export type Available = Array<
         Guild.Structures.Payload & {
           /**
-           * Discord permissions number.
-           * @link https://discord.com/developers/docs/topics/permissions
+           * The {@link https://discord.com/developers/docs/topics/permissions Discord permissions number} of the user.
            */
           permissions: number;
         }

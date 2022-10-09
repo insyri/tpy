@@ -6,13 +6,12 @@ import type {
 } from '../types/util.d.ts';
 
 /**
- * `/deployments`
- *
- * Deployment related resources.
+ * Request and response structures related to the `/deployments` resource.
  */
 declare namespace Deployment {
   /**
-   * Not an API resource, this namespace behaves as templates and other base types.
+   * Not an API resource, this namespace behaves as templates and other
+   * base types.
    */
   export namespace Structures {
     /**
@@ -20,15 +19,13 @@ declare namespace Deployment {
      */
     export enum DeploymentType {
       /**
-       * This deployment is a collection of scripts.
+       * This deployment is a collection of scripts. This is the default.
        *
        * @default
        */
       SCRIPT,
       /**
        * This deployment is an app.
-       *
-       * Currently not used in the API.
        */
       APP,
     }
@@ -42,7 +39,7 @@ declare namespace Deployment {
        */
       DISABLED,
       /**
-       * Deployment is enabled, it runs and is active.
+       * Deployment is enabled, it runs and is active. This is the default.
        *
        * @default
        */
@@ -50,7 +47,7 @@ declare namespace Deployment {
     }
 
     /**
-     * Deployment configurations. Recieved stringified.
+     * Deployment configurations; recieved as a string.
      */
     export type Config = {
       /**
@@ -66,18 +63,18 @@ declare namespace Deployment {
        */
       tasks: {
         /**
-         * Cron task specifications.
+         * Cron task specifications. See the {@link https://pylon.bot/docs/pylon-tasks Pylon SDK Documentation} on Crons and Tasks.
          *
-         * > Note: The current minimum interval cron tasks can run at are once every 5 minutes. You may schedule up to 5 cron handlers.
-         * @link https://pylon.bot/docs/pylon-tasks
-         * @link https://pylon.bot/docs/reference/modules/pylon.tasks.html#cron
+         * Identification map:
+         * ```ts
+         * pylon.tasks.cron('Reminder', '0 0/5 * * * * *', async () => {});
+         * //                ^^^^^^^^    ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^
+         * //               Identifier   Cron              Asynchronous Callback
+         * ```
          */
         cronTasks: Array<{
           /**
-           * Cron identifier. Identified like so:
-           * ```ts
-           * pylon.tasks.cron('cron_identifier', '0 0/5 * * * * *', () => {});
-           * ```
+           * The cron identifier; the given name to the cron instructions.
            */
           name: string;
           /**
@@ -101,16 +98,14 @@ declare namespace Deployment {
        */
       bot_id: StringifiedNumberWithDefault<270148059269300224n>;
       /**
-       * Unused as of 5/31/2022.
+       * The type of deployment.
        */
       type: DeploymentType;
       /**
-       * Unused as of 5/31/2022.
+       * The application ID.
        */
       app_id: StringifiedNumber | null;
       /**
-       * Unused as of 5/31/2022.
-       *
        * Name of the script/app.
        */
       name: string;
@@ -129,8 +124,7 @@ declare namespace Deployment {
      */
     export type DeploymentFiles = {
       /**
-       * Path to the file, probably ends in `.ts`.
-       * Follows pattern: `/*.*`.
+       * Path to the file in formation of `./*.*`, usually ends in `.ts`: `./*.ts`.
        */
       path: string;
       /**
@@ -161,9 +155,9 @@ declare namespace Deployment {
          *       "nested_third": ...
          *     }
          *   }
-         * };
+         * }
          * // would be represented as:
-         * ['nested_top', 'nested_second', 'nested_third'];
+         * ['nested_top', 'nested_second', 'nested_third']
          * ```
          */
         loc: string[];
@@ -180,18 +174,25 @@ declare namespace Deployment {
   }
 
   /**
-   * `GET /deployments/*`
+   * Schemas for `GET /deployments/*`.
    */
   export namespace GET {
     /**
-     * `GET /deployments/:id`
+     * Response schema for `GET /deployments/:id`.
      *
-     * Returns deployment information via ID.
+     * Returns information about the current running deployment.
+     *
+     * @template T Boolean of whether the configuration contents are recieved
+     * as string of JSON or as actual JSON.
      */
     export type Deployment<Raw extends boolean = true> = Structures.Base & {
+      /**
+       * Deployment configurations.
+       */
       config: Raw extends true ? string : Structures.Config;
       /**
-       * Pylon Workbench WebSocket URL. Includes a portion the logged in user's authentication token for Pylon.
+       * Pylon Workbench WebSocket URL. Includes a portion the logged in
+       * user's authentication token for Pylon.
        */
       workbench_url: `wss://workbench.pylon.bot/ws/${string}`;
       /**
@@ -202,15 +203,19 @@ declare namespace Deployment {
   }
 
   /**
-   * `POST /deployments/*`
+   * Schemas for `POST /deployments/*`.
    */
   export namespace POST {
     /**
-     * `POST /deployments/:id` Request
+     * Request schema for `POST /deployments/:id`.
      *
-     * The request schema for the POST deployment resource.
+     * @template T Boolean of whether the file contents are recieved
+     * as string of JSON or as actual JSON.
      */
     export type Request<Raw extends boolean = true> = {
+      /**
+       * The new deployment script information.
+       */
       script: {
         /**
          * Compiled script code in JavaScript.
@@ -229,9 +234,13 @@ declare namespace Deployment {
     };
 
     /**
-     * `POST /deployments/:id` Response
+     * Response schema for `POST /deployments/:id`.
      *
-     * The response schema for the POST deployment resource.
+     * Returns the new deployment's information. If there are errors, the
+     * `errors` property length will be more than 0.
+     *
+     * @template T Boolean of whether the file contents are recieved
+     * as string of JSON or as actual JSON.
      */
     export type Response<Raw extends boolean = true> =
       & Deployment.GET.Deployment
@@ -240,6 +249,9 @@ declare namespace Deployment {
          * FastAPI error.
          */
         errors: Deployment.Structures.FastAPIError;
+        /**
+         * The new deployment script information.
+         */
         script?: {
           /**
            * The Deployment ID.

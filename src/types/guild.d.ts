@@ -4,13 +4,12 @@ import { StringifiedNumber } from './util.d.ts';
 import Deployment from './deployment.d.ts';
 
 /**
- * `/guilds`
- *
- * Guild related resources.
+Request and response structures related to the `/guilds` resource.
  */
 declare namespace Guild {
   /**
-   * Not an API resource, this namespace behaves as templates and other base types.
+   * Not an API resource, this namespace behaves as templates and other
+   * base types.
    */
   export namespace Structures {
     /**
@@ -34,13 +33,11 @@ declare namespace Guild {
   }
 
   /**
-   * `GET /guilds`
-   *
-   * Returns guilds of the respective user.
+   * Schemas for `GET /guilds`.
    */
   export namespace GET {
     /**
-     * `GET /guilds/:id`
+     * Response schema for `GET /guilds/:id`.
      *
      * Returns some guild info (everything the v8 Discord API normally gives you) as well as a list of deployments.
      */
@@ -50,13 +47,16 @@ declare namespace Guild {
         deployments: Array<
           Deployment.Structures.Base & {
             /**
-             * Unused as of 5/31/2022.
+             * Unused.
              */
             last_updated_at: null;
             /**
-             * Deployment configuration.
+             * Deployment configurations.
              */
             config: Raw extends true ? string : Deployment.Structures.Config;
+            /**
+             * A boolean version of {@linkcode Deployment.Structures.DeploymentStatus}.
+             */
             disabled: boolean;
           }
         >;
@@ -71,7 +71,7 @@ declare namespace Guild {
       };
 
     /**
-     * `GET /guilds/:id/stats`
+     * Response schema for `GET /guilds/:id/stats`.
      *
      * Return some statistics of a script container. Some values are undefined when information is not available.
      */
