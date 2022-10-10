@@ -9,7 +9,7 @@ import type User from './types/user.d.ts';
 import type Pylon from './types/pylon.d.ts';
 import type { StringifiedNumber } from './types/util.d.ts';
 import TpyWs from './ws.ts';
-import KVNamespace from './kv.ts';
+import TpyKV from './kv.ts';
 import Context from './context.ts';
 
 /**
@@ -168,7 +168,7 @@ export default class Tpy {
    * @param id The deployment ID to follow the WebSocket when it disconnects.
    */
   connectSocket(id: StringifiedNumber) {
-    return new TpyWs(new Tpy(this.token), id);
+    return new TpyWs(this, id);
   }
 
   /**
@@ -195,11 +195,13 @@ export default class Tpy {
    * Gets all the namespace items under the given deployment ID.
    * @param deploymentID The deployment ID to look under.
    * @param namespace The namespace to look under.
+   *
+   * @template T The type of the `value` object inside {@linkcode Pylon.KV.GET.ItemsFlattened}.
    */
-  async getNamespaceItems(
+  async getNamespaceItems<T>(
     namespace: string,
     deploymentID?: StringifiedNumber,
-  ): Promise<Pylon.KV.GET.ItemsFlattened | undefined> {
+  ): Promise<Pylon.KV.GET.ItemsFlattened<T> | undefined> {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
       throw new TpyError(
@@ -214,7 +216,7 @@ export default class Tpy {
       `/deployments/${dID}/kv/namespaces/${namespace}/items`,
     );
 
-    const a: Pylon.KV.GET.ItemsFlattened = new Array(response.length);
+    const a: Pylon.KV.GET.ItemsFlattened<T> = new Array(response.length);
     for (let i = 0; i < response.length; i++) {
       const p = response[i];
       if (!p.value.string) {
@@ -235,12 +237,11 @@ export default class Tpy {
   }
 
   /**
-   * Creates a new KVNamespace instance,
-   * much like the Pylon SDK's KVNamespace class.
+   * Creates a new {@link TpyKV} instantiation, much like the Pylon SDK's KVNamespace class.
    * @param deploymentID The deployment ID to look under.
    * @param namespace The namespace to look under.
    */
-  newKVNamespace(
+  KV(
     namespace: string,
     deploymentID?: StringifiedNumber,
   ) {
@@ -254,7 +255,7 @@ export default class Tpy {
       );
     }
 
-    return new KVNamespace(this, dID, namespace);
+    return new TpyKV(this, dID, namespace);
   }
 
   /**

@@ -16,9 +16,9 @@ import type User from './src/types/user.d.ts';
 import TpyError, { TpyErrors } from './src/error.ts';
 import TpyWs from './src/ws.ts';
 import Tpy from './src/tpy.ts';
-import KVNamespace from './src/kv.ts';
+import TpyKV from './src/kv.ts';
 import Context from './src/context.ts';
 
 export default Tpy;
 export type { Deployment, Guild, User };
-export { Context, KVNamespace, TpyError, TpyErrors, TpyWs };
+export { Context, TpyError, TpyErrors, TpyKV, TpyWs };

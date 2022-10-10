@@ -1,4 +1,6 @@
 import { SafeObject } from './util.d.ts';
+// deno-lint-ignore no-unused-vars
+import type TpyKV from '../kv.ts';
 
 /**
  * Typings relevant to the Pylon API.
@@ -12,7 +14,7 @@ declare namespace Pylon {
    */
   export type HTTPVerbs = 'GET' | 'POST' | 'PUT' | 'DELETE';
   /**
-   * Types parsable by ES5's `JSON.parse` function.
+   * Types parsable by ES5's {@linkcode JSON.parse} function.
    */
   export type Json =
     | string
@@ -22,7 +24,7 @@ declare namespace Pylon {
     | SafeObject
     | JsonArray[];
   /**
-   * An array of types parsable by ES5's `JSON.parse` function.
+   * An array of types parsable by ES5's {@linkcode JSON.parse} function.
    */
   export type JsonArray = Json[];
   /**
@@ -30,11 +32,13 @@ declare namespace Pylon {
    */
   export namespace KV {
     /**
-     * `GET /deployments/{id}/kv/namespaces/{namespace}`
+     * Schemas for `GET /deployments/:id/kv/namespaces/*`.
      */
     export namespace GET {
       /**
-       * `GET /deployments/{id}/kv/namespaces`
+       * Response schema for `GET /deployments/:id/kv/namespaces`.
+       *
+       * Returns an array of namespace titles and their key count.
        */
       export type Namespace = Array<{
         namespace: string;
@@ -42,38 +46,117 @@ declare namespace Pylon {
       }>;
 
       /**
-       * `GET /deployments/{id}/kv/namespaces/{namespace}/items`
+       * Response schema for `GET /deployments/:id/kv/namespaces/:namespace/items`.
+       *
+       * Returns an array of key and value objects along with other metadata.
+       *
+       * @template T The type of the value.
        */
       export type Items<T = unknown, Raw extends boolean = true> = Array<{
+        /**
+         * The key name.
+         */
         key: string;
-        value: {
-          string?: Raw extends true ? string : T;
-          bytes?: Raw extends true ? string : T;
-          expiresAt?: string;
-        };
+        /**
+         * The key's value.
+         */
+        value:
+          & ({
+            /**
+             * The key represented as a string. JSON parsable.
+             */
+            string?: Raw extends true ? string : T;
+            bytes: never;
+          } | {
+            /**
+             * The key represented as bytes. Comes from
+             * {@linkcode TpyKV.putArrayBuffer}.
+             */
+            bytes?: Raw extends true ? string : T;
+            string: never;
+          })
+          & {
+            /**
+             * KV pair expiration date/time.
+             */
+            expiresAt?: string;
+          };
       }>;
 
+      /**
+       * Surfaces {@linkcode Items}.
+       */
       export type ItemsFlattened<T = unknown> = Array<{
+        /**
+         * The key name.
+         */
         key: string;
+        /**
+         * The key's value.
+         */
         value: T;
+        /**
+         * KV pair expiration date/time.
+         */
         expiresAt?: string;
       }>;
     }
 
+    /**
+     * Schemas for `DELETE /deployments/:id/kv/namespaces/*`.
+     */
     export namespace DELETE {
+      /**
+       * Response schema for `DELETE /deployments/:id/kv/namespaces/:namespace`.
+       *
+       * Returns the number of deleted keys after deleting the whole namespace.
+       */
       export type Namespace = {
+        /**
+         * The number of deleted keys in the deleted namespace.
+         */
         keys_deleted: number;
       };
     }
 
+    /**
+     * Schemas for `PUT /deployments/:id/kv/namespaces/*`.
+     */
     export namespace PUT {
+      /**
+       * Response schema for `PUT /deployments/:id/kv/namespaces/:namespace/items/:key`.
+       */
       export type Item = {
+        /**
+         * The key represented as a string. JSON parsable.
+         */
         string: string;
+        bytes: never;
+        /**
+         * KV pair expiration date/time.
+         */
+        expires_at?: number;
+      } | {
+        string: never;
+        /**
+         * The key represented as bytes. Comes from
+         * {@linkcode TpyKV.putArrayBuffer}.
+         */
+        bytes: string;
+        /**
+         * KV pair expiration date/time.
+         */
         expires_at?: number;
       };
     }
 
+    /**
+     * Function options for operations matching HTTP methods.
+     */
     export namespace OperationOptions {
+      /**
+       * Operation options for {@linkcode TpyKV.put}.
+       */
       export interface Put {
         /**
          * The duration in milliseconds until the key should expire. Mutually exclusive with `ttlEpoch`.
@@ -89,6 +172,9 @@ declare namespace Pylon {
         ifNotExists?: boolean;
       }
 
+      /**
+       * Operation options for {@linkcode TpyKV.items}.
+       */
       export interface Items {
         /**
          * Returns keys after `from`. Meaning, if you had the keys `["a", "b", "c"]` in the namespace, calling `kv.items({from: "a"})` would return the items for the keys `["b", "c"]`.
@@ -102,6 +188,9 @@ declare namespace Pylon {
         limit?: number;
       }
 
+      /**
+       * Operation options for {@linkcode TpyKV.list}.
+       */
       export interface List {
         /**
          * Returns keys after `from`. Meaning, if you had the keys `["a", "b", "c"]` in the namespace, calling `kv.list({from: "a"})` would return `["b", "c"]`.
@@ -115,6 +204,9 @@ declare namespace Pylon {
         limit?: number;
       }
 
+      /**
+       * Operation options for {@linkcode TpyKV.delete}.
+       */
       export interface Delete {
         /**
          * Deletes the value, but only if it equals the provided value.

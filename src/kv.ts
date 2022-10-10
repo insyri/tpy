@@ -14,7 +14,7 @@ import Context from './context.ts';
 /**
  * A KVNamespace interface that (almost) matches the Pylon KVNamespace SDK class.
  */
-export default class KVNamespace {
+export default class TpyKV {
   /**
    * The KV namespace title.
    */
@@ -175,7 +175,7 @@ export default class KVNamespace {
   }
 
   /**
-   * Exactly like {@linkcode KVNamespace.list}, except that it returns the key + value pairs instead.
+   * Exactly like {@linkcode TpyKV.list}, except that it returns the key + value pairs instead.
    *
    * The maximum limit is 100, however.
    *
