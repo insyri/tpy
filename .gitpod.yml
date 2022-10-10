@@ -6,7 +6,7 @@ vscode:
     - denoland.vscode-deno
 
 tasks:
-  - init: "deno run mod.ts --allow-env"
+  - init: "deno run --allow-env mod.ts"
 
 github:
   prebuilds:
