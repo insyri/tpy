@@ -2,37 +2,74 @@ import Tpy from './tpy.ts';
 import type { StringifiedNumber, Unpacked } from './types/util.d.ts';
 import type Pylon from './types/pylon.d.ts';
 import { EventEmitter } from 'events';
+import TpyError, { parametersPrompt } from './error.ts';
 
 /**
- * The Tpy WebSocket manager.
+ * Pylon uses {@link WebSocket}s to listen to a deployment's console out/err.
+ * While this idea is simple enough, the host closes the socket on an interval
+ * ({@link https://discord.com/channels/530557949098065930/696860766665703515/983184117040562246 by design}),
+ * having to make the user reconnect to the socket to continue listening.
+ *
+ * {@link TpyWs} is a {@link WebSocket} wrapper that expects this kind of nature
+ * to aid and provide easier use.
+ *
+ * @module
+ */
+
+/**
+ * {@link TpyWs} is a {@link WebSocket} abstraction specifically made for the
+ * Pylon's socket nature. It provides the following qualities:
+ *
+ * - Automatic reconnection with customizable timeouts.
+ * - Response formatting.
+ * - Keep-alive stream. (Does not exit process on close/error unless
+ * {@linkcode TpyWs.close} is used.)
+ * - Raw access to WebSocket object.
  */
 export default class TpyWs {
-  private ws?: WebSocket;
   private tpyc: Tpy;
   private deploymentID: StringifiedNumber;
   private tryToConnect = true;
   private reconnectionTimout: number;
 
-  rawEventEmitter = new EventEmitter();
+  /**
+   * {@linkcode TpyWs} uses a proxy stream that ensures the process (or at least the stream) is not terminated. This is that proxy stream.
+   */
+  eventEmitter = new EventEmitter();
+  /**
+   * The raw {@linkcode WebSocket} object, advised not to edit.
+   */
+  websocket?: WebSocket;
 
+  /**
+   * @param tpyInstance An instantiation of a {@linkcode Tpy} class.
+   * @param deploymentID The deployment ID to look up for reconnection links.
+   * @param reconnectionTimeout The reconnection timeout in milliseconds.
+   */
   constructor(
-    /**
-     * A constructed instance of Tpy.
-     */
     tpyInstance: Tpy,
-    /**
-     * The deployment ID to follow.
-     */
     deploymentID: StringifiedNumber,
-    /**
-     * The reconnection timeout in milliseconds.
-     */
     reconnectionTimeout = 250,
   ) {
     if (!tpyInstance || !(tpyInstance instanceof Tpy)) {
-      throw new Error('A Tpy instance is required');
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt(
+          !tpyInstance ? 'missing' : 'incompatible',
+          'tpyInstance',
+        ),
+        'tpyInstance',
+        tpyInstance,
+      );
     }
-    if (!deploymentID) throw 'A deployment ID is required';
+    if (!deploymentID) {
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt('missing', 'deploymentID'),
+        'deploymentID',
+        deploymentID,
+      );
+    }
     this.tpyc = tpyInstance;
     this.deploymentID = deploymentID;
     this.reconnectionTimout = reconnectionTimeout;
@@ -40,27 +77,24 @@ export default class TpyWs {
 
   /**
    * Adds an event listener to WebSocket events.
-   * @see rawEventEmitter for internal access to this.
    * @param type Fired when the WebSocket is (re)opened.
-   * @param callback A function to call when this event is fired.
+   * @param callback A callback function to invoke when this event is fired.
    *
    * @event
    */
   on(type: 'open', callback: (data: Event) => void): EventEmitter;
   /**
    * Adds an event listener to WebSocket events.
-   * @see rawEventEmitter for internal access to this.
    * @param type Fired when the WebSocket is closed.
-   * @param callback A function to call when this event is fired.
+   * @param callback A callback function to invoke when this event is fired.
    *
    * @event
    */
   on(type: 'close', callback: (data: CloseEvent) => void): EventEmitter;
   /**
    * Adds an event listener to WebSocket events.
-   * @see rawEventEmitter for internal access to this.
    * @param type Fired when the WebSocket captures an error.
-   * @param callback A function to call when this event is fired.
+   * @param callback A callback function to invoke when this event is fired.
    *
    * # Notice!
    * This event is fired every time the WebSocket is closed. This is
@@ -71,54 +105,67 @@ export default class TpyWs {
   on(type: 'error', callback: (data: ErrorEvent | Event) => void): EventEmitter;
   /**
    * Adds an event listener to WebSocket events.
-   * @see rawEventEmitter for internal access to this.
    * @param type Fired when the WebSocket recieves a message.
-   * @param callback A function to call when this event is fired.
+   * @param callback A callback function to invoke when this event is fired.
+   *
+   * @template T The type of the `data` object inside {@linkcode Pylon.WebSocket.Response}.
    *
    * @event
    */
-  on<C extends unknown[] = unknown[]>(
+  on<T extends unknown[]>(
     type: 'message',
-    callback: (data: Unpacked<Pylon.WebSocket.Response<C>>) => void,
+    callback: (data: Unpacked<Pylon.WebSocket.Response<T>>) => void,
   ): EventEmitter;
-  on<C extends unknown[] = unknown[]>(
+  on<T extends unknown[]>(
     type: unknown,
     callback: unknown,
   ) {
-    if (typeof type != 'string' || typeof callback != 'function') throw '';
-    return this.rawEventEmitter.on(
+    if (typeof type != 'string') {
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt('incompatible', 'type'),
+        'type',
+        typeof type,
+      );
+    }
+    if (typeof callback != 'function') {
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt('incompatible', 'callback'),
+        'callback',
+        typeof callback,
+      );
+    }
+    return this.eventEmitter.on(
       type,
-      <(data: Unpacked<Pylon.WebSocket.Response<C>>) => void> callback,
+      <(data: Unpacked<Pylon.WebSocket.Response<T>>) => void> callback,
     );
   }
 
   /**
    * Retrieves the workbench URL and ties the WebSocket events to an event emitter.
-   * @see rawEventEmitter for internal access to this.
    */
   async connect() {
     if (!this.tryToConnect) return;
-    this.ws = new WebSocket(
-      (await this.tpyc.getDeployment(this.deploymentID).catch((r) => {
-        throw r;
-      })).workbench_url,
+    this.websocket = new WebSocket(
+      (await this.tpyc.getDeployment(this.deploymentID)).workbench_url,
     );
-    this.ws.onopen = this.onOpen.bind(this);
-    this.ws.onclose = this.onClose.bind(this);
-    this.ws.onerror = this.onError.bind(this);
-    this.ws.onmessage = this.onMessage.bind(this);
+    this.websocket.onopen = this.onOpen.bind(this);
+    this.websocket.onclose = this.onClose.bind(this);
+    this.websocket.onerror = this.onError.bind(this);
+    this.websocket.onmessage = this.onMessage.bind(this);
   }
 
   private onOpen(event: Event) {
-    this.rawEventEmitter.emit('open', event);
+    this.eventEmitter.emit('open', event);
   }
 
   private onError(event: Event | ErrorEvent) {
-    if (!this.ws) return;
-    this.rawEventEmitter.emit('error', event);
+    if (!this.websocket) return;
+    this.eventEmitter.emit('error', event);
 
     try {
-      this.ws.close();
+      this.websocket.close();
       // deno-lint-ignore no-empty
     } catch {}
 
@@ -128,31 +175,19 @@ export default class TpyWs {
   }
 
   private onClose(event: CloseEvent) {
-    this.rawEventEmitter.emit('close', event);
+    this.eventEmitter.emit('close', event);
   }
 
   private onMessage(event: MessageEvent<string>) {
-    this.rawEventEmitter.emit('message', this.unpack(JSON.parse(event.data)));
-  }
-
-  /**
-   * Unpacks the WebSocket response to a less nested level.
-   * @param res
-   * @returns
-   */
-  unpack<T extends unknown[] = unknown[]>(
-    res: Pylon.WebSocket.Response<T>,
-  ): Unpacked<Pylon.WebSocket.Response<T>> {
-    const { method, data } = res[0];
-    return { data, method };
+    this.eventEmitter.emit('message', (JSON.parse(event.data))[0]);
   }
 
   /**
    * Closes the WebSocket connection, reconnection will not be attempted.
    */
   close() {
-    if (!this.ws) return;
-    this.ws.close();
+    if (!this.websocket) return;
+    this.websocket.close();
     this.tryToConnect = false;
   }
 }

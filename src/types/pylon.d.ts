@@ -84,7 +84,7 @@ declare namespace Pylon {
          */
         ttlEpoch?: Date;
         /**
-         * Only put the key if it does not already exist, otherwise throw an error.
+         * Only put the key if it does not already exist.
          */
         ifNotExists?: boolean;
       }
@@ -131,6 +131,8 @@ declare namespace Pylon {
     /**
      * A WebSocket Response from a workbench URL.
      * Implementing a generic provides type sense for the `data` object.
+     *
+     * @template T The type of the `data` object.
      */
     export type Response<T extends unknown[] = unknown[]> = [
       {
@@ -145,8 +147,7 @@ declare namespace Pylon {
          * ```ts
          *   method(message?: any, ...optionalParams: any[]): void;
          * ```
-         * [See Reference](
-         * https://github.com/pylonbot/pylon-sdk-types/blob/eb0100c9c8f95a07d95fd511e5afc2923786e95b/runtime/pylon-runtime.d.ts#L3-L14)
+         * {@link https://github.com/pylonbot/pylon-sdk-types/blob/eb0100c9c8f95a07d95fd511e5afc2923786e95b/runtime/pylon-runtime.d.ts#L3-L14 See Reference}
          *
          * However arguments are passed into these methods will reflect here as an array.
          * @example ```ts

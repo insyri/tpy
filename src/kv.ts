@@ -23,7 +23,7 @@ export default class KVNamespace {
   private deploymentID: StringifiedNumber;
 
   /**
-   * @param tpyInstance An instantiation of the {@link Tpy} class.
+   * @param tpyInstance An instantiation of a {@link Tpy} class.
    * @param deploymentID The deployment ID to find the KV namespace on.
    * @param kvnamespace The KV namespace title.
    */
@@ -67,10 +67,7 @@ export default class KVNamespace {
     value: Pylon.Json,
     options?: Pylon.KV.OperationOptions.Put,
   ) {
-    if (options?.ifNotExists) {
-      if (await this.get(key)) throw 'Key exists already';
-      // TODO: add better message and use tpyerr
-    }
+    if (options?.ifNotExists && await this.get(key)) return;
 
     const { deploymentID, kvnamespace } = this;
     await this.tpyc.httpRaw(
@@ -92,10 +89,7 @@ export default class KVNamespace {
     value: ArrayBuffer,
     options?: Pylon.KV.OperationOptions.Put,
   ) {
-    if (options?.ifNotExists) {
-      if (await this.get(key)) throw 'Key exists already';
-      // TODO: add better message and use tpyerr
-    }
+    if (options?.ifNotExists && await this.get(key)) return;
 
     const { deploymentID, kvnamespace } = this;
     await this.tpyc.httpRaw(
@@ -260,8 +254,8 @@ export default class KVNamespace {
 
   /**
    * Deletes a given key from the namespace. Throwing if the key does not exist,
-   * or if {@linkcode Pylon.KV.OperationOptions.Delete options.prevValue} is set, the previous value is not equal to the
-   * value provided.
+   * or if {@linkcode Pylon.KV.OperationOptions.Delete options.prevValue} is set
+   * the previous value is not equal to the value provided.
    * @param key The key to delete.
    * @param options Options, which can provide a delete if equals.
    */
@@ -277,7 +271,6 @@ export default class KVNamespace {
     if (!options?.prevValue) await del();
     else {
       if (await this.get(key) == options.prevValue) await del();
-      // else throw new TpyError('Missing or Unexpected Value in Response', ``);
     }
   }
 }

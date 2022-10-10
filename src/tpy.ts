@@ -33,7 +33,6 @@ export default class Tpy {
   /**
    * @param token The token to use for the API
    * @param deploymentID A default deployment ID.
-   * @returns A new Tpy instance.
    */
   constructor(token: string, deploymentID?: StringifiedNumber) {
     if (!token) {
