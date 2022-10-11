@@ -2,6 +2,12 @@ import { StringifiedNumber, Unpacked } from './util.d.ts';
 import Guild from './guild.d.ts';
 
 /**
+ * Typings relevant to user interfaces on the Pylon API.
+ *
+ * @module
+ */
+
+/**
  * Request and response structures related to the `/user` resource.
  */
 declare namespace User {

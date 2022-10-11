@@ -6,19 +6,33 @@ A strongly typed Pylon API client. https://pylon.bot/
 
 [![GitHub CI](https://github.com/insyri/tpy/actions/workflows/ci.yml/badge.svg)](https://github.com/insyri/tpy/actions/workflows/ci.yml)
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/insyri/tpy)
-
 [![](https://shields.io/badge/deno.land/x-05122A?logo=deno&style=for-the-badge)](https://deno.land/x/tpy)
 [![](https://shields.io/badge/npmjs.com-05122A?logo=npm&style=for-the-badge)](https://www.npmjs.com/package/tpy)
 
-The Pylon API does not have a standardized response, meaning there are alot of
+<!-- The Pylon API does not have a standardized response, meaning there are alot of
 edge cases and can result sometimes in unexpected responses. Tpy aims to resolve
 this by providing type safe interaction along with optional specification if you
 know what to expect. Tpy also provides a predictable interface with
-documentation on almost all used endpoints.
+documentation on almost all used endpoints. -->
+
+Tpy is a small and simplistic [Deno](https://deno.land/) module that provides an
+easier way to interact with the [Pylon](https://pylon.bot/) API. It provides the
+following qualities:
+
+- Cross runtime support; browser, Node.js, even the Pylon runtime!
+- Only type-dependant; the only dependancies are type-based.
+- Made in TypeScript; types everywhere!
+- Provides predictable abstractions.
+- Built-in error handler.
+- WebSocket support.
+- Fully documented.
+
+[Documentation can be viewed on the Deno website.](https://deno.land/x/tpy/mod.ts/)
 
 ```bash
 npm install tpy
+yarn add tpy
+pnpm add tpy
 ```
 
 ```ts
@@ -94,9 +108,11 @@ discord.on('MESSAGE_CREATE', async (m) => {
 
 ## Contributing
 
-Currently, the library is missing some documentation and has some dirty code. If
-you'd like to contribute, please read the
-[contributing guide](.github/CONTRIBUTING.md) before you start working.
+If you'd like to contribute, please read the
+[contributing guide](.github/CONTRIBUTING.md) before you start working. You can
+start a remote workspace immediately by opening the project in GitPod.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/insyri/tpy)
 
 ## Legal
 

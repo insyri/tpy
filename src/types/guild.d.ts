@@ -4,7 +4,13 @@ import { StringifiedNumber } from './util.d.ts';
 import Deployment from './deployment.d.ts';
 
 /**
-Request and response structures related to the `/guilds` resource.
+ * Typings relevant to guild interfaces on the Pylon API.
+ *
+ * @module
+ */
+
+/**
+ * Request and response structures related to the `/guilds` resource.
  */
 declare namespace Guild {
   /**

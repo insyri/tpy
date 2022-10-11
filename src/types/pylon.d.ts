@@ -1,12 +1,19 @@
-import { SafeObject } from './util.d.ts';
 // deno-lint-ignore no-unused-vars
 import type TpyKV from '../kv.ts';
 
 /**
- * Typings relevant to the Pylon API.
- * For official typings, see {@link https://github.com/pylonbot/pylon-sdk-types}.
+ * Typings based on and related to the Pylon API/SDK interfaces, such as
+ * KV, WebSocket, SDK KV function options, and more.
  *
- * Based on runtime typings commit `eb0100c`.
+ * SDK relevant typings are formulated on commit hash
+ * {@linkcode https://github.com/pylonbot/pylon-sdk-types/tree/eb0100c9c8f95a07d95fd511e5afc2923786e95b eb0100c}.
+ *
+ * @module
+ */
+
+/**
+ * Typings relevant to Pylon. For official typings,
+ * see https://github.com/pylonbot/pylon-sdk-types.
  */
 declare namespace Pylon {
   /**
@@ -21,7 +28,7 @@ declare namespace Pylon {
     | number
     | boolean
     | null
-    | SafeObject
+    | Record<string, unknown>
     | JsonArray[];
   /**
    * An array of types parsable by ES5's {@linkcode JSON.parse} function.

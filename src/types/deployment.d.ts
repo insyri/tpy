@@ -1,9 +1,12 @@
 import type Guild from './guild.d.ts';
 import type { GatewayDispatchEvents } from 'discord-api-types/gateway/v8.ts';
-import type {
-  StringifiedNumber,
-  StringifiedNumberWithDefault,
-} from '../types/util.d.ts';
+import type { StringifiedNumber } from '../types/util.d.ts';
+
+/**
+ * Typings relevant to deployment interfaces on the Pylon API.
+ *
+ * @module
+ */
 
 /**
  * Request and response structures related to the `/deployments` resource.
@@ -96,7 +99,7 @@ declare namespace Deployment {
       /**
        * Bot ID the script exists for. Used in BYOB.
        */
-      bot_id: StringifiedNumberWithDefault<270148059269300224n>;
+      bot_id: StringifiedNumber;
       /**
        * The type of deployment.
        */
