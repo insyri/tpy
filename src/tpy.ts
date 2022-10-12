@@ -72,10 +72,12 @@ export default class Tpy {
    * @returns Raw Discord guild information with deployment information.
    */
   async getGuildInfo(guildID: StringifiedNumber) {
-    return await this.httpRaw<Guild.GET.Guild>(
+    const g = (await this.httpRaw<Guild.GET.Guild>(
       new Context({ guildID }),
       `/guilds/${guildID}`,
-    );
+    ));
+    g.deployments.forEach((v) => v.config = JSON.parse(v.config));
+    return g as unknown as Guild.GET.Guild<false>;
   }
 
   /**
@@ -115,10 +117,13 @@ export default class Tpy {
         dID,
       );
     }
-    return await this.httpRaw<Deployment.GET.Deployment>(
+    const d = await this.httpRaw<Deployment.GET.Deployment>(
       new Context({ deploymentID: dID }),
       `/deployments/${dID}`,
     );
+    d.script.project = JSON.parse(d.script.project);
+    d.config = JSON.parse(d.config);
+    return d as unknown as Deployment.GET.Deployment<false>;
   }
 
   /**

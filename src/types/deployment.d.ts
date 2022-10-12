@@ -49,6 +49,37 @@ declare namespace Deployment {
       ENABLED,
     }
 
+    export type Script<Raw extends boolean = true> = {
+      /**
+       * Compiled script code in JavaScript.
+       */
+      contents: string;
+      /**
+       * The deployment ID.
+       */
+      id: StringifiedNumber;
+      /**
+       * The project directory.
+       */
+      project: Raw extends true ? string : {
+        /**
+         * File contents and path information.
+         */
+        files: Array<
+          {
+            /**
+             * Path to the file in formation of `./*.*`, usually ends in `.ts`: `./*.ts`.
+             */
+            path: string;
+            /**
+             * File contents.
+             */
+            content: string;
+          }
+        >;
+      };
+    };
+
     /**
      * Deployment configurations; recieved as a string.
      */
@@ -123,20 +154,6 @@ declare namespace Deployment {
     };
 
     /**
-     * The current project's files and information.
-     */
-    export type DeploymentFiles = {
-      /**
-       * Path to the file in formation of `./*.*`, usually ends in `.ts`: `./*.ts`.
-       */
-      path: string;
-      /**
-       * File contents.
-       */
-      content: string;
-    };
-
-    /**
      * Pylon uses FastAPI, this is a FastAPI error.
      */
     export type FastAPIError = {
@@ -188,21 +205,27 @@ declare namespace Deployment {
      * @template T Boolean of whether the configuration contents are recieved
      * as string of JSON or as actual JSON.
      */
-    export type Deployment<Raw extends boolean = true> = Structures.Base & {
-      /**
-       * Deployment configurations.
-       */
-      config: Raw extends true ? string : Structures.Config;
-      /**
-       * Pylon Workbench WebSocket URL. Includes a portion the logged in
-       * user's authentication token for Pylon.
-       */
-      workbench_url: `wss://workbench.pylon.bot/ws/${string}`;
-      /**
-       * Deployment's guild information.
-       */
-      guild: Guild.Structures.Payload;
-    };
+    export type Deployment<Raw extends boolean = true> =
+      & Structures.Base
+      & {
+        /**
+         * Deployment configurations.
+         */
+        config: Raw extends true ? string : Structures.Config;
+        /**
+         * Pylon Workbench WebSocket URL. Includes a portion the logged in
+         * user's authentication token for Pylon.
+         */
+        workbench_url: `wss://workbench.pylon.bot/ws/${string}`;
+        /**
+         * Deployment's guild information.
+         */
+        guild: Guild.Structures.Payload;
+        /**
+         * The new deployment script information.
+         */
+        script: Omit<Deployment.Structures.Script<Raw>, 'id'>;
+      };
   }
 
   /**
@@ -215,26 +238,10 @@ declare namespace Deployment {
      * @template T Boolean of whether the file contents are recieved
      * as string of JSON or as actual JSON.
      */
-    export type Request<Raw extends boolean = true> = {
-      /**
-       * The new deployment script information.
-       */
-      script: {
-        /**
-         * Compiled script code in JavaScript.
-         */
-        contents: string;
-        /**
-         * The Pylon project.
-         */
-        project: {
-          /**
-           * File contents in displayable format.
-           */
-          files: Raw extends true ? string : Structures.DeploymentFiles[];
-        };
-      };
-    };
+    export type Request<Raw extends boolean = true> = Omit<
+      Deployment.Structures.Script<Raw>,
+      'id'
+    >;
 
     /**
      * Response schema for `POST /deployments/:id`.
@@ -246,7 +253,7 @@ declare namespace Deployment {
      * as string of JSON or as actual JSON.
      */
     export type Response<Raw extends boolean = true> =
-      & Deployment.GET.Deployment
+      & Deployment.GET.Deployment<Raw>
       & {
         /**
          * FastAPI error.
@@ -255,21 +262,7 @@ declare namespace Deployment {
         /**
          * The new deployment script information.
          */
-        script?: {
-          /**
-           * The Deployment ID.
-           */
-          id: StringifiedNumber;
-          /**
-           * The Pylon project.
-           */
-          project: {
-            /**
-             * File contents in displayable format.
-             */
-            files: Raw extends true ? string : Structures.DeploymentFiles[];
-          };
-        };
+        script?: Omit<Deployment.Structures.Script<Raw>, 'contents'>;
       };
   }
 }
