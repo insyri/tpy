@@ -261,7 +261,7 @@ export default class Tpy {
   /**
    * Makes a request to the API.
    *
-   * @param resource The resource to request that will be concatenated with the api url.
+   * @param resource The resource to request that will be concatenated with the API URL.
    *
    * @param method HTTP method to use. Currently, the Pylon API only uses GET and POST.
    *
