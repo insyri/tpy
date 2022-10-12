@@ -114,8 +114,7 @@ export const TpyErrors = {
   },
   'Missing or Unexpected Value in Response': {
     message: (s: string) => `Response structure validation failed: ${s}.`,
-    description:
-      'Response structure is incomplete or has unexpected behavior.',
+    description: 'Response structure is incomplete or has unexpected behavior.',
   },
   'Missing or Invalid JSON in Request Body': {
     message: (s: string) =>
@@ -147,8 +146,7 @@ export const TpyErrors = {
   },
   'Unauthorized': {
     message: (s: string) => serverRespondedWith(s),
-    description:
-      'Required credentials were missing from the request.',
+    description: 'Required credentials were missing from the request.',
   },
   'Forbidden': {
     message: (s: string) => serverRespondedWith(s),
@@ -158,8 +156,7 @@ export const TpyErrors = {
   'Missing or Invalid Required Parameter': {
     message: (s: string) =>
       `Required parameter(s) ${s} were missing or invalid.`,
-    description:
-      'Required parameter(s) were missing or invalid.',
+    description: 'Required parameter(s) were missing or invalid.',
   },
 };
 
