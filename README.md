@@ -12,13 +12,15 @@ easier way to interact with the [Pylon](https://pylon.bot/) API. It provides the
 following qualities:
 
 - 🧬 Cross runtime support.
-- 🔑 Fully Typed APIs.
-- 🗺 Custom error interface.
-- 📄 Fully documented.
-- 📞 WebSocket support.
+- 🔑 Fully typed APIs.
+- 🗺 Developer-friendly error interface.
+- 📄 Extensive documentation.
+- 📞 Keep-alive WebSocket client.
 
 The API documentation can be viewed on the
 [Deno website](https://deno.land/x/tpy/mod.ts/).
+
+## Installation
 
 ```bash
 npm install tpy
@@ -26,14 +28,19 @@ yarn add tpy
 pnpm add tpy
 ```
 
+If you would like to use Tpy in the browser, considering
+[vendoring dependencies](https://deno.land/manual@v1.26.1/tools/vendor) to
+download the type dependencies locally.
+
 ## Examples
 
 Get the token's matching user.
 
 ```ts
 const client = new Tpy('PYLON_TOKEN');
+const user = await client.getUser();
 
-console.log(`Logged in as ${await client.getUser()}.`);
+console.log(`Logged in as ${user.displayName} (<@${user.id}>).`);
 ```
 
 <!-- TODO: add more examples; ws, kv, post deployment, other get stuff -->
@@ -42,7 +49,7 @@ console.log(`Logged in as ${await client.getUser()}.`);
 
 If you'd like to contribute, please read the
 [contributing guide](.github/CONTRIBUTING.md) before you start working. You can
-start a remote workspace immediately by opening the project in GitPod.
+start a pre-setup remote workspace immediately by opening the project in GitPod.
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/insyri/tpy)
 
