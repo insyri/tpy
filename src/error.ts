@@ -110,12 +110,12 @@ export const TpyErrors = {
   'Internal Server Error': {
     message: (s: string) => serverRespondedWith(s),
     description:
-      `Sometimes this happens when a request is made with the authorization header but it is invalid.`,
+      `Sometimes thrown when a request's authorization header is invalid.`,
   },
   'Missing or Unexpected Value in Response': {
     message: (s: string) => `Response structure validation failed: ${s}.`,
     description:
-      'This has to do with verifying an API response \'s structure. If a given value is missing or has unexpected behavior, this is thrown.',
+      'Response structure is incomplete or has unexpected behavior.',
   },
   'Missing or Invalid JSON in Request Body': {
     message: (s: string) =>
@@ -123,11 +123,11 @@ export const TpyErrors = {
     description:
       `The fetch contents sent were did not have the required JSON body.`,
   },
-  'Guild Could Not be Found': {
+  'Guild Not Found': {
     message: (s: string) => couldNotBeFound('Guild ID', s),
     description: `The guild specified was not found.`,
   },
-  'Deployment Could Not be Found': {
+  'Deployment Not Found': {
     message: (s: string) => couldNotBeFound('Deployment ID', s),
     description: `The deployment specified was not found.`,
   },
@@ -139,7 +139,7 @@ export const TpyErrors = {
     message: (s: string) =>
       `Unidentifiable error caught, deterministic via fields: ${s}`,
     description:
-      'The error was unidentifiable, see the raw information via <TpyError>.rawInfo.',
+      'The error was unidentifiable, see details with `<TpyError>.rawInfo`.',
   },
   'URL Resource Not Found': {
     message: (s: string) => serverRespondedWith(s),
@@ -148,18 +148,18 @@ export const TpyErrors = {
   'Unauthorized': {
     message: (s: string) => serverRespondedWith(s),
     description:
-      'Authentication credentials in the request were not populated.',
+      'Required credentials were missing from the request.',
   },
   'Forbidden': {
     message: (s: string) => serverRespondedWith(s),
     description:
-      'Access to the resource with the given authentication credentials is denied.',
+      'Access to the resource is denied despite included credentials.',
   },
   'Missing or Invalid Required Parameter': {
     message: (s: string) =>
-      `Required parameter(s) ${s} were not populated or is incompatible.`,
+      `Required parameter(s) ${s} were missing or invalid.`,
     description:
-      'Parameter(s) were not populated where required or are incompatible.',
+      'Required parameter(s) were missing or invalid.',
   },
 };
 
@@ -170,7 +170,7 @@ function serverRespondedWith(s: string) {
 }
 
 function couldNotBeFound(sub: string, s: string) {
-  return `${sub} ${s} could not be found.`;
+  return `${sub} ${s} was not found.`;
 }
 
 // General util template functions
