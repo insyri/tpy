@@ -296,7 +296,7 @@ export default class Tpy {
 
         if (r === 'could not find deployment') {
           throw new TpyError<Response>(
-            'Deployment Could Not be Found',
+            'Deployment Not Found',
             responseBody(r),
             context.deploymentID,
             response,
@@ -305,7 +305,7 @@ export default class Tpy {
 
         if (r === 'could not find guild') {
           throw new TpyError<Response>(
-            'Guild Could Not be Found',
+            'Guild Not Found',
             responseBody(r),
             context.guildID,
             response,
