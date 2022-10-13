@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for showing your interest for contributing to tpy! If you have further
+Thanks for showing your interest for contributing to Tpy! If you have further
 questions on contributing or setup, contact insyri directly on Discord.
 
 Before contributing, ensure that an the appropriate issue has reported (unless
