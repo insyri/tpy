@@ -273,7 +273,7 @@ export default class Tpy {
     other: RequestInit = {},
   ): Promise<T> {
     const response = await fetch(
-      "https://pylon.bot/api" + resource,
+      'https://pylon.bot/api' + resource,
       this.readyRequest(method, other),
     );
 
