@@ -17,14 +17,6 @@ import Context from './context.ts';
  */
 export default class Tpy {
   /**
-   * The Pylon API base URL.
-   */
-  readonly api_url = 'https://pylon.bot/api';
-  /**
-   * The Pylon workbench websocket URL.
-   */
-  readonly wss_url = 'wss://workbench.pylon.bot/ws';
-  /**
    * The specified deployment ID used for deployment ID entries as a default.
    */
   readonly deploymentID?: StringifiedNumber;
@@ -281,7 +273,7 @@ export default class Tpy {
     other: RequestInit = {},
   ): Promise<T> {
     const response = await fetch(
-      this.api_url + resource,
+      "https://pylon.bot/api" + resource,
       this.readyRequest(method, other),
     );
 

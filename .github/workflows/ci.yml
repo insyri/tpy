@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 jobs:
@@ -9,24 +11,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: denoland/setup-deno@v1
       - uses: actions/setup-node@v3
+      - uses: denoland/setup-deno@v1.1.0
       - run: ./node-transform.ps1 -Version "x"
         shell: pwsh
+        
   Cleaning:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
       - uses: denoland/setup-deno@v1
         with:
           deno-version: vx.x.x
+
       - name: Format and Lint
         run: deno task precommit
-      - run: |
+
+      - name: Commit and Push
+        run: |
           if [[ ! -z $(git status -s) ]]; then
             git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git config --local user.name "tpy bot"
+            git config --local user.name "Tpy Janitor"
             git commit -a -m "chore: lint & fmt"
-            git push origin ${{ github.ref }}
+            git push
           fi

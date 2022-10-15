@@ -16,18 +16,18 @@ import TpyError, { parametersPrompt } from './error.ts';
  * @module
  */
 
+type messageTypes = typeof TpyWs.prototype.messageTypes[number];
+
 /**
- * {@link TpyWs} is a {@link WebSocket} abstraction specifically made for the
- * Pylon's socket nature. It provides the following qualities:
- *
- * - Automatic reconnection with customizable timeouts.
- * - Response formatting.
- * - Keep-alive stream. (Does not exit process on close/error unless
- * {@linkcode TpyWs.close} is used.)
- * - Raw access to WebSocket object.
+ * A {@link WebSocket} abstraction specifically made for the Pylon's socket
+ * nature. It provides automatic reconnection (with customizable timeouts)
+ * and a keep-alive stream to keep listeners active. It works by introducing
+ * an {@link EventEmitter} proxy object that stays alive when the {@link WebSocket}
+ * connections closes or errors.
  */
 export default class TpyWs {
-  private tpyc: Tpy;
+  readonly messageTypes = ['message', 'open', 'close', 'error'] as const;
+  private tpyClient: Tpy;
   private deploymentID: StringifiedNumber;
   private tryToConnect = true;
   private reconnectionTimout: number;
@@ -70,7 +70,7 @@ export default class TpyWs {
         deploymentID,
       );
     }
-    this.tpyc = tpyInstance;
+    this.tpyClient = tpyInstance;
     this.deploymentID = deploymentID;
     this.reconnectionTimout = reconnectionTimeout;
   }
@@ -117,17 +117,9 @@ export default class TpyWs {
     callback: (data: Unpacked<Pylon.WebSocket.Response<T>>) => void,
   ): EventEmitter;
   on<T extends unknown[]>(
-    type: unknown,
+    type: messageTypes,
     callback: unknown,
   ) {
-    if (typeof type != 'string') {
-      throw new TpyError(
-        'Missing or Invalid Required Parameter',
-        parametersPrompt('incompatible', 'type'),
-        'type',
-        typeof type,
-      );
-    }
     if (typeof callback != 'function') {
       throw new TpyError(
         'Missing or Invalid Required Parameter',
@@ -148,7 +140,7 @@ export default class TpyWs {
   async connect() {
     if (!this.tryToConnect) return;
     this.websocket = new WebSocket(
-      (await this.tpyc.getDeployment(this.deploymentID)).workbench_url,
+      (await this.tpyClient.getDeployment(this.deploymentID)).workbench_url,
     );
     this.websocket.onopen = this.onOpen.bind(this);
     this.websocket.onclose = this.onClose.bind(this);
@@ -187,6 +179,9 @@ export default class TpyWs {
    */
   close() {
     if (!this.websocket) return;
+    for (const type in this.messageTypes) {
+      this.eventEmitter.removeAllListeners(type);
+    }
     this.websocket.close();
     this.tryToConnect = false;
   }
