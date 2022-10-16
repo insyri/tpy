@@ -34,7 +34,7 @@ download the type dependencies locally.
 
 ## Examples
 
-Get the token's matching user.
+#### Get the token's matching user.
 
 ```ts
 const client = new Tpy('PYLON_TOKEN');
@@ -42,6 +42,55 @@ const user = await client.getUser();
 
 console.log(`Logged in as ${user.displayName} (<@${user.id}>).`);
 ```
+
+#### Listen to a deployment's console output.
+
+```ts
+const client = new Tpy('PYLON_TOKEN');
+const ws = client.connectSocket(
+  await client.getDeploymentfromGuild('GUILD_ID')).id,
+);
+
+ws.on('open', (_) => console.log('WebSocket Opened'));
+ws.on('error', (_) => _);
+// The array matches the console log parameter types.
+ws.on<[string, string, number]>(
+  'message',
+  ({ data }) =>
+    console.log(`${data[0]} said "${data[1]}" and sent ${data[2]} attachments`),
+);
+
+// Remember this!
+await ws.connect();
+```
+
+With the following Pylon code:
+
+```ts
+discord.on('MESSAGE_CREATE', async (message) => {
+  console.log(
+    // string
+    message.author.username,
+    // string
+    message.content,
+    // number
+    message.attachments.length,
+  );
+});
+```
+
+<!--
+
+const client = new Tpy(Deno.env.get('PYLON_TOKEN')!);
+const guildStats = await client.getGuildStats('759174794968301569');
+const mostRecent = guildStats.find((e) =>
+  e.date === Math.min(...guildStats.map((e) => e.date))
+);
+if (!mostRecent) throw '???';
+const mostRecentDateFormatted = new Date(mostRecent.date).getMilliseconds();
+console.log(mostRecentDateFormatted);
+
+ -->
 
 <!-- TODO: add more examples; ws, kv, post deployment, other get stuff -->
 

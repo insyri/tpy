@@ -138,6 +138,14 @@ export default class Tpy {
   }
 
   /**
+   * Gets the most recent deployment ID from a guildID.
+   * @param guildID The guild to fetch the deployment from.
+   */
+  async getDeploymentfromGuild(guildID: StringifiedNumber) {
+    return (await this.getGuildInfo(guildID)).deployments[0];
+  }
+
+  /**
    * A factory function with default headers, allowing optional specificity.
    *
    * @param method HTTP Method.
