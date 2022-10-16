@@ -15,7 +15,7 @@
     "mod.d.ts"
   ],
   "scripts": {
-    "build": "tsc && tsc ./mod.ts --outdir . -d"
+    "build": "tsc"
   },
   "keywords": [
     "pylon",

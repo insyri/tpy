@@ -12,6 +12,6 @@
     "noFallthroughCasesInSwitch": true,
     "allowUnreachableCode": false
   },
-  "include": ["src"],
+  "include": ["src", "mod.ts"],
   "exclude": ["node_modules"]
 }
