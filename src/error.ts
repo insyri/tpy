@@ -11,7 +11,7 @@
  * // ...
  * } catch (e) {
  *   if (e instanceof TpyError)
- *     console.error(`There was an error: ${e.name} ${e.message()}`);
+ *     console.error(`There was an error! ${e.name}: ${e.message()}`);
  *
  *   // Handle if e suits other Error interfaces.
  * }
@@ -157,6 +157,11 @@ export const TpyErrors = {
     message: (s: string) =>
       `Required parameter(s) ${s} were missing or invalid.`,
     description: 'Required parameter(s) were missing or invalid.',
+  },
+  'Nullish Context': {
+    message: (s: string) =>
+      `Context parameter ${s} is nullish, where access is necessary.`,
+    description: 'A context parameter was missing where it was needed.',
   },
 };
 

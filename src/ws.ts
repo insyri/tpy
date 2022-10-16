@@ -19,11 +19,8 @@ import TpyError, { parametersPrompt } from './error.ts';
 type messageTypes = typeof TpyWs.prototype.messageTypes[number];
 
 /**
- * A {@link WebSocket} abstraction specifically made for the Pylon's socket
- * nature. It provides automatic reconnection (with customizable timeouts)
- * and a keep-alive stream to keep listeners active. It works by introducing
- * an {@link EventEmitter} proxy object that stays alive when the {@link WebSocket}
- * connections closes or errors.
+ * This class forwards {@link WebSocket} recieving events to create a persistant
+ * stream to keep listeners active with automatic reconnection (with customizable timeouts).
  */
 export default class TpyWs {
   readonly messageTypes = ['message', 'open', 'close', 'error'] as const;
@@ -31,15 +28,19 @@ export default class TpyWs {
   private deploymentID: StringifiedNumber;
   private tryToConnect = true;
   private reconnectionTimout: number;
+  private _websocket?: WebSocket;
 
   /**
-   * {@linkcode TpyWs} uses a proxy stream that ensures the process (or at least the stream) is not terminated. This is that proxy stream.
+   * {@linkcode TpyWs} uses a proxy stream that ensures the process (or at least the
+   * stream) is not terminated. This is that proxy stream.
    */
   eventEmitter = new EventEmitter();
   /**
-   * The raw {@linkcode WebSocket} object, advised not to edit.
+   * The raw {@linkcode WebSocket} object.
    */
-  websocket?: WebSocket;
+  get websocket() {
+    return this._websocket;
+  }
 
   /**
    * @param tpyInstance An instantiation of a {@linkcode Tpy} class.
@@ -139,13 +140,13 @@ export default class TpyWs {
    */
   async connect() {
     if (!this.tryToConnect) return;
-    this.websocket = new WebSocket(
+    this._websocket = new WebSocket(
       (await this.tpyClient.getDeployment(this.deploymentID)).workbench_url,
     );
-    this.websocket.onopen = this.onOpen.bind(this);
-    this.websocket.onclose = this.onClose.bind(this);
-    this.websocket.onerror = this.onError.bind(this);
-    this.websocket.onmessage = this.onMessage.bind(this);
+    this._websocket.onopen = this.onOpen.bind(this);
+    this._websocket.onclose = this.onClose.bind(this);
+    this._websocket.onerror = this.onError.bind(this);
+    this._websocket.onmessage = this.onMessage.bind(this);
   }
 
   private onOpen(event: Event) {

@@ -13,7 +13,7 @@ import TpyKV from './kv.ts';
 import Context from './context.ts';
 
 /**
- * A Tpy class, intialized with a pylon token.
+ * The central entity for interacting with the Pylon API; the entrypoint.
  */
 export default class Tpy {
   /**
@@ -40,16 +40,14 @@ export default class Tpy {
   }
 
   /**
-   * @returns The current logged in user.
+   * Gets the user's account details associated with the included credentials.
    */
   async getUser() {
     return await this.httpRaw<User.GET.User>(new Context({}), '/user');
   }
 
   /**
-   * Response can be slow since this endpoint makes a Discord API call.
-   *
-   * @returns All guilds a user is in.
+   * Gets all the guilds the user is in.
    */
   async getAvailableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Available>(
@@ -59,9 +57,8 @@ export default class Tpy {
   }
 
   /**
+   * Gets the raw Discord guild information with deployment information.
    * @param guildID The ID of the guild to get.
-   *
-   * @returns Raw Discord guild information with deployment information.
    */
   async getGuildInfo(guildID: StringifiedNumber) {
     const g = (await this.httpRaw<Guild.GET.Guild>(
@@ -73,9 +70,8 @@ export default class Tpy {
   }
 
   /**
+   * Gets the guild computational statistics.
    * @param guildID The ID of the guild to get.
-   *
-   * @returns Guild computational statistics.
    */
   async getGuildStats(guildID: StringifiedNumber) {
     return await this.httpRaw<Guild.GET.Stats>(
@@ -85,7 +81,8 @@ export default class Tpy {
   }
 
   /**
-   * @returns All guilds a user can edit with Pylon. More specifically, all guilds which the user has `manage server` or `administrator` permissions in.
+   * Gets all guilds a user can edit with Pylon. More specifically, all guilds
+   * which the user has `manage server` or `administrator` permissions in.
    */
   async getEditableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Allowed>(
@@ -95,9 +92,10 @@ export default class Tpy {
   }
 
   /**
-   * @param deploymentID The ID of the deployment to get. If empty, the function will use the set deploymentID in the class. (`this.deploymentID`)
+   * Gets the deployment information.
    *
-   * @returns Deployment information.
+   * @param deploymentID The ID of the deployment to get. If empty, the function
+   * will use the set deploymentID in the class. (`this.deploymentID`)
    */
   async getDeployment(deploymentID?: StringifiedNumber) {
     const dID = deploymentID || this.deploymentID;
@@ -119,13 +117,11 @@ export default class Tpy {
   }
 
   /**
-   * Makes a POST request to publish a deployment.
+   * Makes a POST request to publish a deployment; returns details
+   * of the new deployment.
    *
    * @param id The script/deployment ID to publish to.
-   *
    * @param body Project specifications.
-   *
-   * @returns Information of the deployment.
    */
   async publishDeployment(
     id: StringifiedNumber,
@@ -142,11 +138,10 @@ export default class Tpy {
   }
 
   /**
-   * A factory function for organizing HTTP request objects, preset for authorization.
+   * A factory function with default headers, allowing optional specificity.
    *
    * @param method HTTP Method.
    * @param other Other fetch parameters.
-   * @returns Headers with specifics.
    */
   readyRequest(method: Pylon.HTTPVerbs, other?: RequestInit): RequestInit {
     return {
@@ -256,18 +251,16 @@ export default class Tpy {
   }
 
   /**
-   * Makes a request to the API.
+   * Makes a request to the API and creates possible errors according to the response.
    *
    * @param resource The resource to request that will be concatenated with the API URL.
-   *
    * @param method HTTP method to use. Currently, the Pylon API only uses GET and POST.
-   *
    * @param other Other fetch parameters.
    *
-   * @throws {TpyError<Response>}
+   * @throws {TpyError<Response | Context>}
    */
   async httpRaw<T>(
-    context: Context,
+    ctx: Context,
     resource: `/${string}`,
     method: Pylon.HTTPVerbs = 'GET',
     other: RequestInit = {},
@@ -286,25 +279,43 @@ export default class Tpy {
           throw new TpyError<Response>(
             'URL Resource Not Found',
             responseBody(r),
-            response.statusText,
+            response.status.toString(),
             response,
           );
         }
 
         if (r === 'could not find deployment') {
+          if (Context.isNullish(ctx.deploymentID)) {
+            throw new TpyError<Context>(
+              'Nullish Context',
+              ctx.deploymentID,
+              'ctx.deploymentID',
+              ctx,
+            );
+          }
+
           throw new TpyError<Response>(
             'Deployment Not Found',
             responseBody(r),
-            context.deploymentID,
+            ctx.deploymentID,
             response,
           );
         }
 
         if (r === 'could not find guild') {
+          if (Context.isNullish(ctx.guildID)) {
+            throw new TpyError<Context>(
+              'Nullish Context',
+              ctx.guildID,
+              'ctx.guildID',
+              ctx,
+            );
+          }
+
           throw new TpyError<Response>(
             'Guild Not Found',
             responseBody(r),
-            context.guildID,
+            ctx.guildID,
             response,
           );
         }
@@ -314,24 +325,24 @@ export default class Tpy {
       case 401:
         throw new TpyError<Response>(
           'Unauthorized',
-          responseHTTP(response.statusText),
-          response.statusText,
+          responseHTTP(response.status.toString()),
+          response.status.toString(),
           response,
         );
 
       case 403:
         throw new TpyError<Response>(
           'Forbidden',
-          responseHTTP(response.statusText),
-          response.statusText,
+          responseHTTP(response.status.toString()),
+          response.status.toString(),
           response,
         );
 
       case 405:
         throw new TpyError<Response>(
           'HTTP Method Not Allowed',
-          responseHTTP(response.statusText),
-          response.statusText,
+          responseHTTP(response.status.toString()),
+          response.status.toString(),
           response,
         );
 
@@ -340,7 +351,7 @@ export default class Tpy {
         if ('msg' in res && res['msg'] === 'missing json body') {
           throw new TpyError<Response>(
             'Missing or Invalid JSON in Request Body',
-            responseHTTP(response.statusText),
+            responseHTTP(response.status.toString()),
             JSON.stringify(res['msg']),
             response,
           );
@@ -351,8 +362,8 @@ export default class Tpy {
       case 500:
         throw new TpyError<Response>(
           'Internal Server Error',
-          responseHTTP(response.statusText),
-          response.statusText,
+          responseHTTP(response.status.toString()),
+          response.status.toString(),
           response,
         );
     }
