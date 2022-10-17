@@ -263,7 +263,8 @@ export default class Tpy {
    *
    * @param resource The resource to request that will be concatenated with the API URL.
    * @param method HTTP method to use. Currently, the Pylon API only uses GET and POST.
-   * @param other Other fetch parameters.
+   * @param requestInit Other fetch parameters.
+   * @param parse Whether to parse out the body or not, default is true.
    *
    * @throws {TpyError<Response | Context>}
    */
@@ -271,14 +272,18 @@ export default class Tpy {
     ctx: Context,
     resource: `/${string}`,
     method: Pylon.HTTPVerbs = 'GET',
-    other: RequestInit = {},
+    requestInit: RequestInit = {},
+    parse = true,
   ): Promise<T> {
     const response = await fetch(
       'https://pylon.bot/api' + resource,
-      this.readyRequest(method, other),
+      this.readyRequest(method, requestInit),
     );
 
-    if (response.ok) return await response.json() as T;
+    if (response.ok) {
+      if (parse) return await response.json() as T;
+      return {} as T;
+    }
 
     switch (response.status) {
       case 404: {

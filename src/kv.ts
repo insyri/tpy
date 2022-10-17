@@ -74,7 +74,12 @@ export default class TpyKV {
       new Context({ deploymentID }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
       'PUT',
-      { body: JSON.stringify({ 'string': value }) },
+      {
+        body: JSON.stringify({
+          'string': typeof value === 'string' ? `"${value}"` : value,
+        }),
+      },
+      false,
     );
   }
 
@@ -125,7 +130,9 @@ export default class TpyKV {
           response,
         );
       }
-      item = JSON.parse(p.value.string);
+      item = ['\'', '"', '`'].includes(p.value.string[0])
+        ? JSON.parse(p.value.string)
+        : p.value.string;
       break;
     }
     return item;

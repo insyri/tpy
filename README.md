@@ -57,7 +57,7 @@ ws.on('error', (_) => _);
 ws.on<[string, string, number]>(
   'message',
   ({ data }) =>
-    console.log(`${data[0]} said "${data[1]}" and sent ${data[2]} attachments`),
+    console.log(`${data[0]} said "${data[1]}" and sent ${data[2]} attachment(s).`),
 );
 
 // Remember this!
@@ -79,20 +79,76 @@ discord.on('MESSAGE_CREATE', async (message) => {
 });
 ```
 
-<!--
+#### Get a guild's statistics.
 
-const client = new Tpy(Deno.env.get('PYLON_TOKEN')!);
-const guildStats = await client.getGuildStats('759174794968301569');
+```ts
+const client = new Tpy('PYLON_TOKEN');
+const guildStats = await client.getGuildStats('GUILD_ID');
 const mostRecent = guildStats.find((e) =>
   e.date === Math.min(...guildStats.map((e) => e.date))
+)!;
+const { date, events, executionMsAvg } = mostRecent;
+
+const mostRecentDateFormatted = new Date(date * 1000).toDateString();
+console.log(
+  `On ${mostRecentDateFormatted}, there was a total of ${events} events with an average execution time of ${executionMsAvg} (in ms).`,
 );
-if (!mostRecent) throw '???';
-const mostRecentDateFormatted = new Date(mostRecent.date).getMilliseconds();
-console.log(mostRecentDateFormatted);
+```
 
- -->
+#### Get a deployment's listening events and cron tasks.
 
-<!-- TODO: add more examples; ws, kv, post deployment, other get stuff -->
+```ts
+const client = new Tpy('PYLON_TOKEN');
+const { config } = await client.getDeploymentfromGuild('GUILD_ID');
+const { cronTasks } = config.tasks;
+const { events } = config;
+const cronTasksFormatted = cronTasks.map(({ cronString, name }) =>
+  `    ${name} (${cronString})`
+);
+
+console.log(
+  `Listening to ${events.length} discord event(s):
+  ${events.join(', ')}\n`,
+  `Running ${cronTasks.length} cron job(s):\n${cronTasksFormatted.join('\n')}`,
+);
+```
+
+#### Get the keys in a KV namespace.
+
+```ts
+const client = new Tpy('PYLON_TOKEN');
+const kvnamespace = 'tags';
+const kv = client.KV(
+  kvnamespace,
+  (await client.getDeploymentfromGuild('GUILD_ID')).id,
+);
+
+const keys = await kv.list({ limit: 10 });
+const amountOfKeys = await kv.count();
+
+console.log(
+  `There are ${amountOfKeys} key(s) within the ${kvnamespace} KV namespace, these are the first 10 (or less).
+  ${keys.join(', ')}`,
+);
+```
+
+#### Get and modify values within a KV namespace.
+
+```ts
+const client = new Tpy('PYLON_TOKEN');
+const kvnamespace = 'tags';
+const kv = client.KV(
+  kvnamespace,
+  (await client.getDeploymentfromGuild('GUILD_ID')).id,
+);
+
+const key = 'cool';
+console.log(`Value of key "${key}":`, await kv.get(key));
+await kv.put(key, 'rust');
+console.log(`Value of key "${key}":`, await kv.get(key));
+await kv.delete(key);
+console.log(`Value of key "${key}":`, await kv.get(key));
+```
 
 ## Contributing
 
