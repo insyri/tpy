@@ -157,15 +157,15 @@ export default class TpyKV {
    */
   async list(options?: Pylon.KV.OperationOptions.List) {
     const { deploymentID, kvnamespace } = this;
-    const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
+    let response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
       new Context({ deploymentID, kvnamespace }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
 
-    if (options?.limit) response.splice(0, options.limit);
+    if (options?.limit) response = response.slice(0, options.limit);
 
     if (options?.from) {
-      response.splice(
+      response = response.slice(
         response.findIndex((i) => i.key === options.from) + 1,
         response.length,
       );
