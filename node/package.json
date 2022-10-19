@@ -4,15 +4,13 @@
   "description": "🔑 A strongly typed Pylon API client.",
   "license": "MIT",
   "type": "commonjs",
-  "main": "mod.js",
-  "types": "mod.d.ts",
+  "main": "lib/mod.js",
+  "types": "lib/mod.d.ts",
   "files": [
     "lib",
     "LICENSE",
     "README.md",
-    "package.json",
-    "mod.js",
-    "mod.d.ts"
+    "package.json"
   ],
   "scripts": {
     "build": "tsc"
