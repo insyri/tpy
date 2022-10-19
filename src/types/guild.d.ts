@@ -83,7 +83,7 @@ declare namespace Guild {
      */
     export type Stats = Array<{
       /**
-       * Date (Unix timestamp) of when statistics were captured.
+       * Date (Unix timestamp) in seconds of when statistics were captured.
        */
       date: number;
       /**

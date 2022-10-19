@@ -102,6 +102,7 @@ export default class TpyKV {
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
       'PUT',
       { body: JSON.stringify({ 'bytes': value }) },
+      false,
     );
   }
 
@@ -273,6 +274,8 @@ export default class TpyKV {
         new Context({ deploymentID, kvnamespace }),
         `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
         'DELETE',
+        {},
+        false,
       );
 
     if (!options?.prevValue) await del();

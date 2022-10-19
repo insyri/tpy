@@ -17,6 +17,8 @@ following qualities:
 - 📄 Extensive documentation.
 - 📞 Keep-alive WebSocket client.
 
+## Documentation
+
 The API documentation can be viewed on the
 [Deno website](https://deno.land/x/tpy/mod.ts/).
 
@@ -38,9 +40,9 @@ download the type dependencies locally.
 
 ```ts
 const client = new Tpy('PYLON_TOKEN');
-const user = await client.getUser();
+const { displayName, id } = await client.getUser();
 
-console.log(`Logged in as ${user.displayName} (<@${user.id}>).`);
+console.log(`Logged in as ${displayName} (<@${id}>).`);
 ```
 
 #### Listen to a deployment's console output.
@@ -142,10 +144,13 @@ const kv = client.KV(
   (await client.getDeploymentfromGuild('GUILD_ID')).id,
 );
 
-const key = 'cool';
+const key = '';
+
 console.log(`Value of key "${key}":`, await kv.get(key));
+
 await kv.put(key, 'rust');
 console.log(`Value of key "${key}":`, await kv.get(key));
+
 await kv.delete(key);
 console.log(`Value of key "${key}":`, await kv.get(key));
 ```

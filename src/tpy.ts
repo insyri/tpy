@@ -266,23 +266,29 @@ export default class Tpy {
    * @param requestInit Other fetch parameters.
    * @param parse Whether to parse out the body or not, default is true.
    *
+   * @template T The return type of the response body.
+   * @template Parse Follows the {@linkcode parse} parameter and should match values. Determines whether T is returned or not.
+   *
    * @throws {TpyError<Response | Context>}
    */
-  async httpRaw<T>(
+  async httpRaw<T, Parse extends boolean = true>(
     ctx: Context,
     resource: `/${string}`,
     method: Pylon.HTTPVerbs = 'GET',
     requestInit: RequestInit = {},
-    parse = true,
-  ): Promise<T> {
+    parse: Parse = (true as Parse),
+  ): Promise<Parse extends true ? T : void> {
     const response = await fetch(
       'https://pylon.bot/api' + resource,
       this.readyRequest(method, requestInit),
     );
 
     if (response.ok) {
-      if (parse) return await response.json() as T;
-      return {} as T;
+      return (
+        parse
+          ? await response.json() as Parse extends true ? T : void
+          : undefined as Parse extends true ? T : void
+      );
     }
 
     switch (response.status) {
