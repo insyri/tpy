@@ -1,12 +1,35 @@
 /**
- * A strongly typed Pylon API client.
+ * Tpy, a strongly typed Pylon API client.
  *
- * Tpy works on all JavaScript runtimes, including Node.js.
- * (See {@link README.md README.md} for the NPM link.)
- * As it's only dependencies are type-based and rather small,
- * Tpy is extremely portable and easy to look through.
- * These parts that make up Tpy are components that are
- * specific to their functional use; Tpy is modular.
+ * The center of Tpy starts at the default {@linkcode Tpy} class,
+ * defining the Pylon token and optionally a global deployment ID.
+ *
+ * ```ts
+ * const client = new Tpy(Deno.env.get('PYLON_TOKEN')!, 'DEPLOYMENT_ID');
+ * client.KV('NAMESPACE');
+ * client.getDeployment();
+ * client.publishDeployment({} as Deployment.POST.Request<false>);
+ *
+ * // or
+ *
+ * const client2 = new Tpy(Deno.env.get('PYLON_TOKEN')!);
+ * client2.KV('NAMESPACE', 'DEPLOYMENT_ID');
+ * client2.getDeployment('DEPLOYMENT_ID');
+ * client2.publishDeployment(
+ *   {} as Deployment.POST.Request<false>,
+ *   'DEPLOYMENT_ID',
+ * );
+ * ```
+ *
+ * Even if a default is set, it can be overridden.
+ *
+ * ```ts
+ * client2.publishDeployment(
+ *   {} as Deployment.POST.Request<false>,
+ *   'ANOTHER_DEPLOYMENT_ID',
+ * );
+ * ```
+ *
  * @module
  */
 

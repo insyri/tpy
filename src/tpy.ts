@@ -17,7 +17,7 @@ import Context from './context.ts';
  */
 export default class Tpy {
   /**
-   * The specified deployment ID used for deployment ID entries as a default.
+   * A default deployment ID used to occupy `deploymentID` parameter entries.
    */
   readonly deploymentID?: StringifiedNumber;
   private readonly token: string;
@@ -95,7 +95,7 @@ export default class Tpy {
    * Gets the deployment information.
    *
    * @param deploymentID The ID of the deployment to get. If empty, the function
-   * will use the set deploymentID in the class. (`this.deploymentID`)
+   * will use the set {@linkcode Tpy.deploymentID} in the class.
    */
   async getDeployment(deploymentID?: StringifiedNumber) {
     const dID = deploymentID || this.deploymentID;
@@ -120,16 +120,27 @@ export default class Tpy {
    * Makes a POST request to publish a deployment; returns details
    * of the new deployment.
    *
-   * @param id The script/deployment ID to publish to.
+   * @param deploymentID The script/deployment ID to publish to. If empty, the function
+   * will use the set {@linkcode Tpy.deploymentID} in the class.
    * @param body Project specifications.
    */
   async publishDeployment(
-    id: StringifiedNumber,
     body: Deployment.POST.Request<false>,
+    deploymentID?: StringifiedNumber,
   ) {
+    const dID = deploymentID || this.deploymentID;
+    if (!(dID)) {
+      throw new TpyError(
+        'Missing or Invalid Required Parameter',
+        parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
+        ['deploymentID', 'this.deploymentID'].join(', '),
+        dID,
+      );
+    }
+
     return await this.httpRaw<Deployment.POST.Response>(
-      new Context({ deploymentID: id }),
-      `/deployments/${id}`,
+      new Context({ deploymentID: dID }),
+      `/deployments/${dID}`,
       'POST',
       {
         body: JSON.stringify(body),
@@ -165,15 +176,17 @@ export default class Tpy {
   /**
    * Connects to the Pylon workbench WebSocket.
    *
-   * @param id The deployment ID to follow the WebSocket when it disconnects.
+   * @param deploymentID The deployment ID to follow the WebSocket when it disconnects. If empty, the function
+   * will use the set {@linkcode Tpy.deploymentID} in the class.
    */
-  connectSocket(id: StringifiedNumber) {
-    return new TpyWs(this, id);
+  connectSocket(deploymentID: StringifiedNumber) {
+    return new TpyWs(this, deploymentID);
   }
 
   /**
    * Gets all the namespaces under the given deployment ID.
-   * @param deploymentID The deployment ID to look under.
+   * @param deploymentID The deployment ID to look under. If empty, the function
+   * will use the set {@linkcode Tpy.deploymentID} in the class.
    */
   async getNamespaces(deploymentID?: StringifiedNumber) {
     const dID = deploymentID || this.deploymentID;
@@ -193,8 +206,9 @@ export default class Tpy {
 
   /**
    * Gets all the namespace items under the given deployment ID.
-   * @param deploymentID The deployment ID to look under.
    * @param namespace The namespace to look under.
+   * @param deploymentID The deployment ID to look under. If empty, the function
+   * will use the set {@linkcode Tpy.deploymentID} in the class.
    *
    * @template T The type of the `value` object inside {@linkcode Pylon.KV.GET.ItemsFlattened}.
    */
@@ -238,8 +252,9 @@ export default class Tpy {
 
   /**
    * Creates a new {@link TpyKV} instantiation, much like the Pylon SDK's KVNamespace class.
-   * @param deploymentID The deployment ID to look under.
    * @param namespace The namespace to look under.
+   * @param deploymentID The deployment ID to look under. If empty, the function
+   * will use the set {@linkcode Tpy.deploymentID} in the class.
    */
   KV(
     namespace: string,

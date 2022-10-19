@@ -138,13 +138,13 @@ console.log(
 
 ```ts
 const client = new Tpy('PYLON_TOKEN');
-const kvnamespace = 'tags';
+const kvnamespace = 'NAMESPACE';
 const kv = client.KV(
   kvnamespace,
   (await client.getDeploymentfromGuild('GUILD_ID')).id,
 );
 
-const key = '';
+const key = 'cool_lang';
 
 console.log(`Value of key "${key}":`, await kv.get(key));
 
