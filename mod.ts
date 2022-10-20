@@ -5,14 +5,14 @@
  * defining the Pylon token and optionally a global deployment ID.
  *
  * ```ts
- * const client = new Tpy(Deno.env.get('PYLON_TOKEN')!, 'DEPLOYMENT_ID');
+ * const client = new Tpy('PYLON_TOKEN', 'DEPLOYMENT_ID');
  * client.KV('NAMESPACE');
  * client.getDeployment();
  * client.publishDeployment({} as Deployment.POST.Request<false>);
  *
  * // or
  *
- * const client2 = new Tpy(Deno.env.get('PYLON_TOKEN')!);
+ * const client2 = new Tpy('PYLON_TOKEN');
  * client2.KV('NAMESPACE', 'DEPLOYMENT_ID');
  * client2.getDeployment('DEPLOYMENT_ID');
  * client2.publishDeployment(
