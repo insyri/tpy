@@ -70,6 +70,8 @@ Set-Location "$Destination"
 npm install -Wait
 npm run build -Wait
 
-Copy-Item -Recurse "src/types" "lib"
+Copy-Item -Recurse "src/types" "lib/src"
+
+npm run build_noemit -Wait
 
 Set-Location ".."
