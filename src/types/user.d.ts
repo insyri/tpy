@@ -59,7 +59,7 @@ declare namespace User {
        * Returns all guilds where the user can edit with Pylon.
        * More specifically, all guilds which the user has `manage
        * server` or `administrator` permissions in. The site says this
-       * directly when {@link https://pylon.bot/studio/add-guild adding a guild}
+       * directly when {@linkcode https://pylon.bot/studio/add-guild adding a guild}
        * and scrolling all the way down:
        *
        * > Don’t see the guild you’re looking for? Ensure you have the “Administrator” or “Manage Server” permission!
@@ -81,7 +81,7 @@ declare namespace User {
       export type Available = Array<
         Guild.Structures.Payload & {
           /**
-           * The {@link https://discord.com/developers/docs/topics/permissions Discord permissions number} of the user.
+           * The {@linkcode https://discord.com/developers/docs/topics/permissions Discord permissions number} of the user.
            */
           permissions: number;
         }

@@ -5,12 +5,12 @@ import { EventEmitter } from 'events';
 import TpyError, { parametersPrompt } from './error.ts';
 
 /**
- * Pylon uses {@link WebSocket}s to listen to a deployment's console out/err.
+ * Pylon uses {@linkcode WebSocket}s to listen to a deployment's console out/err.
  * While this idea is simple enough, the host closes the socket on an interval
- * ({@link https://discord.com/channels/530557949098065930/696860766665703515/983184117040562246 by design}),
+ * ({@linkcode https://discord.com/channels/530557949098065930/696860766665703515/983184117040562246 by design}),
  * having to make the user reconnect to the socket to continue listening.
  *
- * {@link TpyWs} is a {@link WebSocket} wrapper that expects this kind of nature
+ * {@linkcode TpyWs} is a {@linkcode WebSocket} wrapper that expects this kind of nature
  * to aid and provide easier use.
  *
  * @module
@@ -19,7 +19,7 @@ import TpyError, { parametersPrompt } from './error.ts';
 type messageTypes = typeof TpyWs.prototype.messageTypes[number];
 
 /**
- * This class forwards {@link WebSocket} recieving events to create a persistant
+ * This class forwards {@linkcode WebSocket} recieving events to create a persistant
  * stream to keep listeners active with automatic reconnection (with customizable timeouts).
  */
 export default class TpyWs {

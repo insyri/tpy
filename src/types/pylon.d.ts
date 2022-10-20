@@ -246,7 +246,7 @@ declare namespace Pylon {
          * ```ts
          *   method(message?: any, ...optionalParams: any[]): void;
          * ```
-         * {@link https://github.com/pylonbot/pylon-sdk-types/blob/eb0100c9c8f95a07d95fd511e5afc2923786e95b/runtime/pylon-runtime.d.ts#L3-L14 See Reference}
+         * {@linkcode https://github.com/pylonbot/pylon-sdk-types/blob/eb0100c9c8f95a07d95fd511e5afc2923786e95b/runtime/pylon-runtime.d.ts#L3-L14 See Reference}
          *
          * However arguments are passed into these methods will reflect here as an array.
          * @example ```ts

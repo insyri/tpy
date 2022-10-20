@@ -97,7 +97,7 @@ declare namespace Deployment {
        */
       tasks: {
         /**
-         * Cron task specifications. See the {@link https://pylon.bot/docs/pylon-tasks Pylon SDK Documentation} on Crons and Tasks.
+         * Cron task specifications. See the {@linkcode https://pylon.bot/docs/pylon-tasks Pylon SDK Documentation} on Crons and Tasks.
          *
          * Identification map:
          * ```ts

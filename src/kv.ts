@@ -6,7 +6,7 @@ import Context from './context.ts';
 
 /**
  * Pylon uses an internal Key-Value persistence that can
- * be used via the {@link https://pylon.bot/docs/reference/classes/pylon.kvnamespace.html Pylon KVNamespace SDK}.
+ * be used via the {@linkcode https://pylon.bot/docs/reference/classes/pylon.kvnamespace.html Pylon KVNamespace SDK}.
  *
  * @module
  */
@@ -23,7 +23,7 @@ export default class TpyKV {
   private deploymentID: StringifiedNumber;
 
   /**
-   * @param tpyInstance An instantiation of a {@link Tpy} class.
+   * @param tpyInstance An instantiation of a {@linkcode Tpy} class.
    * @param deploymentID The deployment ID to find the KV namespace on.
    * @param kvnamespace The KV namespace title.
    */

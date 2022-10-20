@@ -251,7 +251,7 @@ export default class Tpy {
   }
 
   /**
-   * Creates a new {@link TpyKV} instantiation, much like the Pylon SDK's KVNamespace class.
+   * Creates a new {@linkcode TpyKV} instantiation, much like the Pylon SDK's KVNamespace class.
    * @param namespace The namespace to look under.
    * @param deploymentID The deployment ID to look under. If empty, the function
    * will use the set {@linkcode Tpy.deploymentID} in the class.
