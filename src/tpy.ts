@@ -12,6 +12,8 @@ import TpyWs from './ws.ts';
 import TpyKV from './kv.ts';
 import Context from './context.ts';
 
+if (!Deno) await import('./fetch_polyfill.ts');
+
 /**
  * The central entity for interacting with the Pylon API; the entrypoint.
  */

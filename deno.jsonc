@@ -27,7 +27,8 @@
     },
     "files": {
       "exclude": [
-        "node"
+        "node",
+        "src/fetch_polyfill.ts"
       ]
     }
   },

@@ -6,6 +6,9 @@
   "type": "commonjs",
   "main": "lib/mod.js",
   "types": "lib/mod.d.ts",
+  "engines": {
+    "node": ">=12.20"
+  },
   "files": [
     "lib",
     "LICENSE",
@@ -33,5 +36,8 @@
   },
   "devDependencies": {
     "typescript": "4.7.4"
+  },
+  "optionalDependencies": {
+    "node-fetch": "3.2.10"
   }
 }
