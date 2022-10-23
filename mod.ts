@@ -30,6 +30,16 @@
  * );
  * ```
  *
+ * ## `fetch` API in Node.js
+ *
+ * Node.js v18 has a native browser-like fetch interface. Versions
+ * below are normally using [`node-fetch`](https://github.com/node-fetch/node-fetch)
+ * to circumvent this issue.
+ *
+ * For environments using Node v18 and earlier, Tpy uses the native
+ * fetch without requiring the package. Environments containing earlier
+ * versions of Node will require the package.
+ *
  * @module
  */
 

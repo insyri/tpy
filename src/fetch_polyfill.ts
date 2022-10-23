@@ -1,19 +1,13 @@
-import fetch, {
-  Blob,
-  blobFrom,
-  blobFromSync,
-  File,
-  fileFrom,
-  fileFromSync,
-  FormData,
-  Headers,
-  Request,
-  Response,
-} from 'node-fetch';
+// This file is meant to be read by Node.js, Deno stops at line 5.
+// If Deno extension enabled, ignore errors.
 
-if (!globalThis.fetch) {
-  Object.defineProperty(globalThis, 'fetch', fetch);
-  Object.defineProperty(globalThis, 'Headers', Headers);
-  Object.defineProperty(globalThis, 'Request', Request);
-  Object.defineProperty(globalThis, 'Response', Response);
+if (
+  'process' in globalThis && // If Node
+  Number(globalThis.process.version.substring(1, 3)) < 18
+) {
+  Object.defineProperty(
+    globalThis,
+    'fetch',
+    require('node-fetch'),
+  );
 }

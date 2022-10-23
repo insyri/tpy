@@ -1,6 +1,6 @@
 {
   "name": "tpy",
-  "version": "v1.0.0-pre-release-4",
+  "version": "v1.0.0-pre-release-5",
   "description": "🔑 A strongly typed Pylon API client.",
   "license": "MIT",
   "type": "commonjs",
@@ -30,14 +30,17 @@
   "bugs": {
     "url": "https://github.com/insyri/tpy/issues"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@types/node": "18.11.3",
-    "discord-api-types": "0.37.14"
+    "discord-api-types": "0.37.14",
+    "node-fetch": "3.2.10"
+  },
+  "peerDependenciesMeta": {
+    "node-fetch": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "typescript": "4.8.4"
-  },
-  "optionalDependencies": {
-    "node-fetch": "3.2.10"
   }
 }
