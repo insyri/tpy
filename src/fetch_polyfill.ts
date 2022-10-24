@@ -5,8 +5,8 @@ if (
   'process' in globalThis && // If Node
   Number(globalThis.process.version.substring(1, 3)) < 18
 ) {
-  const fetch = (url: RequestInfo, init?: RequestInit): Promise<Response> =>
-    import('node-fetch').then(({ default: fetch }) => fetch(url, init));
+  const fetch = (...args: any[]) =>
+    import('node-fetch').then(({ default: fetch }) => fetch(args[0], args[1]));
   Object.defineProperty(
     globalThis,
     'fetch',

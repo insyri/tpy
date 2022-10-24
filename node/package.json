@@ -42,6 +42,7 @@
     }
   },
   "devDependencies": {
+    "node-fetch": "^3.2.10",
     "typescript": "4.8.4"
   }
 }
