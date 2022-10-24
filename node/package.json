@@ -2,6 +2,7 @@
   "name": "tpy",
   "version": "v1.0.0-pre-release-5",
   "description": "🔑 A strongly typed Pylon API client.",
+  "author": "insyri",
   "license": "MIT",
   "type": "commonjs",
   "main": "lib/mod.js",

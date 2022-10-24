@@ -5,9 +5,11 @@ if (
   'process' in globalThis && // If Node
   Number(globalThis.process.version.substring(1, 3)) < 18
 ) {
+  const fetch = (url: RequestInfo, init?: RequestInit): Promise<Response> =>
+    import('node-fetch').then(({ default: fetch }) => fetch(url, init));
   Object.defineProperty(
     globalThis,
     'fetch',
-    require('node-fetch'),
+    fetch,
   );
 }
