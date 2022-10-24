@@ -1,6 +1,6 @@
 {
   "name": "tpy",
-  "version": "v1.0.0-pre-release-5",
+  "version": "v1.0.0-pre-release-6",
   "description": "🔑 A strongly typed Pylon API client.",
   "author": "insyri",
   "license": "MIT",
