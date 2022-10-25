@@ -43,15 +43,15 @@
  * @module
  */
 
-import type Guild from './src/types/guild.d.ts';
-import type Deployment from './src/types/deployment.d.ts';
-import type User from './src/types/user.d.ts';
-import TpyError, { TpyErrors } from './src/error.ts';
-import TpyWs from './src/ws.ts';
-import Tpy from './src/tpy.ts';
-import TpyKV from './src/kv.ts';
-import Context from './src/context.ts';
+export { Tpy } from './src/tpy.ts';
+export { TpyWs } from './src/ws.ts';
+export { TpyKV } from './src/kv.ts';
+export { TpyError, TpyErrors } from './src/error.ts';
+export { Context } from './src/context.ts';
 
-export default Tpy;
-export type { Deployment, Guild, User };
-export { Context, TpyError, TpyErrors, TpyKV, TpyWs };
+import type * as Guild from './src/types/guild.d.ts';
+import type * as Deployment from './src/types/deployment.d.ts';
+import type * as User from './src/types/user.d.ts';
+import type * as Pylon from './src/types/pylon.d.ts';
+
+export type { Deployment, Guild, Pylon, User };

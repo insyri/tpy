@@ -1,8 +1,8 @@
-import Tpy from './tpy.ts';
+import { Tpy } from './tpy.ts';
 import type { StringifiedNumber } from './types/util.d.ts';
-import type Pylon from './types/pylon.d.ts';
-import TpyError, { parametersPrompt } from './error.ts';
-import Context from './context.ts';
+import type { Json, KV } from './types/pylon.d.ts';
+import { parametersPrompt, TpyError } from './error.ts';
+import { Context } from './context.ts';
 
 /**
  * Pylon uses an internal Key-Value persistence that can
@@ -14,7 +14,7 @@ import Context from './context.ts';
 /**
  * A KVNamespace interface that (almost) matches the Pylon KVNamespace SDK class.
  */
-export default class TpyKV {
+export class TpyKV {
   /**
    * The KV namespace title.
    */
@@ -64,8 +64,8 @@ export default class TpyKV {
    */
   async put(
     key: string,
-    value: Pylon.Json,
-    options?: Pylon.KV.OperationOptions.Put,
+    value: Json,
+    options?: KV.OperationOptions.Put,
   ) {
     if (options?.ifNotExists && await this.get(key)) return;
 
@@ -92,7 +92,7 @@ export default class TpyKV {
   async putArrayBuffer(
     key: string,
     value: ArrayBuffer,
-    options?: Pylon.KV.OperationOptions.Put,
+    options?: KV.OperationOptions.Put,
   ) {
     if (options?.ifNotExists && await this.get(key)) return;
 
@@ -108,14 +108,15 @@ export default class TpyKV {
 
   /**
    * Gets a key's value - returning the value or undefined.
-   * @param key The Key to get.
-   * @template T The return type of the function to a given Json type.
+   *
+   * @param key The key to get.
+   * @template T The return type of the function to a given `Json` type.
    */
-  async get<T extends Pylon.Json = Pylon.Json>(
+  async get<T extends Json = Json>(
     key: string,
   ): Promise<T | undefined> {
     const { deploymentID, kvnamespace } = this;
-    const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items<T>>(
+    const response = await this.tpyc.httpRaw<KV.GET.Items<T>>(
       new Context({ deploymentID, kvnamespace }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
@@ -141,11 +142,12 @@ export default class TpyKV {
 
   /**
    * Gets a key's value - returning the value or undefined.
+   *
    * @param key The Key to get.
    */
   async getArrayBuffer(key: string): Promise<ArrayBuffer | undefined> {
     const { deploymentID, kvnamespace } = this;
-    const response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
+    const response = await this.tpyc.httpRaw<KV.GET.Items>(
       new Context({ deploymentID, kvnamespace }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
@@ -161,11 +163,12 @@ export default class TpyKV {
 
   /**
    * Lists the keys that are set within the namespace.
+   *
    * @param options
    */
-  async list(options?: Pylon.KV.OperationOptions.List) {
+  async list(options?: KV.OperationOptions.List) {
     const { deploymentID, kvnamespace } = this;
-    let response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
+    let response = await this.tpyc.httpRaw<KV.GET.Items>(
       new Context({ deploymentID, kvnamespace }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
@@ -183,17 +186,18 @@ export default class TpyKV {
   }
 
   /**
-   * Exactly like {@linkcode TpyKV.list}, except that it returns the key + value pairs instead.
+   * Lists the keys and values in a namespace, including their expiration date if
+   * applicable.
    *
    * The maximum limit is 100, however.
    *
-   * @template T The type of the value.
+   * @template T The type of the key's value.
    */
   async items<T>(
-    options?: Pylon.KV.OperationOptions.Items,
-  ): Promise<Pylon.KV.GET.ItemsFlattened<T>> {
+    options?: KV.OperationOptions.Items,
+  ): Promise<KV.GET.ItemsFlattened<T>> {
     const { deploymentID, kvnamespace } = this;
-    let response = await this.tpyc.httpRaw<Pylon.KV.GET.Items>(
+    let response = await this.tpyc.httpRaw<KV.GET.Items>(
       new Context({ deploymentID, kvnamespace }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
@@ -237,7 +241,7 @@ export default class TpyKV {
    */
   async count() {
     const { deploymentID, kvnamespace } = this;
-    return (await this.tpyc.httpRaw<Pylon.KV.GET.Namespace>(
+    return (await this.tpyc.httpRaw<KV.GET.Namespace>(
       new Context({ deploymentID, kvnamespace }),
       `/deployments/${deploymentID}/kv/namespaces`,
     )).find((n) => n.namespace == kvnamespace)?.count || 0;
@@ -253,7 +257,7 @@ export default class TpyKV {
    */
   async clear() {
     const { deploymentID, kvnamespace } = this;
-    return (await this.tpyc.httpRaw<Pylon.KV.DELETE.Namespace>(
+    return (await this.tpyc.httpRaw<KV.DELETE.Namespace>(
       new Context({ deploymentID, kvnamespace }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}`,
       'DELETE',
@@ -262,12 +266,13 @@ export default class TpyKV {
 
   /**
    * Deletes a given key from the namespace. Throwing if the key does not exist,
-   * or if {@linkcode Pylon.KV.OperationOptions.Delete options.prevValue} is set
-   * the previous value is not equal to the value provided.
+   * or if `options.prevValue` is set the previous value is not equal to the
+   * value provided.
+   *
    * @param key The key to delete.
    * @param options Options, which can provide a delete if equals.
    */
-  async delete(key: string, options?: Pylon.KV.OperationOptions.Delete) {
+  async delete(key: string, options?: KV.OperationOptions.Delete) {
     const { deploymentID, kvnamespace } = this;
     const del = async () =>
       await this.tpyc.httpRaw(

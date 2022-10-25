@@ -1,7 +1,4 @@
 import { StringifiedNumber } from './types/util.d.ts';
-// Used for typing annotations
-// deno-lint-ignore no-unused-vars
-import Tpy from './tpy.ts';
 
 /**
  * Functions, like building errors, may need additional environmental information to
@@ -78,7 +75,7 @@ import Tpy from './tpy.ts';
  * is already done internally given that one is not interacting with internal functions such, i.e.,
  * {@linkcode Tpy.httpRaw}.*
  */
-export default class Context {
+export class Context {
   /**
    * A deployment ID.
    */

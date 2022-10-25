@@ -52,7 +52,8 @@ export interface ITpyErrorsProperty {
  *
  * @template T The type of {@linkcode rawInfo}.
  */
-class TpyError<T> extends Error implements Omit<ITpyErrorsProperty, 'message'> {
+export class TpyError<T> extends Error
+  implements Omit<ITpyErrorsProperty, 'message'> {
   /**
    * A short description of the Tpy error.
    */
@@ -102,8 +103,7 @@ class TpyError<T> extends Error implements Omit<ITpyErrorsProperty, 'message'> {
 /**
  * The set of errors returned by {@linkcode TpyError} that describes a
  * dictionary based on the name as the index/key which consists of two
- * values: a {@linkcode ITpyErrorsProperty.description description} string
- * and a {@linkcode ITpyErrorsProperty.message message} method to create a
+ * values: a description string and a message method to create a
  * description with specific context information.
  */
 export const TpyErrors = {
@@ -207,5 +207,3 @@ export function parametersPrompt(
 export function responseHTTP(s: string) {
   return `Response HTTP status code: ${s}`;
 }
-
-export default TpyError;

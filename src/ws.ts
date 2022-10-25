@@ -1,17 +1,17 @@
-import Tpy from './tpy.ts';
+import { Tpy } from './tpy.ts';
 import type { StringifiedNumber, Unpacked } from './types/util.d.ts';
-import type Pylon from './types/pylon.d.ts';
+import type { PylonWebSocket } from './types/pylon.d.ts';
 import { EventEmitter } from 'events';
-import TpyError, { parametersPrompt } from './error.ts';
+import { parametersPrompt, TpyError } from './error.ts';
 
 /**
+ * {@linkcode TpyWs} is a {@linkcode WebSocket} wrapper that expects this kind of nature
+ * to aid and provide easier use.
+ *
  * Pylon uses {@linkcode WebSocket}s to listen to a deployment's console out/err.
  * While this idea is simple enough, the host closes the socket on an interval
  * ({@linkcode https://discord.com/channels/530557949098065930/696860766665703515/983184117040562246 by design}),
  * having to make the user reconnect to the socket to continue listening.
- *
- * {@linkcode TpyWs} is a {@linkcode WebSocket} wrapper that expects this kind of nature
- * to aid and provide easier use.
  *
  * @module
  */
@@ -22,7 +22,7 @@ type messageTypes = typeof TpyWs.prototype.messageTypes[number];
  * This class forwards {@linkcode WebSocket} recieving events to create a persistant
  * stream to keep listeners active with automatic reconnection (with customizable timeouts).
  */
-export default class TpyWs {
+export class TpyWs {
   readonly messageTypes = ['message', 'open', 'close', 'error'] as const;
   private tpyClient: Tpy;
   private deploymentID: StringifiedNumber;
@@ -31,8 +31,7 @@ export default class TpyWs {
   private _websocket?: WebSocket;
 
   /**
-   * {@linkcode TpyWs} uses a proxy stream that ensures the process (or at least the
-   * stream) is not terminated. This is that proxy stream.
+   * The proxy stream that ensures the process (or at least the stream) is not terminated.
    */
   eventEmitter = new EventEmitter();
   /**
@@ -109,13 +108,13 @@ export default class TpyWs {
    * @param type Fired when the WebSocket recieves a message.
    * @param callback A callback function to invoke when this event is fired.
    *
-   * @template T The type of the `data` object inside {@linkcode Pylon.WebSocket.Response}.
+   * @template T The type of the `data` object inside {@linkcode PylonWebSocket.Response}.
    *
    * @event
    */
   on<T extends unknown[]>(
     type: 'message',
-    callback: (data: Unpacked<Pylon.WebSocket.Response<T>>) => void,
+    callback: (data: Unpacked<PylonWebSocket.Response<T>>) => void,
   ): EventEmitter;
   on<T extends unknown[]>(
     type: messageTypes,
@@ -131,7 +130,7 @@ export default class TpyWs {
     }
     return this.eventEmitter.on(
       type,
-      <(data: Unpacked<Pylon.WebSocket.Response<T>>) => void> callback,
+      <(data: Unpacked<PylonWebSocket.Response<T>>) => void> callback,
     );
   }
 

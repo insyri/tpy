@@ -4,8 +4,8 @@
 export type StringifiedNumber = `${number | bigint}`;
 
 /**
- * Extracts objects inside an array (if it is one) and
- * forms a union for each of those elements.
+ * Extracts objects inside an array (if it is one) and forms a union for each of
+ * those elements.
  *
  * @template T The type to be extracted from an array.
  */

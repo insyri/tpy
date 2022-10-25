@@ -1,23 +1,24 @@
-import TpyError, {
+import {
   parametersPrompt,
   responseBody,
   responseHTTP,
+  TpyError,
 } from './error.ts';
-import type Deployment from './types/deployment.d.ts';
-import type Guild from './types/guild.d.ts';
-import type User from './types/user.d.ts';
-import type Pylon from './types/pylon.d.ts';
+import type * as Deployment from './types/deployment.d.ts';
+import type * as Guild from './types/guild.d.ts';
+import type * as User from './types/user.d.ts';
+import type { HTTPVerbs, KV } from './types/pylon.d.ts';
 import type { StringifiedNumber } from './types/util.d.ts';
-import TpyWs from './ws.ts';
-import TpyKV from './kv.ts';
-import Context from './context.ts';
+import { TpyWs } from './ws.ts';
+import { TpyKV } from './kv.ts';
+import { Context } from './context.ts';
 
 import './fetch_polyfill.ts';
 
 /**
  * The central entity for interacting with the Pylon API; the entrypoint.
  */
-export default class Tpy {
+export class Tpy {
   /**
    * A default deployment ID used to occupy `deploymentID` parameter entries.
    */
@@ -164,7 +165,7 @@ export default class Tpy {
    * @param method HTTP Method.
    * @param other Other fetch parameters.
    */
-  readyRequest(method: Pylon.HTTPVerbs, other?: RequestInit): RequestInit {
+  readyRequest(method: HTTPVerbs, other?: RequestInit): RequestInit {
     return {
       method,
       headers: {
@@ -200,7 +201,7 @@ export default class Tpy {
         dID,
       );
     }
-    return await this.httpRaw<Pylon.KV.GET.Namespace>(
+    return await this.httpRaw<KV.GET.Namespace>(
       new Context({ deploymentID: dID }),
       `/deployments/${dID}/kv/namespaces`,
     );
@@ -212,12 +213,12 @@ export default class Tpy {
    * @param deploymentID The deployment ID to look under. If empty, the function
    * will use the set {@linkcode Tpy.deploymentID} in the class.
    *
-   * @template T The type of the `value` object inside {@linkcode Pylon.KV.GET.ItemsFlattened}.
+   * @template T The type of the `value` object inside {@linkcode KV.GET.ItemsFlattened}.
    */
   async getNamespaceItems<T>(
     namespace: string,
     deploymentID?: StringifiedNumber,
-  ): Promise<Pylon.KV.GET.ItemsFlattened<T> | undefined> {
+  ): Promise<KV.GET.ItemsFlattened<T> | undefined> {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
       throw new TpyError(
@@ -227,12 +228,12 @@ export default class Tpy {
         dID,
       );
     }
-    const response = await this.httpRaw<Pylon.KV.GET.Items>(
+    const response = await this.httpRaw<KV.GET.Items>(
       new Context({ deploymentID: dID }),
       `/deployments/${dID}/kv/namespaces/${namespace}/items`,
     );
 
-    const a: Pylon.KV.GET.ItemsFlattened<T> = new Array(response.length);
+    const a: KV.GET.ItemsFlattened<T> = new Array(response.length);
     for (let i = 0; i < response.length; i++) {
       const p = response[i];
       if (!p.value.string) {
@@ -291,7 +292,7 @@ export default class Tpy {
   async httpRaw<T, Parse extends boolean = true>(
     ctx: Context,
     resource: `/${string}`,
-    method: Pylon.HTTPVerbs = 'GET',
+    method: HTTPVerbs = 'GET',
     requestInit: RequestInit = {},
     parse: Parse = (true as Parse),
   ): Promise<Parse extends true ? T : void> {
