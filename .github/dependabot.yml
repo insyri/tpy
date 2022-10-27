@@ -4,3 +4,8 @@ updates:
     directory: "/node"
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: "node-fetch"
+        versions: ["3.x", "4.x"]
+      - dependency-name: "@types/node-fetch"
+        versions: ["3.x", "4.x"]
