@@ -50,7 +50,7 @@ console.log(`Logged in as ${displayName} (<@${id}>).`);
 ```ts
 const client = new Tpy('PYLON_TOKEN');
 const ws = client.connectSocket(
-  await client.getDeploymentfromGuild('GUILD_ID')).id,
+  await client.getDeploymentIDfromGuild('GUILD_ID')),
 );
 
 ws.on('open', (_) => console.log('WebSocket Opened'));
@@ -101,7 +101,9 @@ console.log(
 
 ```ts
 const client = new Tpy('PYLON_TOKEN');
-const { config } = await client.getDeploymentfromGuild('GUILD_ID');
+const { config } = await client.getDeployment(
+  await client.getDeploymentIDfromGuild('GUILD_ID'),
+);
 const { cronTasks } = config.tasks;
 const { events } = config;
 const cronTasksFormatted = cronTasks.map(({ cronString, name }) =>
@@ -122,7 +124,7 @@ const client = new Tpy('PYLON_TOKEN');
 const kvnamespace = 'tags';
 const kv = client.KV(
   kvnamespace,
-  (await client.getDeploymentfromGuild('GUILD_ID')).id,
+  await client.getDeploymentIDfromGuild('GUILD_ID'),
 );
 
 const keys = await kv.list({ limit: 10 });
@@ -141,7 +143,7 @@ const client = new Tpy('PYLON_TOKEN');
 const kvnamespace = 'NAMESPACE';
 const kv = client.KV(
   kvnamespace,
-  (await client.getDeploymentfromGuild('GUILD_ID')).id,
+  await client.getDeploymentIDfromGuild('GUILD_ID'),
 );
 
 const key = 'cool_lang';

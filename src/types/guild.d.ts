@@ -12,7 +12,7 @@ import { DeploymentStructures } from './deployment.d.ts';
  */
 
 /**
- * Not an API resource, this namespace behaves as templates and other
+ * Not an API resource, this namespace behaves as a set of templates and other
  * base types.
  */
 export namespace GuildStructures {

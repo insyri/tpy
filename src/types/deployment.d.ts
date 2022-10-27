@@ -11,7 +11,7 @@ import type { StringifiedNumber } from '../types/util.d.ts';
  */
 
 /**
- * Not an API resource, this namespace behaves as templates and other
+ * Not an API resource, this namespace behaves as a set of templates and other
  * base types.
  */
 export namespace DeploymentStructures {
@@ -47,9 +47,12 @@ export namespace DeploymentStructures {
     ENABLED,
   }
 
+  /**
+   * Detailed script information of a deployment.
+   */
   export type Script<Raw extends boolean = true> = {
     /**
-     * Compiled script code in JavaScript.
+     * Compiled script code in JavaScript. Used exclusively for publishing.
      */
     contents: string;
     /**
@@ -57,7 +60,7 @@ export namespace DeploymentStructures {
      */
     id: StringifiedNumber;
     /**
-     * The project directory.
+     * The displayed project directory.
      */
     project: Raw extends true ? string : {
       /**
@@ -222,7 +225,7 @@ export namespace GET {
       /**
        * The new deployment script information.
        */
-      script: Omit<DeploymentStructures.Script<Raw>, 'id'>;
+      script: Omit<DeploymentStructures.Script<Raw>, 'contents'>;
     };
 }
 
