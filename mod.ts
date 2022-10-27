@@ -43,7 +43,7 @@
  * @module
  */
 
-export { Tpy } from './src/tpy.ts';
+export { Tpy as default } from './src/tpy.ts';
 export { TpyWs } from './src/ws.ts';
 export { TpyKV } from './src/kv.ts';
 export { TpyError, TpyErrors } from './src/error.ts';

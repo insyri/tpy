@@ -2,10 +2,7 @@
 
 Param(
   [Parameter(Mandatory = $false, Position = 0)]
-  [string] $Version,
-
-  [Parameter(Mandatory = $false, Position = 0)]
-  [switch] $RemoveFileExtentions
+  [string] $Version
 )
 
 If ((Get-Location).Path -notlike '*tpy') {
@@ -16,7 +13,7 @@ If ((Get-Location).Path -notlike '*tpy') {
 # Injection
 
 $ItemList = "src", "README.md", "LICENSE", "mod.ts"
-$DeleteList = "lib", "node_modules", "package-lock.json", "mod.js", "mod.d.ts"
+$DeleteList = "lib", "node_modules", "mod.js", "mod.d.ts"
 $Destination = "node"
 $NodePackageLocation = "$Destination/package.json"
 $ImportRegex = "(?<=(?<=\n|^)(im|ex)port(?:(?!(\.d)?\.ts).|\n)*)(\.d)?\.ts"
@@ -54,17 +51,16 @@ ForEach ($Item in $ItemList) {
 }
 
 # Package Setup
-
-$NodePackage = (Get-Content "$NodePackageLocation" -Raw | ConvertFrom-Json)
-$NodePackage.version = $Version
-$NodePackage | ConvertTo-Json > $NodePackageLocation
+If ($Version) {
+  $NodePackage = (Get-Content "$NodePackageLocation" -Raw | ConvertFrom-Json)
+  $NodePackage.version = $Version
+  $NodePackage | ConvertTo-Json > $NodePackageLocation
+}
 
 # Node Import Syntax Fix
-If ($RemoveFileExtentions.IsPresent) { 
-  Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
-    $Content = Get-Content $_.FullName -Raw
-    $Content -replace "$ImportRegex", "" > $_.FullName
-  }
+Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
+  $Content = Get-Content $_.FullName -Raw
+  $Content -replace "$ImportRegex", "" > $_.FullName
 }
 
 # Verification
