@@ -14,7 +14,7 @@
  * for other functions to use the information. A great use of this would be provide a `guildID`
  * parameter and pass it on to an error directly without searching for it in the URL. In code,
  * this could look like this:
- * 
+ *
  * ```ts
  *  async function fetchAndHandleError<T>(ctx: Context, url: string): Promise<T> {
  *   const response = await fetch(url);
@@ -29,7 +29,7 @@
  *   // Default error.
  *   throw 'There was an error, but it could not be identified.';
  * }
- * 
+ *
  * async function guildName(guildID: StringifiedNumber): Promise<string> {
  *   const response = await fetchAndHandleError<Guild.GET.Guild>(
  *     new Context({ guildID }),
@@ -37,11 +37,11 @@
  *   );
  *   return response.name;
  * }
- * 
+ *
  * const guildID: StringifiedNumber = '0';
  * console.log(await guildName(guildID));
  * ```
- * 
+ *
  * Here, {@linkcode Context} is leveraged to discover what the `guildID` parameter was
  * without searching through the URL (where, it may possibly return a wrong parsed value,
  * like a regex edge case). It provided environmental parameters directly to eliminate
