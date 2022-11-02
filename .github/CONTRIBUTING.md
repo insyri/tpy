@@ -39,3 +39,9 @@ You can use it like this:
 ```
 
 Will generate an `npm` folder with contents formatted to ship on npm.
+
+## Documenting Conventions
+
+When writing documentation, create a new line at somewhat a middle point of the
+screen so that browsers who have split-screen on do not experience line overlap,
+however, if it's only a few characters more, ignore.

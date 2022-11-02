@@ -104,9 +104,9 @@ export class TpyError<T> extends Error
 
 /**
  * The set of errors returned by {@linkcode TpyError} that describes a
- * dictionary based on the name as the index/key which consists of two
- * values: a description string and a message method to create a
- * description with specific context information.
+ * set of error names (keys) which consists of two values: a string
+ * `description` and a method `message` to create a human-friendly
+ * defintion with specific context information.
  */
 export const TpyErrors = {
   'Internal Server Error': {
@@ -146,11 +146,11 @@ export const TpyErrors = {
     message: (s: string) => serverRespondedWith(s),
     description: 'The URL resource on the web server was not found.',
   },
-  'Unauthorized': {
+  Unauthorized: {
     message: (s: string) => serverRespondedWith(s),
     description: 'Required credentials were missing from the request.',
   },
-  'Forbidden': {
+  Forbidden: {
     message: (s: string) => serverRespondedWith(s),
     description:
       'Access to the resource is denied despite included credentials.',

@@ -9,15 +9,15 @@ import {
   responseBody,
   responseHTTP,
   TpyError,
-} from './error.ts';
-import type * as Deployment from './types/deployment.d.ts';
-import type * as Guild from './types/guild.d.ts';
-import type * as User from './types/user.d.ts';
-import type { HTTPVerbs, KV } from './types/pylon.d.ts';
-import type { StringifiedNumber } from './types/util.d.ts';
-import { TpyWs } from './ws.ts';
-import { TpyKV } from './kv.ts';
-import { Context } from './context.ts';
+} from "./error.ts";
+import type * as Deployment from "./types/deployment.d.ts";
+import type * as Guild from "./types/guild.d.ts";
+import type * as User from "./types/user.d.ts";
+import type { HTTPVerbs, KV } from "./types/pylon.d.ts";
+import type { StringifiedNumber } from "./types/util.d.ts";
+import { TpyWs } from "./ws.ts";
+import { TpyKV } from "./kv.ts";
+import { Context } from "./context.ts";
 
 /**
  * The central entity for interacting with the Pylon API; the entrypoint.
@@ -56,20 +56,20 @@ export class Tpy {
 
     if (!token) {
       throw new TpyError(
-        'Missing or Unexpected Value in Response',
-        parametersPrompt('missing', 'token'),
-        'token',
-        token,
+        "Missing or Unexpected Value in Response",
+        parametersPrompt("missing", "token"),
+        "token",
+        token
       );
     }
     this.token = token;
     if (deploymentID) this.deploymentID = deploymentID;
     // If this is Node.js
-    if ('process' in globalThis && useNodeFetch) {
+    if ("process" in globalThis && useNodeFetch) {
       const fetch = (
-        ...args: Parameters<typeof import('node-fetch')['default']>
-      ) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-      (<unknown> globalThis.fetch) = fetch;
+        ...args: Parameters<typeof import("node-fetch")["default"]>
+      ) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
+      (<unknown>globalThis.fetch) = fetch;
     }
   }
 
@@ -77,7 +77,7 @@ export class Tpy {
    * Gets the user's account details associated with the included credentials.
    */
   async getUser() {
-    return await this.httpRaw<User.GET.User>(new Context({}), '/user');
+    return await this.httpRaw<User.GET.User>(new Context({}), "/user");
   }
 
   /**
@@ -86,7 +86,7 @@ export class Tpy {
   async getAvailableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Available>(
       new Context({}),
-      '/user/guilds/available',
+      "/user/guilds/available"
     );
   }
 
@@ -97,7 +97,7 @@ export class Tpy {
   async getGuildInfo(guildID: StringifiedNumber) {
     const g = await this.httpRaw<Guild.GET.Guild>(
       new Context({ guildID }),
-      `/guilds/${guildID}`,
+      `/guilds/${guildID}`
     );
     g.deployments.forEach((v) => (v.config = JSON.parse(v.config)));
     return g as unknown as Guild.GET.Guild<false>;
@@ -110,7 +110,7 @@ export class Tpy {
   async getGuildStats(guildID: StringifiedNumber) {
     return await this.httpRaw<Guild.GET.Stats>(
       new Context({ guildID }),
-      `/guilds/${guildID}/stats`,
+      `/guilds/${guildID}/stats`
     );
   }
 
@@ -121,7 +121,7 @@ export class Tpy {
   async getEditableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Allowed>(
       new Context({}),
-      `/user/guilds`,
+      `/user/guilds`
     );
   }
 
@@ -135,15 +135,15 @@ export class Tpy {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
       throw new TpyError(
-        'Missing or Invalid Required Parameter',
-        parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
-        ['deploymentID', 'this.deploymentID'].join(', '),
-        dID,
+        "Missing or Invalid Required Parameter",
+        parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
+        ["deploymentID", "this.deploymentID"].join(", "),
+        dID
       );
     }
     const d = await this.httpRaw<Deployment.GET.Deployment>(
       new Context({ deploymentID: dID }),
-      `/deployments/${dID}`,
+      `/deployments/${dID}`
     );
     d.script.project = JSON.parse(d.script.project);
     d.config = JSON.parse(d.config);
@@ -160,25 +160,25 @@ export class Tpy {
    */
   async publishDeployment(
     body: Deployment.POST.Request<false>,
-    deploymentID?: StringifiedNumber,
+    deploymentID?: StringifiedNumber
   ) {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
       throw new TpyError(
-        'Missing or Invalid Required Parameter',
-        parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
-        ['deploymentID', 'this.deploymentID'].join(', '),
-        dID,
+        "Missing or Invalid Required Parameter",
+        parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
+        ["deploymentID", "this.deploymentID"].join(", "),
+        dID
       );
     }
 
     return (await this.httpRaw<Deployment.POST.Response>(
       new Context({ deploymentID: dID }),
       `/deployments/${dID}`,
-      'POST',
+      "POST",
       {
         body: JSON.stringify(body),
-      },
+      }
     )) as unknown as Deployment.POST.Response<false>;
   }
 
@@ -201,7 +201,7 @@ export class Tpy {
       method,
       headers: {
         Authorization: this.token,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       ...other,
     } as RequestInit;
@@ -226,15 +226,15 @@ export class Tpy {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
       throw new TpyError(
-        'Missing or Invalid Required Parameter',
-        parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
-        ['deploymentID', 'this.deploymentID'].join(', '),
-        dID,
+        "Missing or Invalid Required Parameter",
+        parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
+        ["deploymentID", "this.deploymentID"].join(", "),
+        dID
       );
     }
     return await this.httpRaw<KV.GET.Namespace>(
       new Context({ deploymentID: dID }),
-      `/deployments/${dID}/kv/namespaces`,
+      `/deployments/${dID}/kv/namespaces`
     );
   }
 
@@ -248,20 +248,20 @@ export class Tpy {
    */
   async getNamespaceItems<T>(
     namespace: string,
-    deploymentID?: StringifiedNumber,
+    deploymentID?: StringifiedNumber
   ): Promise<KV.GET.ItemsFlattened<T> | undefined> {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
       throw new TpyError(
-        'Missing or Invalid Required Parameter',
-        parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
-        ['deploymentID', 'this.deploymentID'].join(', '),
-        dID,
+        "Missing or Invalid Required Parameter",
+        parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
+        ["deploymentID", "this.deploymentID"].join(", "),
+        dID
       );
     }
     const response = await this.httpRaw<KV.GET.Items>(
       new Context({ deploymentID: dID }),
-      `/deployments/${dID}/kv/namespaces/${namespace}/items`,
+      `/deployments/${dID}/kv/namespaces/${namespace}/items`
     );
 
     const a: KV.GET.ItemsFlattened<T> = new Array(response.length);
@@ -269,10 +269,10 @@ export class Tpy {
       const p = response[i];
       if (!p.value.string) {
         throw new TpyError(
-          'Missing or Unexpected Value in Response',
+          "Missing or Unexpected Value in Response",
           `response[${i}\].value.string is undefined`,
           `response[${i}\].value.string`,
-          response,
+          response
         );
       }
       a[i] = {
@@ -294,10 +294,10 @@ export class Tpy {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
       throw new TpyError(
-        'Missing or Invalid Required Parameter',
-        parametersPrompt('missing', ['deploymentID', 'this.deploymentID']),
-        ['deploymentID', 'this.deploymentID'].join(', '),
-        dID,
+        "Missing or Invalid Required Parameter",
+        parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
+        ["deploymentID", "this.deploymentID"].join(", "),
+        dID
       );
     }
 
@@ -320,13 +320,13 @@ export class Tpy {
   async httpRaw<T, Parse extends boolean = true>(
     ctx: Context,
     resource: `/${string}`,
-    method: HTTPVerbs = 'GET',
+    method: HTTPVerbs = "GET",
     requestInit: RequestInit = {},
-    parse: Parse = true as Parse,
+    parse: Parse = true as Parse
   ): Promise<Parse extends true ? T : void> {
     const response = await fetch(
-      'https://pylon.bot/api' + resource,
-      this.readyRequest(method, requestInit),
+      "https://pylon.bot/api" + resource,
+      this.readyRequest(method, requestInit)
     );
 
     if (response.ok) {
@@ -338,48 +338,48 @@ export class Tpy {
     switch (response.status) {
       case 404: {
         const r = await response.text();
-        if (r.startsWith('\u26A0\uFE0F')) {
+        if (r.startsWith("\u26A0\uFE0F")) {
           throw new TpyError<Response>(
-            'URL Resource Not Found',
+            "URL Resource Not Found",
             responseBody(r),
             response.status.toString(),
-            response,
+            response
           );
         }
 
-        if (r === 'could not find deployment') {
+        if (r === "could not find deployment") {
           if (Context.isNullish(ctx.deploymentID)) {
             throw new TpyError<Context>(
-              'Nullish Context',
+              "Nullish Context",
               ctx.deploymentID,
-              'ctx.deploymentID',
-              ctx,
+              "ctx.deploymentID",
+              ctx
             );
           }
 
           throw new TpyError<Response>(
-            'Deployment Not Found',
+            "Deployment Not Found",
             responseBody(r),
             ctx.deploymentID,
-            response,
+            response
           );
         }
 
-        if (r === 'could not find guild') {
+        if (r === "could not find guild") {
           if (Context.isNullish(ctx.guildID)) {
             throw new TpyError<Context>(
-              'Nullish Context',
+              "Nullish Context",
               ctx.guildID,
-              'ctx.guildID',
-              ctx,
+              "ctx.guildID",
+              ctx
             );
           }
 
           throw new TpyError<Response>(
-            'Guild Not Found',
+            "Guild Not Found",
             responseBody(r),
             ctx.guildID,
-            response,
+            response
           );
         }
         break;
@@ -387,36 +387,36 @@ export class Tpy {
 
       case 401:
         throw new TpyError<Response>(
-          'Unauthorized',
+          "Unauthorized",
           responseHTTP(response.status.toString()),
           response.status.toString(),
-          response,
+          response
         );
 
       case 403:
         throw new TpyError<Response>(
-          'Forbidden',
+          "Forbidden",
           responseHTTP(response.status.toString()),
           response.status.toString(),
-          response,
+          response
         );
 
       case 405:
         throw new TpyError<Response>(
-          'HTTP Method Not Allowed',
+          "HTTP Method Not Allowed",
           responseHTTP(response.status.toString()),
           response.status.toString(),
-          response,
+          response
         );
 
       case 400: {
         const res = await response.json();
-        if ('msg' in res && res['msg'] === 'missing json body') {
+        if ("msg" in res && res["msg"] === "missing json body") {
           throw new TpyError<Response>(
-            'Missing or Invalid JSON in Request Body',
+            "Missing or Invalid JSON in Request Body",
             responseHTTP(response.status.toString()),
-            JSON.stringify(res['msg']),
-            response,
+            JSON.stringify(res["msg"]),
+            response
           );
         }
         break;
@@ -424,20 +424,20 @@ export class Tpy {
 
       case 500:
         throw new TpyError<Response>(
-          'Internal Server Error',
+          "Internal Server Error",
           responseHTTP(response.status.toString()),
           response.status.toString(),
-          response,
+          response
         );
     }
 
     throw new TpyError<Response>(
-      'Unidentifiable Error',
+      "Unidentifiable Error",
       `Response is ok: ${response.ok}`,
       JSON.stringify({
-        'response.ok': response.ok,
+        "response.ok": response.ok,
       }),
-      response,
+      response
     );
   }
 }

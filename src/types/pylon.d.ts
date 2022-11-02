@@ -63,19 +63,22 @@ export namespace KV {
        * The key's value.
        */
       value:
-        & ({
-          /**
-           * The key represented as a string. JSON parsable.
-           */
-          string?: Raw extends true ? string : T;
-          bytes: never;
-        } | {
-          /**
-           * The key represented as bytes. Comes from `TpyKV.putArrayBuffer`.
-           */
-          bytes?: Raw extends true ? string : T;
-          string: never;
-        })
+        & (
+          | {
+            /**
+             * The key represented as a string. JSON parsable.
+             */
+            string?: Raw extends true ? string : T;
+            bytes: never;
+          }
+          | {
+            /**
+             * The key represented as bytes. Comes from `TpyKV.putArrayBuffer`.
+             */
+            bytes?: Raw extends true ? string : T;
+            string: never;
+          }
+        )
         & {
           /**
            * KV pair expiration date/time.
@@ -127,27 +130,29 @@ export namespace KV {
     /**
      * Response schema for `PUT /deployments/:id/kv/namespaces/:namespace/items/:key`.
      */
-    export type Item = {
-      /**
-       * The key represented as a string. JSON parsable.
-       */
-      string: string;
-      bytes: never;
-      /**
-       * KV pair expiration date/time.
-       */
-      expires_at?: number;
-    } | {
-      string: never;
-      /**
-       * The key represented as bytes. Comes from `TpyKV.putArrayBuffer`.
-       */
-      bytes: string;
-      /**
-       * KV pair expiration date/time.
-       */
-      expires_at?: number;
-    };
+    export type Item =
+      | {
+        /**
+         * The key represented as a string. JSON parsable.
+         */
+        string: string;
+        bytes: never;
+        /**
+         * KV pair expiration date/time.
+         */
+        expires_at?: number;
+      }
+      | {
+        string: never;
+        /**
+         * The key represented as bytes. Comes from `TpyKV.putArrayBuffer`.
+         */
+        bytes: string;
+        /**
+         * KV pair expiration date/time.
+         */
+        expires_at?: number;
+      };
   }
 
   /**
@@ -258,7 +263,7 @@ export namespace PylonWebSocket {
       data: [...T];
       /**
        * The method of logging this was caused by. Follows the Console
-       * interface methods supported on the Pylon SDK as of 7/24/2022.
+       * interface methods supported on the Pylon SDK.
        */
       method: ConsoleMethods;
     },
@@ -266,7 +271,7 @@ export namespace PylonWebSocket {
 
   /**
    * The method of logging this was caused by. Follows the Console
-   * interface methods supported on the Pylon SDK as of 7/24/2022.
+   * interface methods supported on the Pylon SDK.
    */
   export type ConsoleMethods = 'error' | 'debug' | 'info' | 'warn' | 'log';
 }
