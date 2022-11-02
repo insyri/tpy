@@ -1,9 +1,3 @@
-import { Tpy } from './tpy.ts';
-import type { StringifiedNumber, Unpacked } from './types/util.d.ts';
-import type { PylonWebSocket } from './types/pylon.d.ts';
-import { EventEmitter } from 'events';
-import { parametersPrompt, TpyError } from './error.ts';
-
 /**
  * {@linkcode TpyWs} is a {@linkcode WebSocket} wrapper that expects this kind of nature
  * to aid and provide easier use.
@@ -15,6 +9,12 @@ import { parametersPrompt, TpyError } from './error.ts';
  *
  * @module
  */
+
+import { Tpy } from './tpy.ts';
+import type { StringifiedNumber, Unpacked } from './types/util.d.ts';
+import type { PylonWebSocket } from './types/pylon.d.ts';
+import { EventEmitter } from 'events';
+import { parametersPrompt, TpyError } from './error.ts';
 
 type messageTypes = typeof TpyWs.prototype.messageTypes[number];
 

@@ -1,7 +1,3 @@
-import type { GuildStructures } from './guild.d.ts';
-import type { GatewayDispatchEvents } from 'discord-api-types/gateway/v8.ts';
-import type { StringifiedNumber } from '../types/util.d.ts';
-
 /**
  * Request and response structures related to the `/deployments` resource.
  *
@@ -9,6 +5,10 @@ import type { StringifiedNumber } from '../types/util.d.ts';
  *
  * @module
  */
+
+import type { GuildStructures } from './guild.d.ts';
+import type { GatewayDispatchEvents } from 'discord-api-types/gateway/v8.ts';
+import type { StringifiedNumber } from '../types/util.d.ts';
 
 /**
  * Not an API resource, this namespace behaves as a set of templates and other

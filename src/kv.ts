@@ -1,15 +1,17 @@
-import { Tpy } from './tpy.ts';
-import type { StringifiedNumber } from './types/util.d.ts';
-import type { Json, KV } from './types/pylon.d.ts';
-import { parametersPrompt, TpyError } from './error.ts';
-import { Context } from './context.ts';
-
 /**
+ * The Pylon KVNamespace API client.
+ *
  * Pylon uses an internal Key-Value persistence that can
  * be used via the {@linkcode https://pylon.bot/docs/reference/classes/pylon.kvnamespace.html Pylon KVNamespace SDK}.
  *
  * @module
  */
+
+import { Tpy } from './tpy.ts';
+import type { StringifiedNumber } from './types/util.d.ts';
+import type { Json, KV } from './types/pylon.d.ts';
+import { parametersPrompt, TpyError } from './error.ts';
+import { Context } from './context.ts';
 
 /**
  * A KVNamespace interface that (almost) matches the Pylon KVNamespace SDK class.

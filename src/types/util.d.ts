@@ -1,4 +1,8 @@
 /**
+ * Utility types.
+ */
+
+/**
  * A string containing numerical values.
  */
 export type StringifiedNumber = `${number | bigint}`;

@@ -1,6 +1,7 @@
 {
   "imports": {
     "discord-api-types/": "https://deno.land/x/discord_api_types@0.33.0/",
-    "events": "https://deno.land/std@0.148.0/node/events.ts"
+    "events": "https://deno.land/std@0.148.0/node/events.ts",
+    "node-fetch": "https://raw.githubusercontent.com/denoland/deno/v1.26/ext/fetch/lib.deno_fetch.d.ts"
   }
 }

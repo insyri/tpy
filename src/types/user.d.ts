@@ -1,6 +1,3 @@
-import type { StringifiedNumber, Unpacked } from './util.d.ts';
-import type { GuildStructures } from './guild.d.ts';
-
 /**
  * Request and response structures related to the `/user` resource.
  *
@@ -8,6 +5,9 @@ import type { GuildStructures } from './guild.d.ts';
  *
  * @module
  */
+
+import type { StringifiedNumber, Unpacked } from './util.d.ts';
+import type { GuildStructures } from './guild.d.ts';
 
 /**
  * Schemas for `GET /user`.

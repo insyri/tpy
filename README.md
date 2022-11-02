@@ -39,7 +39,7 @@ download the type dependencies locally.
 #### Get the token's matching user.
 
 ```ts
-const client = new Tpy('PYLON_TOKEN');
+const client = new Tpy({ token: 'PYLON_TOKEN' });
 const { displayName, id } = await client.getUser();
 
 console.log(`Logged in as ${displayName} (<@${id}>).`);
@@ -48,7 +48,7 @@ console.log(`Logged in as ${displayName} (<@${id}>).`);
 #### Listen to a deployment's console output.
 
 ```ts
-const client = new Tpy('PYLON_TOKEN');
+const client = new Tpy({ token: 'PYLON_TOKEN' });
 const ws = client.connectSocket(
   await client.getDeploymentIDfromGuild('GUILD_ID')),
 );
@@ -84,7 +84,7 @@ discord.on('MESSAGE_CREATE', async (message) => {
 #### Get a guild's statistics.
 
 ```ts
-const client = new Tpy('PYLON_TOKEN');
+const client = new Tpy({ token: 'PYLON_TOKEN' });
 const guildStats = await client.getGuildStats('GUILD_ID');
 const mostRecent = guildStats.find((e) =>
   e.date === Math.min(...guildStats.map((e) => e.date))
@@ -100,10 +100,11 @@ console.log(
 #### Get a deployment's listening events and cron tasks.
 
 ```ts
-const client = new Tpy('PYLON_TOKEN');
-const { config } = await client.getDeployment(
-  await client.getDeploymentIDfromGuild('GUILD_ID'),
-);
+const client = new Tpy({
+  token: 'PYLON_TOKEN',
+  deploymentID: 'DEPLOYMENT_ID',
+});
+const { config } = await client.getDeployment();
 const { cronTasks } = config.tasks;
 const { events } = config;
 const cronTasksFormatted = cronTasks.map(({ cronString, name }) =>
@@ -120,7 +121,7 @@ console.log(
 #### Get the keys in a KV namespace.
 
 ```ts
-const client = new Tpy('PYLON_TOKEN');
+const client = new Tpy({ token: 'PYLON_TOKEN' });
 const kvnamespace = 'tags';
 const kv = client.KV(
   kvnamespace,
@@ -139,7 +140,7 @@ console.log(
 #### Get and modify values within a KV namespace.
 
 ```ts
-const client = new Tpy('PYLON_TOKEN');
+const client = new Tpy({ token: 'PYLON_TOKEN' });
 const kvnamespace = 'NAMESPACE';
 const kv = client.KV(
   kvnamespace,
@@ -161,7 +162,7 @@ console.log(`Value of key "${key}":`, await kv.get(key));
 
 If you'd like to contribute, please read the
 [contributing guide](.github/CONTRIBUTING.md) before you start working. You can
-start a pre-setup remote workspace immediately by opening the project in GitPod.
+start a pre-setup remote workspace immediately by opening the project in Gitpod.
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/insyri/tpy)
 

@@ -1,8 +1,10 @@
 /**
  * Tpy's library specific error interface, provides more specific
  * and helpful messages along with direct context with what caused
- * the error. It is made to be disected and verifiable, as it only
- * comes with set possible outcomes derived from {@linkcode TpyErrors}.
+ * the error.
+ *
+ * It is made to be disected and verifiable, as it only comes with
+ * set possible outcomes derived from {@linkcode TpyErrors}.
  *
  * ### Example Error
  *
@@ -17,7 +19,7 @@
  * }
  * ```
  *
- * *Type casting `e` implied `e` will only ever return a `TpyError`.
+ * *Type casting `e` implies `e` will only ever return a `TpyError`.
  * `TpyError` does not catch all errors, it should catch most errors
  * regarding the request, though.*
  *
@@ -178,7 +180,7 @@ function couldNotBeFound(sub: string, s: string) {
 // General util template functions
 
 /**
- * Clarifies that the parameter `s` is the response body.
+ * Clarifies that the string is the response body.
  * @param s The response body information as a string.
  */
 export function responseBody(s: string) {
@@ -201,7 +203,7 @@ export function parametersPrompt(
 }
 
 /**
- * Clarifies that the parameter `s` is the HTTP response code.
+ * Clarifies that the string is the HTTP response code.
  * @param s The HTTP response code information as a string.
  */
 export function responseHTTP(s: string) {

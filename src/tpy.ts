@@ -1,3 +1,9 @@
+/**
+ * The main component of Tpy.
+ *
+ * @module
+ */
+
 import {
   parametersPrompt,
   responseBody,
@@ -32,7 +38,10 @@ export class Tpy {
      */
     deploymentID?: StringifiedNumber;
     /**
-     * Whether Tpy uses the `node-fetch` polyfill or not. Specific to Node.js runtimes.
+     * Whether Tpy uses `node-fetch` or not. Ignored on non-Node.js runtimes.
+     * Default: `true`.
+     *
+     * Node.js runtimes are identified with the `process` property inside the `globalThis`.
      */
     useNodeFetch?: boolean;
     /**
@@ -40,7 +49,10 @@ export class Tpy {
      */
     token: string;
   }) {
-    const { token, deploymentID, useNodeFetch } = options;
+    let { token, deploymentID, useNodeFetch } = options;
+    if (useNodeFetch === undefined) {
+      useNodeFetch = true;
+    }
 
     if (!token) {
       throw new TpyError(
@@ -52,13 +64,12 @@ export class Tpy {
     }
     this.token = token;
     if (deploymentID) this.deploymentID = deploymentID;
+    // If this is Node.js
     if ('process' in globalThis && useNodeFetch) {
-      // deno-lint-ignore no-explicit-any
-      const fetch = (...args: any[]) =>
-        import('node-fetch').then(({ default: fetch }) =>
-          fetch(args[0], args[1])
-        );
-      Object.defineProperty(globalThis, 'fetch', fetch);
+      const fetch = (
+        ...args: Parameters<typeof import('node-fetch')['default']>
+      ) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+      (<unknown> globalThis.fetch) = fetch;
     }
   }
 

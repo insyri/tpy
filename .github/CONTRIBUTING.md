@@ -10,7 +10,7 @@ appropriate issue.
 ## Setup
 
 You can start a pre-setup remote workspace immediately by opening the project in
-GitPod, dismissing this step entirely.
+Gitpod, dismissing this step entirely.
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/insyri/tpy)
 

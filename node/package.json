@@ -1,6 +1,6 @@
 {
   "name": "tpy",
-  "version": "v1.0.0-pre-release-8",
+  "version": "v1.0.0-pre-release-9",
   "description": "🔑 A strongly typed Pylon API client.",
   "author": "insyri",
   "license": "MIT",
@@ -8,7 +8,7 @@
   "main": "lib/mod.js",
   "types": "lib/mod.d.ts",
   "engines": {
-    "node": ">=12.20"
+    "node": ">=16.14.2"
   },
   "files": [
     "lib",

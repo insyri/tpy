@@ -1,8 +1,3 @@
-import { RESTPostAPIGuildsJSONBody } from 'discord-api-types/rest/v8/guild.ts';
-import { APIUnavailableGuild } from 'discord-api-types/payloads/v8/guild.ts';
-import { StringifiedNumber } from './util.d.ts';
-import { DeploymentStructures } from './deployment.d.ts';
-
 /**
  * Request and response structures related to the `/guilds` resource.
  *
@@ -10,6 +5,11 @@ import { DeploymentStructures } from './deployment.d.ts';
  *
  * @module
  */
+
+import { RESTPostAPIGuildsJSONBody } from 'discord-api-types/rest/v8/guild.ts';
+import { APIUnavailableGuild } from 'discord-api-types/payloads/v8/guild.ts';
+import { StringifiedNumber } from './util.d.ts';
+import { DeploymentStructures } from './deployment.d.ts';
 
 /**
  * Not an API resource, this namespace behaves as a set of templates and other

@@ -5,14 +5,19 @@
  * defining the Pylon token and optionally a global deployment ID.
  *
  * ```ts
- * const client = new Tpy('PYLON_TOKEN', 'DEPLOYMENT_ID');
+ * const client = new Tpy({
+ *   token: 'PYLON_TOKEN',
+ *   deploymentID: 'DEPLOYMENT_ID'
+ * });
  * client.KV('NAMESPACE');
  * client.getDeployment();
  * client.publishDeployment({} as Deployment.POST.Request<false>);
  *
  * // or
  *
- * const client2 = new Tpy('PYLON_TOKEN');
+ * const client2 = new Tpy({
+ *   token: 'PYLON_TOKEN',
+ * });
  * client2.KV('NAMESPACE', 'DEPLOYMENT_ID');
  * client2.getDeployment('DEPLOYMENT_ID');
  * client2.publishDeployment(
@@ -34,14 +39,15 @@
  *
  * Node.js v18 has a native browser-like fetch interface. Versions
  * below are normally using [`node-fetch`](https://github.com/node-fetch/node-fetch)
- * to circumvent this issue.
- *
- * For environments using Node v18 and earlier, Tpy uses the native
- * fetch without requiring the package. Environments containing earlier
- * versions of Node will require the package.
+ * to circumvent this issue. Users can specify the usage of this by simply using the
+ * `useNodeFetch` parameter when instantiating Tpy. Verify the package is downloaded.
  *
  * @module
  */
+
+// Used for docs.
+// deno-lint-ignore no-unused-vars
+import { type Tpy } from './src/tpy.ts';
 
 export { Tpy as default } from './src/tpy.ts';
 export { TpyWs } from './src/ws.ts';
