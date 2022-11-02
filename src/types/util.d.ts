@@ -1,6 +1,6 @@
 /**
  * Utility types.
- * 
+ *
  * @module
  */
 
