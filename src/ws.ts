@@ -1,7 +1,7 @@
 /**
- * {@linkcode TpyWs} is a {@linkcode WebSocket} wrapper that expects this kind of nature
- * to aid and provide easier use.
- *
+ * An {@linkcode EventEmitter} forwarder that keeps an emitter alive while a {@linkcode WebSocket}
+ * reconnects. Listens to a deployment's console output.
+ * 
  * Pylon uses {@linkcode WebSocket}s to listen to a deployment's console out/err.
  * While this idea is simple enough, the host closes the socket on an interval
  * ({@linkcode https://discord.com/channels/530557949098065930/696860766665703515/983184117040562246 by design}),
@@ -19,8 +19,12 @@ import { parametersPrompt, TpyError } from './error.ts';
 type messageTypes = typeof TpyWs.prototype.messageTypes[number];
 
 /**
- * This class forwards {@linkcode WebSocket} recieving events to create a persistant
- * stream to keep listeners active with automatic reconnection (with customizable timeouts).
+ * An {@linkcode EventEmitter} forwarder that keeps an emitter alive while a {@linkcode WebSocket}
+ * reconnects. Listens to a deployment's console output.
+ * 
+ * This class creates a parent emitter over a child {@linkcode WebSocket} emitter, forwarding events and
+ * persists when the child emitter terminates, maintaining active listeners and allowing reconnection
+ * with customizable timeouts.
  */
 export class TpyWs {
   readonly messageTypes = ['message', 'open', 'close', 'error'] as const;

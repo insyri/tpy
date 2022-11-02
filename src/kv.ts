@@ -1,5 +1,5 @@
 /**
- * The Pylon KVNamespace API client.
+ * An API client specific to Pylon KV namespace operations. Nearly matches the SDK interface.
  *
  * Pylon uses an internal Key-Value persistence that can
  * be used via the {@linkcode https://pylon.bot/docs/reference/classes/pylon.kvnamespace.html Pylon KVNamespace SDK}.
