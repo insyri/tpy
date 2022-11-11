@@ -6,10 +6,9 @@
  * @module
  */
 
-import { RESTPostAPIGuildsJSONBody } from 'discord-api-types/rest/v8/guild.ts';
-import { APIUnavailableGuild } from 'discord-api-types/payloads/v8/guild.ts';
-import { StringifiedNumber } from './util.d.ts';
-import { DeploymentStructures } from './deployment.d.ts';
+import { RESTPostAPIGuildsJSONBody } from "discord-api-types/rest/v8/guild.ts";
+import { APIUnavailableGuild } from "discord-api-types/payloads/v8/guild.ts";
+import { DeploymentStructures } from "./deployment.d.ts";
 
 /**
  * Not an API resource, this namespace behaves as a set of templates and other
@@ -23,7 +22,7 @@ export namespace GuildStructures {
     /**
      * The guild's ID.
      */
-    id: StringifiedNumber;
+    id: string;
     /**
      * The guild's username
      */
@@ -45,34 +44,32 @@ export namespace GET {
    *
    * Returns some guild info (everything the v8 Discord API normally gives you) as well as a list of deployments.
    */
-  export type Guild<Raw extends boolean = true> =
-    & RESTPostAPIGuildsJSONBody
-    & {
-      deployments: Array<
-        DeploymentStructures.Base & {
-          /**
-           * Unused.
-           */
-          last_updated_at: null;
-          /**
-           * Deployment configurations.
-           */
-          config: Raw extends true ? string : DeploymentStructures.Config;
-          /**
-           * A boolean version of {@linkcode Deployment.Structures.DeploymentStatus}.
-           */
-          disabled: boolean;
-        }
-      >;
-      /**
-       * Region of the guild, deprecated because the API uses a deprecated version of the Discord API. (v8)
-       */
-      region: `deprecated`;
-      /**
-       * `true` if the guild is unavailable due to an outage.
-       */
-      unavailable: APIUnavailableGuild['unavailable'];
-    };
+  export type Guild<Raw extends boolean = true> = RESTPostAPIGuildsJSONBody & {
+    deployments: Array<
+      DeploymentStructures.Base & {
+        /**
+         * Unused.
+         */
+        last_updated_at: null;
+        /**
+         * Deployment configurations.
+         */
+        config: Raw extends true ? string : DeploymentStructures.Config;
+        /**
+         * A boolean version of {@linkcode Deployment.Structures.DeploymentStatus}.
+         */
+        disabled: boolean;
+      }
+    >;
+    /**
+     * Region of the guild, deprecated because the API uses a deprecated version of the Discord API. (v8)
+     */
+    region: `deprecated`;
+    /**
+     * `true` if the guild is unavailable due to an outage.
+     */
+    unavailable: APIUnavailableGuild["unavailable"];
+  };
 
   /**
    * Response schema for `GET /guilds/:id/stats`.

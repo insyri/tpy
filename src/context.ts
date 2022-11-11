@@ -59,8 +59,6 @@
  * @module
  */
 
-import { StringifiedNumber } from './types/util.d.ts';
-
 /**
  * Provides parameter context about the current execution environment to provide error reporting
  * data to generate reports that include said information comprised inside the given `Context`.
@@ -76,11 +74,11 @@ export class Context {
   /**
    * A deployment ID.
    */
-  deploymentID: StringifiedNumber;
+  deploymentID: string;
   /**
    * A guild ID.
    */
-  guildID: StringifiedNumber;
+  guildID: string;
   /**
    * A KV namespace title.
    */
@@ -93,11 +91,11 @@ export class Context {
   /**
    * A null context number.
    */
-  static nullNumber: StringifiedNumber = '-1';
+  static nullNumber = "-1";
   /**
    * A null context string.
    */
-  static nullString = '<null string>';
+  static nullString = "<null string>";
 
   /**
    * Whether the given context matches a nullish context value.

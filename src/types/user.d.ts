@@ -6,8 +6,8 @@
  * @module
  */
 
-import type { StringifiedNumber, Unpacked } from './util.d.ts';
-import type { GuildStructures } from './guild.d.ts';
+import type { Unpacked } from "./util.d.ts";
+import type { GuildStructures } from "./guild.d.ts";
 
 /**
  * Schemas for `GET /user`.
@@ -22,7 +22,7 @@ export namespace GET {
     /**
      * The user's Discord ID.
      */
-    id: StringifiedNumber;
+    id: string;
     /**
      * The user's join date of the Pylon Discord Server.
      *

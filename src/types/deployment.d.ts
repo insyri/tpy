@@ -6,9 +6,8 @@
  * @module
  */
 
-import type { GuildStructures } from './guild.d.ts';
-import type { GatewayDispatchEvents } from 'discord-api-types/gateway/v8.ts';
-import type { StringifiedNumber } from '../types/util.d.ts';
+import type { GuildStructures } from "./guild.d.ts";
+import type { GatewayDispatchEvents } from "discord-api-types/gateway/v8.ts";
 
 /**
  * Not an API resource, this namespace behaves as a set of templates and other
@@ -58,27 +57,27 @@ export namespace DeploymentStructures {
     /**
      * The deployment ID.
      */
-    id: StringifiedNumber;
+    id: string;
     /**
      * The displayed project directory.
      */
-    project: Raw extends true ? string : {
-      /**
-       * File contents and path information.
-       */
-      files: Array<
-        {
+    project: Raw extends true
+      ? string
+      : {
           /**
-           * Path to the file in formation of `./*.*`, usually ends in `.ts`: `./*.ts`.
+           * File contents and path information.
            */
-          path: string;
-          /**
-           * File contents.
-           */
-          content: string;
-        }
-      >;
-    };
+          files: Array<{
+            /**
+             * Path to the file in formation of `./*.*`, usually ends in `.ts`: `./*.ts`.
+             */
+            path: string;
+            /**
+             * File contents.
+             */
+            content: string;
+          }>;
+        };
   };
 
   /**
@@ -127,11 +126,11 @@ export namespace DeploymentStructures {
     /**
      * Deployment and script ID.
      */
-    id: StringifiedNumber;
+    id: string;
     /**
      * Bot ID the script exists for. Used in BYOB.
      */
-    bot_id: StringifiedNumber;
+    bot_id: string;
     /**
      * The type of deployment.
      */
@@ -139,7 +138,7 @@ export namespace DeploymentStructures {
     /**
      * The application ID.
      */
-    app_id: StringifiedNumber | null;
+    app_id: string | null;
     /**
      * Name of the script/app.
      */
@@ -207,8 +206,7 @@ export namespace GET {
    * as string of JSON or as actual JSON.
    */
   export type Deployment<Raw extends boolean = true> =
-    & DeploymentStructures.Base
-    & {
+    DeploymentStructures.Base & {
       /**
        * Deployment configurations.
        */
@@ -225,7 +223,7 @@ export namespace GET {
       /**
        * The new deployment script information.
        */
-      script: Omit<DeploymentStructures.Script<Raw>, 'contents'>;
+      script: Omit<DeploymentStructures.Script<Raw>, "contents">;
     };
 }
 
@@ -241,7 +239,7 @@ export namespace POST {
    */
   export type Request<Raw extends boolean = true> = Omit<
     DeploymentStructures.Script<Raw>,
-    'id'
+    "id"
   >;
 
   /**
@@ -253,16 +251,14 @@ export namespace POST {
    * @template T Boolean of whether the file contents are recieved
    * as string of JSON or as actual JSON.
    */
-  export type Response<Raw extends boolean = true> =
-    & GET.Deployment<Raw>
-    & {
-      /**
-       * FastAPI error.
-       */
-      errors: DeploymentStructures.FastAPIError;
-      /**
-       * The new deployment script information.
-       */
-      script?: Omit<DeploymentStructures.Script<Raw>, 'contents'>;
-    };
+  export type Response<Raw extends boolean = true> = GET.Deployment<Raw> & {
+    /**
+     * FastAPI error.
+     */
+    errors: DeploymentStructures.FastAPIError;
+    /**
+     * The new deployment script information.
+     */
+    script?: Omit<DeploymentStructures.Script<Raw>, "contents">;
+  };
 }
