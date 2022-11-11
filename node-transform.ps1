@@ -17,6 +17,7 @@ $DeleteList = "lib", "node_modules", "mod.js", "mod.d.ts"
 $Destination = "node"
 $NodePackageLocation = "$Destination/package.json"
 $ImportRegex = "(?<=(?<=\n|^)(im|ex)port(?:(?!(\.d)?\.ts).|\n)*)(\.d)?\.ts"
+$NodeOnlyRegex = "\/\/ build:node-only "
 
 [string[]]$PresentFiles = @()
 $ItemList + $DeleteList | ForEach-Object {
@@ -32,8 +33,8 @@ If ($PresentFiles.Length -ne 0) {
   $decision = $Host.UI.PromptForChoice(
     "Item(s) in the specified destination location already exists. ($PresentFilesFormated)",
     "Do you want to delete these items and continue?",
-    ('&Yes', '&No'), 1)
-  If (($decision -eq 0) -or ($null -ne $env:CI)) {
+    ('&No', '&Yes'), 1)
+  If (($decision -eq 1) -or ($null -ne $env:CI)) {
     $PresentFiles | Remove-Item -Recurse -Force
   }
   Else {
@@ -60,7 +61,7 @@ If ($Version) {
 # Node Import Syntax Fix
 Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
   $Content = Get-Content $_.FullName -Raw
-  $Content -replace "$ImportRegex", "" > $_.FullName
+  $Content -replace "($ImportRegex|$NodeOnlyRegex)", "" > $_.FullName
 }
 
 # Verification

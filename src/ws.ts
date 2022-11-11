@@ -10,6 +10,12 @@
  * @module
  */
 
+// build:node-only import WebSocket, {
+// build:node-only   type CloseEvent,
+// build:node-only   type Event,
+// build:node-only   type ErrorEvent,
+// build:node-only   type MessageEvent,
+// build:node-only } from "ws";
 import { Tpy } from "./tpy.ts";
 import type { Unpacked } from "./types/util.d.ts";
 import type { PylonWebSocket } from "./types/pylon.d.ts";
@@ -171,8 +177,8 @@ export class TpyWs {
     this.eventEmitter.emit("close", event);
   }
 
-  private onMessage(event: MessageEvent<string>) {
-    this.eventEmitter.emit("message", JSON.parse(event.data)[0]);
+  private onMessage(event: MessageEvent) {
+    this.eventEmitter.emit("message", JSON.parse(String(event.data))[0]);
   }
 
   /**
