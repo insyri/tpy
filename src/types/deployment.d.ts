@@ -6,8 +6,8 @@
  * @module
  */
 
-import type { GuildStructures } from "./guild.d.ts";
-import type { GatewayDispatchEvents } from "discord-api-types/gateway/v8.ts";
+import type { GuildStructures } from './guild.d.ts';
+import type { GatewayDispatchEvents } from 'discord-api-types/gateway/v8.ts';
 
 /**
  * Not an API resource, this namespace behaves as a set of templates and other
@@ -61,23 +61,22 @@ export namespace DeploymentStructures {
     /**
      * The displayed project directory.
      */
-    project: Raw extends true
-      ? string
+    project: Raw extends true ? string
       : {
+        /**
+         * File contents and path information.
+         */
+        files: Array<{
           /**
-           * File contents and path information.
+           * Path to the file in formation of `./*.*`, usually ends in `.ts`: `./*.ts`.
            */
-          files: Array<{
-            /**
-             * Path to the file in formation of `./*.*`, usually ends in `.ts`: `./*.ts`.
-             */
-            path: string;
-            /**
-             * File contents.
-             */
-            content: string;
-          }>;
-        };
+          path: string;
+          /**
+           * File contents.
+           */
+          content: string;
+        }>;
+      };
   };
 
   /**
@@ -206,7 +205,8 @@ export namespace GET {
    * as string of JSON or as actual JSON.
    */
   export type Deployment<Raw extends boolean = true> =
-    DeploymentStructures.Base & {
+    & DeploymentStructures.Base
+    & {
       /**
        * Deployment configurations.
        */
@@ -223,7 +223,7 @@ export namespace GET {
       /**
        * The new deployment script information.
        */
-      script: Omit<DeploymentStructures.Script<Raw>, "contents">;
+      script: Omit<DeploymentStructures.Script<Raw>, 'contents'>;
     };
 }
 
@@ -239,7 +239,7 @@ export namespace POST {
    */
   export type Request<Raw extends boolean = true> = Omit<
     DeploymentStructures.Script<Raw>,
-    "id"
+    'id'
   >;
 
   /**
@@ -259,6 +259,6 @@ export namespace POST {
     /**
      * The new deployment script information.
      */
-    script?: Omit<DeploymentStructures.Script<Raw>, "contents">;
+    script?: Omit<DeploymentStructures.Script<Raw>, 'contents'>;
   };
 }

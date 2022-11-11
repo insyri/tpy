@@ -6,9 +6,9 @@
  * @module
  */
 
-import { RESTPostAPIGuildsJSONBody } from "discord-api-types/rest/v8/guild.ts";
-import { APIUnavailableGuild } from "discord-api-types/payloads/v8/guild.ts";
-import { DeploymentStructures } from "./deployment.d.ts";
+import { RESTPostAPIGuildsJSONBody } from 'discord-api-types/rest/v8/guild.ts';
+import { APIUnavailableGuild } from 'discord-api-types/payloads/v8/guild.ts';
+import { DeploymentStructures } from './deployment.d.ts';
 
 /**
  * Not an API resource, this namespace behaves as a set of templates and other
@@ -68,7 +68,7 @@ export namespace GET {
     /**
      * `true` if the guild is unavailable due to an outage.
      */
-    unavailable: APIUnavailableGuild["unavailable"];
+    unavailable: APIUnavailableGuild['unavailable'];
   };
 
   /**

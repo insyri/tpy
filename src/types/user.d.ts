@@ -6,8 +6,8 @@
  * @module
  */
 
-import type { Unpacked } from "./util.d.ts";
-import type { GuildStructures } from "./guild.d.ts";
+import type { Unpacked } from './util.d.ts';
+import type { GuildStructures } from './guild.d.ts';
 
 /**
  * Schemas for `GET /user`.

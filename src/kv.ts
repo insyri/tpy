@@ -7,10 +7,10 @@
  * @module
  */
 
-import { Tpy } from "./tpy.ts";
-import type { Json, KV } from "./types/pylon.d.ts";
-import { parametersPrompt, TpyError } from "./error.ts";
-import { Context } from "./context.ts";
+import { Tpy } from './tpy.ts';
+import type { Json, KV } from './types/pylon.d.ts';
+import { parametersPrompt, TpyError } from './error.ts';
+import { Context } from './context.ts';
 
 /**
  * A KVNamespace interface that (almost) matches the Pylon KVNamespace SDK class.
@@ -31,21 +31,21 @@ export class TpyKV {
   constructor(tpyInstance: Tpy, deploymentID: string, kvnamespace: string) {
     if (!tpyInstance || !(tpyInstance instanceof Tpy)) {
       throw new TpyError(
-        "Missing or Invalid Required Parameter",
+        'Missing or Invalid Required Parameter',
         parametersPrompt(
-          !tpyInstance ? "missing" : "incompatible",
-          "tpyInstance"
+          !tpyInstance ? 'missing' : 'incompatible',
+          'tpyInstance',
         ),
-        "tpyInstance",
-        tpyInstance
+        'tpyInstance',
+        tpyInstance,
       );
     }
     if (!deploymentID) {
       throw new TpyError(
-        "Missing or Invalid Required Parameter",
-        parametersPrompt("missing", "deploymentID"),
-        "deploymentID",
-        deploymentID
+        'Missing or Invalid Required Parameter',
+        parametersPrompt('missing', 'deploymentID'),
+        'deploymentID',
+        deploymentID,
       );
     }
     this.tpyc = tpyInstance;
@@ -66,13 +66,13 @@ export class TpyKV {
     await this.tpyc.httpRaw(
       new Context({ deploymentID }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
-      "PUT",
+      'PUT',
       {
         body: JSON.stringify({
-          string: typeof value === "string" ? `"${value}"` : value,
+          string: typeof value === 'string' ? `"${value}"` : value,
         }),
       },
-      false
+      false,
     );
   }
 
@@ -85,7 +85,7 @@ export class TpyKV {
   async putArrayBuffer(
     key: string,
     value: ArrayBuffer,
-    options?: KV.OperationOptions.Put
+    options?: KV.OperationOptions.Put,
   ) {
     if (options?.ifNotExists && (await this.get(key))) return;
 
@@ -93,9 +93,9 @@ export class TpyKV {
     await this.tpyc.httpRaw(
       new Context({ deploymentID, kvnamespace }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
-      "PUT",
+      'PUT',
       { body: JSON.stringify({ bytes: value }) },
-      false
+      false,
     );
   }
 
@@ -109,7 +109,7 @@ export class TpyKV {
     const { deploymentID, kvnamespace } = this;
     const response = await this.tpyc.httpRaw<KV.GET.Items<T>>(
       new Context({ deploymentID, kvnamespace }),
-      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
     let item: T | undefined;
     for (let i = 0; i < response.length; i++) {
@@ -117,13 +117,13 @@ export class TpyKV {
       if (p.key !== key) continue;
       if (!p.value.string) {
         throw new TpyError(
-          "Missing or Unexpected Value in Response",
+          'Missing or Unexpected Value in Response',
           `response[${i}].value.string is undefined`,
           `response[${i}].value.string`,
-          response
+          response,
         );
       }
-      item = ["'", '"', "`"].includes(p.value.string[0])
+      item = ['\'', '"', '`'].includes(p.value.string[0])
         ? JSON.parse(p.value.string)
         : p.value.string;
       break;
@@ -140,7 +140,7 @@ export class TpyKV {
     const { deploymentID, kvnamespace } = this;
     const response = await this.tpyc.httpRaw<KV.GET.Items>(
       new Context({ deploymentID, kvnamespace }),
-      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
     let item: ArrayBuffer | undefined;
     for (const p of response) {
@@ -161,7 +161,7 @@ export class TpyKV {
     const { deploymentID, kvnamespace } = this;
     let response = await this.tpyc.httpRaw<KV.GET.Items>(
       new Context({ deploymentID, kvnamespace }),
-      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
 
     if (options?.limit) response = response.slice(0, options.limit);
@@ -169,7 +169,7 @@ export class TpyKV {
     if (options?.from) {
       response = response.slice(
         response.findIndex((i) => i.key === options.from) + 1,
-        response.length
+        response.length,
       );
     }
 
@@ -185,18 +185,18 @@ export class TpyKV {
    * @template T The type of the key's value.
    */
   async items<T>(
-    options?: KV.OperationOptions.Items
+    options?: KV.OperationOptions.Items,
   ): Promise<KV.GET.ItemsFlattened<T>> {
     const { deploymentID, kvnamespace } = this;
     let response = await this.tpyc.httpRaw<KV.GET.Items>(
       new Context({ deploymentID, kvnamespace }),
-      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
 
     if (options?.from) {
       response = response.slice(
         response.findIndex((i) => i.key === options.from) + 1,
-        response.length
+        response.length,
       );
     }
 
@@ -210,12 +210,12 @@ export class TpyKV {
         : i.value.bytes;
       if (!j) {
         throw new TpyError(
-          "Missing or Unexpected Value in Response",
+          'Missing or Unexpected Value in Response',
           `response[${i}].value.string and/or response[${i}].value.bytes are undefined`,
           [`response[${i}].value.string`, `response[${i}].value.bytes`].join(
-            ", "
+            ', ',
           ),
-          response
+          response,
         );
       }
       return {
@@ -235,7 +235,7 @@ export class TpyKV {
       (
         await this.tpyc.httpRaw<KV.GET.Namespace>(
           new Context({ deploymentID, kvnamespace }),
-          `/deployments/${deploymentID}/kv/namespaces`
+          `/deployments/${deploymentID}/kv/namespaces`,
         )
       ).find((n) => n.namespace == kvnamespace)?.count || 0
     );
@@ -255,7 +255,7 @@ export class TpyKV {
       await this.tpyc.httpRaw<KV.DELETE.Namespace>(
         new Context({ deploymentID, kvnamespace }),
         `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}`,
-        "DELETE"
+        'DELETE',
       )
     ).keys_deleted;
   }
@@ -274,9 +274,9 @@ export class TpyKV {
       await this.tpyc.httpRaw(
         new Context({ deploymentID, kvnamespace }),
         `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
-        "DELETE",
+        'DELETE',
         {},
-        false
+        false,
       );
 
     if (!options?.prevValue) await del();
