@@ -212,8 +212,17 @@ export class Tpy {
    * @param deploymentID The deployment ID to follow the WebSocket when it disconnects. If empty, the function
    * will use the set {@linkcode Tpy.deploymentID} in the class.
    */
-  connectSocket(deploymentID: string) {
-    return new TpyWs(this, deploymentID);
+  connectSocket(deploymentID?: string) {
+    const dID = deploymentID || this.deploymentID;
+    if (!dID) {
+      throw new TpyError(
+        "Missing or Invalid Required Parameter",
+        parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
+        ["deploymentID", "this.deploymentID"].join(", "),
+        dID
+      );
+    }
+    return new TpyWs(this, dID);
   }
 
   /**
