@@ -326,33 +326,36 @@ export class Tpy {
    *
    * @throws {TpyError<Response | Context>}
    */
-  async httpRaw<T, Parse extends boolean = true>(
+  async httpRaw<T>(
     ctx: Context,
-    resource: `/${string}`,
+    resource: string,
     cases: Array<{
       /**
        * Determines if case is applicable; number for HTTP status code, or
        * a function that takes the response object and returns the validity.
+       *
+       * @param r The {@linkcode Response} object
        */
-      case: number | ((r: Response) => Promise<boolean> | boolean);
+      case: number | ((r: Response, b: string) => Promise<boolean> | boolean);
       /**
        * Function to run if `case` matches the response's HTTP status code or is true.
        */
       fn: () => void;
     }> = [],
     method: HTTPVerbs = "GET",
-    requestInit: RequestInit = {},
-    parse: Parse = true as Parse
-  ): Promise<Parse extends true ? T : void> {
+    requestInit: RequestInit = {}
+  ): Promise<T> {
     const response = await fetch(
       "https://pylon.bot/api" + resource,
       this.readyRequest(method, requestInit)
     );
 
+    const body = await response.text();
+
     if (cases.length)
       for (const i of cases) {
         let rv = false;
-        if (typeof i.case === "function") rv = await i.case(response);
+        if (typeof i.case === "function") rv = await i.case(response, body);
         else rv = i.case === response.status;
 
         if (rv) {
@@ -362,24 +365,27 @@ export class Tpy {
       }
 
     if (response.ok) {
-      return parse
-        ? ((await response.json()) as Parse extends true ? T : void)
-        : (undefined as Parse extends true ? T : void);
+      let r;
+      try {
+        r = JSON.parse(body);
+      } catch {
+        r = body;
+      }
+      return r;
     }
 
     switch (response.status) {
       case 404: {
-        const r = await response.text();
-        if (r.startsWith("\u26A0\uFE0F")) {
+        if (body.startsWith("\u26A0\uFE0F")) {
           throw new TpyError<Response>(
             "URL Resource Not Found",
-            responseBody(r),
+            responseBody(body),
             response.status.toString(),
             response
           );
         }
 
-        if (r === "could not find deployment") {
+        if (body === "could not find deployment") {
           if (Context.isNullish(ctx.deploymentID)) {
             throw new TpyError<Context>(
               "Nullish Context",
@@ -391,13 +397,13 @@ export class Tpy {
 
           throw new TpyError<Response>(
             "Deployment Not Found",
-            responseBody(r),
+            responseBody(body),
             ctx.deploymentID,
             response
           );
         }
 
-        if (r === "could not find guild") {
+        if (body === "could not find guild") {
           if (Context.isNullish(ctx.guildID)) {
             throw new TpyError<Context>(
               "Nullish Context",
@@ -409,7 +415,7 @@ export class Tpy {
 
           throw new TpyError<Response>(
             "Guild Not Found",
-            responseBody(r),
+            responseBody(body),
             ctx.guildID,
             response
           );
@@ -442,7 +448,7 @@ export class Tpy {
         );
 
       case 400: {
-        const res = await response.json();
+        const res = JSON.parse(body);
         if ("msg" in res && res["msg"] === "missing json body") {
           throw new TpyError<Response>(
             "Missing or Invalid JSON in Request Body",
