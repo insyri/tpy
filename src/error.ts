@@ -55,7 +55,7 @@ export interface ITpyErrorsProperty {
  * @template T The type of {@linkcode rawInfo}.
  */
 export class TpyError<T> extends Error
-  implements Omit<ITpyErrorsProperty, 'message'> {
+  implements Omit<ITpyErrorsProperty, "message"> {
   /**
    * A short description of the Tpy error.
    */
@@ -109,61 +109,61 @@ export class TpyError<T> extends Error
  * defintion with specific context information.
  */
 export const TpyErrors = {
-  'Internal Server Error': {
+  "Internal Server Error": {
     message: (s: string) => serverRespondedWith(s),
     description:
       `Sometimes thrown when a request's authorization header is invalid.`,
   },
-  'Missing or Unexpected Value in Response': {
+  "Missing or Unexpected Value in Response": {
     message: (s: string) => `Response structure validation failed: ${s}.`,
-    description: 'Response structure is incomplete or has unexpected behavior.',
+    description: "Response structure is incomplete or has unexpected behavior.",
   },
-  'Missing or Invalid JSON in Request Body': {
+  "Missing or Invalid JSON in Request Body": {
     message: (s: string) =>
       `With given field(s) ${s} were unsatisfactory; contains invalid JSON.`,
     description:
       `The fetch contents sent were did not have the required JSON body.`,
   },
-  'Guild Not Found': {
-    message: (s: string) => couldNotBeFound('Guild ID', s),
+  "Guild Not Found": {
+    message: (s: string) => couldNotBeFound("Guild ID", s),
     description: `The guild specified was not found.`,
   },
-  'Deployment Not Found': {
-    message: (s: string) => couldNotBeFound('Deployment ID', s),
+  "Deployment Not Found": {
+    message: (s: string) => couldNotBeFound("Deployment ID", s),
     description: `The deployment specified was not found.`,
   },
-  'HTTP Method Not Allowed': {
+  "HTTP Method Not Allowed": {
     message: (s: string) => serverRespondedWith(s),
-    description: 'The HTTP method is not allowed.',
+    description: "The HTTP method is not allowed.",
   },
-  'Unidentifiable Error': {
+  "Unidentifiable Error": {
     message: (s: string) =>
       `Unidentifiable error caught, deterministic via fields: ${s}`,
     description:
-      'The error was unidentifiable, see details with `<TpyError>.rawInfo`.',
+      "The error was unidentifiable, see details with `<TpyError>.rawInfo`.",
   },
-  'URL Resource Not Found': {
+  "URL Resource Not Found": {
     message: (s: string) => serverRespondedWith(s),
-    description: 'The URL resource on the web server was not found.',
+    description: "The URL resource on the web server was not found.",
   },
   Unauthorized: {
     message: (s: string) => serverRespondedWith(s),
-    description: 'Required credentials were missing from the request.',
+    description: "Required credentials were missing from the request.",
   },
   Forbidden: {
     message: (s: string) => serverRespondedWith(s),
     description:
-      'Access to the resource is denied despite included credentials.',
+      "Access to the resource is denied despite included credentials.",
   },
-  'Missing or Invalid Required Parameter': {
+  "Missing or Invalid Required Parameter": {
     message: (s: string) =>
       `Required parameter(s) ${s} were missing or invalid.`,
-    description: 'Required parameter(s) were missing or invalid.',
+    description: "Required parameter(s) were missing or invalid.",
   },
-  'Nullish Context': {
+  "Nullish Context": {
     message: (s: string) =>
       `Context parameter ${s} is nullish, where access is necessary.`,
-    description: 'A context parameter was missing where it was needed.',
+    description: "A context parameter was missing where it was needed.",
   },
 };
 
@@ -194,11 +194,11 @@ export function responseBody(s: string) {
  * @param params The parameter(s) in this context.
  */
 export function parametersPrompt(
-  issue: 'missing' | 'incompatible',
+  issue: "missing" | "incompatible",
   params: string | string[],
 ) {
   return `Parameter(s) are ${issue}: ${
-    Array.isArray(params) ? params.join(', ') : params
+    Array.isArray(params) ? params.join(", ") : params
   }`;
 }
 

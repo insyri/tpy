@@ -60,17 +60,17 @@
 
 // Used for docs.
 // deno-lint-ignore no-unused-vars
-import { type Tpy } from './src/tpy.ts';
+import { type Tpy } from "./src/tpy.ts";
 
-export { Tpy as default } from './src/tpy.ts';
-export { TpyWs } from './src/ws.ts';
-export { TpyKV } from './src/kv.ts';
-export { TpyError, TpyErrors } from './src/error.ts';
-export { Context } from './src/context.ts';
+export { Tpy as default } from "./src/tpy.ts";
+export { TpyWs } from "./src/ws.ts";
+export { TpyKV } from "./src/kv.ts";
+export { TpyError, TpyErrors } from "./src/error.ts";
+export { Context } from "./src/context.ts";
 
-import type * as Guild from './src/types/guild.d.ts';
-import type * as Deployment from './src/types/deployment.d.ts';
-import type * as User from './src/types/user.d.ts';
-import type * as Pylon from './src/types/pylon.d.ts';
+import type * as Guild from "./src/types/guild.d.ts";
+import type * as Deployment from "./src/types/deployment.d.ts";
+import type * as User from "./src/types/user.d.ts";
+import type * as Pylon from "./src/types/pylon.d.ts";
 
 export type { Deployment, Guild, Pylon, User };

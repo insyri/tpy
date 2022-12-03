@@ -6,8 +6,8 @@
  * @module
  */
 
-import type { GuildStructures } from './guild.d.ts';
-import type { GatewayDispatchEvents } from 'discord-api-types/gateway/v8.ts';
+import type { GuildStructures } from "./guild.d.ts";
+import type { GatewayDispatchEvents } from "discord-api-types/gateway/v8.ts";
 
 /**
  * Not an API resource, this namespace behaves as a set of templates and other
@@ -223,7 +223,7 @@ export namespace GET {
       /**
        * The new deployment script information.
        */
-      script: Omit<DeploymentStructures.Script<Raw>, 'contents'>;
+      script: Omit<DeploymentStructures.Script<Raw>, "contents">;
     };
 }
 
@@ -239,7 +239,7 @@ export namespace POST {
    */
   export type Request<Raw extends boolean = true> = Omit<
     DeploymentStructures.Script<Raw>,
-    'id'
+    "id"
   >;
 
   /**
@@ -259,6 +259,6 @@ export namespace POST {
     /**
      * The new deployment script information.
      */
-    script?: Omit<DeploymentStructures.Script<Raw>, 'contents'>;
+    script?: Omit<DeploymentStructures.Script<Raw>, "contents">;
   };
 }

@@ -7,10 +7,10 @@
  * @module
  */
 
-import { Tpy } from './tpy.ts';
-import type { Json, KV } from './types/pylon.d.ts';
-import { parametersPrompt, TpyError } from './error.ts';
-import { Context } from './context.ts';
+import { Tpy } from "./tpy.ts";
+import type { Json, KV } from "./types/pylon.d.ts";
+import { parametersPrompt, TpyError } from "./error.ts";
+import { Context } from "./context.ts";
 
 /**
  * A KVNamespace interface that (almost) matches the Pylon KVNamespace SDK class.
@@ -31,20 +31,20 @@ export class TpyKV {
   constructor(tpyInstance: Tpy, deploymentID: string, kvnamespace: string) {
     if (!tpyInstance || !(tpyInstance instanceof Tpy)) {
       throw new TpyError(
-        'Missing or Invalid Required Parameter',
+        "Missing or Invalid Required Parameter",
         parametersPrompt(
-          !tpyInstance ? 'missing' : 'incompatible',
-          'tpyInstance',
+          !tpyInstance ? "missing" : "incompatible",
+          "tpyInstance",
         ),
-        'tpyInstance',
+        "tpyInstance",
         tpyInstance,
       );
     }
     if (!deploymentID) {
       throw new TpyError(
-        'Missing or Invalid Required Parameter',
-        parametersPrompt('missing', 'deploymentID'),
-        'deploymentID',
+        "Missing or Invalid Required Parameter",
+        parametersPrompt("missing", "deploymentID"),
+        "deploymentID",
         deploymentID,
       );
     }
@@ -66,10 +66,10 @@ export class TpyKV {
     await this.tpyc.httpRaw(
       new Context({ deploymentID }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
-      'PUT',
+      "PUT",
       {
         body: JSON.stringify({
-          string: typeof value === 'string' ? `"${value}"` : value,
+          string: typeof value === "string" ? `"${value}"` : value,
         }),
       },
       false,
@@ -93,7 +93,7 @@ export class TpyKV {
     await this.tpyc.httpRaw(
       new Context({ deploymentID, kvnamespace }),
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
-      'PUT',
+      "PUT",
       { body: JSON.stringify({ bytes: value }) },
       false,
     );
@@ -117,13 +117,13 @@ export class TpyKV {
       if (p.key !== key) continue;
       if (!p.value.string) {
         throw new TpyError(
-          'Missing or Unexpected Value in Response',
+          "Missing or Unexpected Value in Response",
           `response[${i}].value.string is undefined`,
           `response[${i}].value.string`,
           response,
         );
       }
-      item = ['\'', '"', '`'].includes(p.value.string[0])
+      item = ["'", '"', "`"].includes(p.value.string[0])
         ? JSON.parse(p.value.string)
         : p.value.string;
       break;
@@ -210,10 +210,10 @@ export class TpyKV {
         : i.value.bytes;
       if (!j) {
         throw new TpyError(
-          'Missing or Unexpected Value in Response',
+          "Missing or Unexpected Value in Response",
           `response[${i}].value.string and/or response[${i}].value.bytes are undefined`,
           [`response[${i}].value.string`, `response[${i}].value.bytes`].join(
-            ', ',
+            ", ",
           ),
           response,
         );
@@ -255,7 +255,7 @@ export class TpyKV {
       await this.tpyc.httpRaw<KV.DELETE.Namespace>(
         new Context({ deploymentID, kvnamespace }),
         `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}`,
-        'DELETE',
+        "DELETE",
       )
     ).keys_deleted;
   }
@@ -274,7 +274,7 @@ export class TpyKV {
       await this.tpyc.httpRaw(
         new Context({ deploymentID, kvnamespace }),
         `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
-        'DELETE',
+        "DELETE",
         {},
         false,
       );

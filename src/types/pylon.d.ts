@@ -11,7 +11,7 @@
 /**
  * HTTP Verbs supported by the Pylon API.
  */
-export type HTTPVerbs = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type HTTPVerbs = "GET" | "POST" | "PUT" | "DELETE";
 
 /**
  * Types parsable by ES5's `JSON.parse` function.
@@ -273,5 +273,5 @@ export namespace PylonWebSocket {
    * The method of logging this was caused by. Follows the Console
    * interface methods supported on the Pylon SDK.
    */
-  export type ConsoleMethods = 'error' | 'debug' | 'info' | 'warn' | 'log';
+  export type ConsoleMethods = "error" | "debug" | "info" | "warn" | "log";
 }

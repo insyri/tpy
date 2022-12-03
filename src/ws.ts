@@ -16,11 +16,11 @@
 // build:node-only   type ErrorEvent,
 // build:node-only   type MessageEvent,
 // build:node-only } from "ws";
-import { Tpy } from './tpy.ts';
-import type { Unpacked } from './types/util.d.ts';
-import type { PylonWebSocket } from './types/pylon.d.ts';
-import { EventEmitter } from 'events';
-import { parametersPrompt, TpyError } from './error.ts';
+import { Tpy } from "./tpy.ts";
+import type { Unpacked } from "./types/util.d.ts";
+import type { PylonWebSocket } from "./types/pylon.d.ts";
+import { EventEmitter } from "events";
+import { parametersPrompt, TpyError } from "./error.ts";
 
 type messageTypes = typeof TpyWs.prototype.messageTypes[number];
 
@@ -33,7 +33,7 @@ type messageTypes = typeof TpyWs.prototype.messageTypes[number];
  * with customizable timeouts.
  */
 export class TpyWs {
-  readonly messageTypes = ['message', 'open', 'close', 'error'] as const;
+  readonly messageTypes = ["message", "open", "close", "error"] as const;
   private tpyClient: Tpy;
   private deploymentID: string;
   private tryToConnect = true;
@@ -63,20 +63,20 @@ export class TpyWs {
   ) {
     if (!tpyInstance || !(tpyInstance instanceof Tpy)) {
       throw new TpyError(
-        'Missing or Invalid Required Parameter',
+        "Missing or Invalid Required Parameter",
         parametersPrompt(
-          !tpyInstance ? 'missing' : 'incompatible',
-          'tpyInstance',
+          !tpyInstance ? "missing" : "incompatible",
+          "tpyInstance",
         ),
-        'tpyInstance',
+        "tpyInstance",
         tpyInstance,
       );
     }
     if (!deploymentID) {
       throw new TpyError(
-        'Missing or Invalid Required Parameter',
-        parametersPrompt('missing', 'deploymentID'),
-        'deploymentID',
+        "Missing or Invalid Required Parameter",
+        parametersPrompt("missing", "deploymentID"),
+        "deploymentID",
         deploymentID,
       );
     }
@@ -92,7 +92,7 @@ export class TpyWs {
    *
    * @event
    */
-  on(type: 'open', callback: (data: Event) => void): EventEmitter;
+  on(type: "open", callback: (data: Event) => void): EventEmitter;
   /**
    * Adds an event listener to WebSocket events.
    * @param type Fired when the WebSocket is closed.
@@ -100,7 +100,7 @@ export class TpyWs {
    *
    * @event
    */
-  on(type: 'close', callback: (data: CloseEvent) => void): EventEmitter;
+  on(type: "close", callback: (data: CloseEvent) => void): EventEmitter;
   /**
    * Adds an event listener to WebSocket events.
    * @param type Fired when the WebSocket captures an error.
@@ -112,7 +112,7 @@ export class TpyWs {
    *
    * @event
    */
-  on(type: 'error', callback: (data: ErrorEvent | Event) => void): EventEmitter;
+  on(type: "error", callback: (data: ErrorEvent | Event) => void): EventEmitter;
   /**
    * Adds an event listener to WebSocket events.
    * @param type Fired when the WebSocket recieves a message.
@@ -123,15 +123,15 @@ export class TpyWs {
    * @event
    */
   on<T extends unknown[]>(
-    type: 'message',
+    type: "message",
     callback: (data: Unpacked<PylonWebSocket.Response<T>>) => void,
   ): EventEmitter;
   on<T extends unknown[]>(type: messageTypes, callback: unknown) {
-    if (typeof callback != 'function') {
+    if (typeof callback != "function") {
       throw new TpyError(
-        'Missing or Invalid Required Parameter',
-        parametersPrompt('incompatible', 'callback'),
-        'callback',
+        "Missing or Invalid Required Parameter",
+        parametersPrompt("incompatible", "callback"),
+        "callback",
         typeof callback,
       );
     }
@@ -156,12 +156,12 @@ export class TpyWs {
   }
 
   private onOpen(event: Event) {
-    this.eventEmitter.emit('open', event);
+    this.eventEmitter.emit("open", event);
   }
 
   private onError(event: Event | ErrorEvent) {
     if (!this.websocket) return;
-    this.eventEmitter.emit('error', event);
+    this.eventEmitter.emit("error", event);
 
     try {
       this.websocket.close();
@@ -174,11 +174,11 @@ export class TpyWs {
   }
 
   private onClose(event: CloseEvent) {
-    this.eventEmitter.emit('close', event);
+    this.eventEmitter.emit("close", event);
   }
 
   private onMessage(event: MessageEvent) {
-    this.eventEmitter.emit('message', JSON.parse(String(event.data))[0]);
+    this.eventEmitter.emit("message", JSON.parse(String(event.data))[0]);
   }
 
   /**

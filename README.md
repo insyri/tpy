@@ -39,7 +39,7 @@ download the type dependencies locally.
 #### Get the token's matching user.
 
 ```ts
-const client = new Tpy({ token: 'PYLON_TOKEN' });
+const client = new Tpy({ token: "PYLON_TOKEN" });
 const { displayName, id } = await client.getUser();
 
 console.log(`Logged in as ${displayName} (<@${id}>).`);
@@ -69,7 +69,7 @@ await ws.connect();
 With the following Pylon code:
 
 ```ts
-discord.on('MESSAGE_CREATE', async (message) => {
+discord.on("MESSAGE_CREATE", async (message) => {
   console.log(
     // string
     message.author.username,
@@ -84,8 +84,8 @@ discord.on('MESSAGE_CREATE', async (message) => {
 #### Get a guild's statistics.
 
 ```ts
-const client = new Tpy({ token: 'PYLON_TOKEN' });
-const guildStats = await client.getGuildStats('GUILD_ID');
+const client = new Tpy({ token: "PYLON_TOKEN" });
+const guildStats = await client.getGuildStats("GUILD_ID");
 const mostRecent = guildStats.find((e) =>
   e.date === Math.min(...guildStats.map((e) => e.date))
 )!;
@@ -101,8 +101,8 @@ console.log(
 
 ```ts
 const client = new Tpy({
-  token: 'PYLON_TOKEN',
-  deploymentID: 'DEPLOYMENT_ID',
+  token: "PYLON_TOKEN",
+  deploymentID: "DEPLOYMENT_ID",
 });
 const { config } = await client.getDeployment();
 const { cronTasks } = config.tasks;
@@ -113,19 +113,19 @@ const cronTasksFormatted = cronTasks.map(({ cronString, name }) =>
 
 console.log(
   `Listening to ${events.length} discord event(s):
-  ${events.join(', ')}\n`,
-  `Running ${cronTasks.length} cron job(s):\n${cronTasksFormatted.join('\n')}`,
+  ${events.join(", ")}\n`,
+  `Running ${cronTasks.length} cron job(s):\n${cronTasksFormatted.join("\n")}`,
 );
 ```
 
 #### Get the keys in a KV namespace.
 
 ```ts
-const client = new Tpy({ token: 'PYLON_TOKEN' });
-const kvnamespace = 'tags';
+const client = new Tpy({ token: "PYLON_TOKEN" });
+const kvnamespace = "tags";
 const kv = client.KV(
   kvnamespace,
-  await client.getDeploymentIDfromGuild('GUILD_ID'),
+  await client.getDeploymentIDfromGuild("GUILD_ID"),
 );
 
 const keys = await kv.list({ limit: 10 });
@@ -133,25 +133,25 @@ const amountOfKeys = await kv.count();
 
 console.log(
   `There are ${amountOfKeys} key(s) within the ${kvnamespace} KV namespace, these are the first 10 (or less).
-  ${keys.join(', ')}`,
+  ${keys.join(", ")}`,
 );
 ```
 
 #### Get and modify values within a KV namespace.
 
 ```ts
-const client = new Tpy({ token: 'PYLON_TOKEN' });
-const kvnamespace = 'NAMESPACE';
+const client = new Tpy({ token: "PYLON_TOKEN" });
+const kvnamespace = "NAMESPACE";
 const kv = client.KV(
   kvnamespace,
-  await client.getDeploymentIDfromGuild('GUILD_ID'),
+  await client.getDeploymentIDfromGuild("GUILD_ID"),
 );
 
-const key = 'cool_lang';
+const key = "cool_lang";
 
 console.log(`Value of key "${key}":`, await kv.get(key));
 
-await kv.put(key, 'rust');
+await kv.put(key, "rust");
 console.log(`Value of key "${key}":`, await kv.get(key));
 
 await kv.delete(key);

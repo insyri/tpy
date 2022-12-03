@@ -18,6 +18,7 @@ $Destination = "node"
 $NodePackageLocation = "$Destination/package.json"
 $ImportRegex = "(?<=(?<=\n|^)(im|ex)port(?:(?!(\.d)?\.ts).|\n)*)(\.d)?\.ts"
 $NodeOnlyRegex = "\/\/ build:node-only "
+$DiscordAPIRegex = "(?<=discord-api-types\/[a-z]+\/v8)\/guild"
 
 [string[]]$PresentFiles = @()
 $ItemList + $DeleteList | ForEach-Object {
@@ -61,7 +62,7 @@ If ($Version) {
 # Node Import Syntax Fix
 Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
   $Content = Get-Content $_.FullName -Raw
-  $Content -replace "($ImportRegex|$NodeOnlyRegex)", "" > $_.FullName
+  $Content -replace "($ImportRegex|$NodeOnlyRegex|$DiscordAPIRegex)", "" > $_.FullName
 }
 
 # Verification

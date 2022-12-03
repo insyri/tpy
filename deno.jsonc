@@ -12,7 +12,7 @@
   },
   "fmt": {
     "options": {
-      "singleQuote": true,
+      "singleQuote": false,
       "useTabs": false,
       "indentWidth": 2,
       "lineWidth": 80
