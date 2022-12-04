@@ -54,13 +54,9 @@ export namespace GET {
     /**
      * Response schema for `GET /user/guilds`.
      *
-     * Returns all guilds where the user can edit with Pylon.
-     * More specifically, all guilds which the user has `manage
-     * server` or `administrator` permissions in. The site says this
-     * directly when {@linkcode https://pylon.bot/studio/add-guild adding a guild}
-     * and scrolling all the way down:
+     * Returns all guilds where the user can edit with Pylon. More specifically, all
+     * guilds which the user is an administrator.
      *
-     * > Don’t see the guild you’re looking for? Ensure you have the “Administrator” or “Manage Server” permission!
      */
     export type Allowed = Array<
       Unpacked<Available> & {

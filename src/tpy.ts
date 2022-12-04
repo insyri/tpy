@@ -115,7 +115,7 @@ export class Tpy {
 
   /**
    * Gets all guilds a user can edit with Pylon. More specifically, all guilds
-   * which the user has `manage server` or `administrator` permissions in.
+   * which the user is an administrator.
    */
   async getEditableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Allowed>(
