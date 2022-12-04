@@ -56,7 +56,6 @@ export namespace GET {
      *
      * Returns all guilds where the user can edit with Pylon. More specifically, all
      * guilds which the user is an administrator.
-     *
      */
     export type Allowed = Array<
       Unpacked<Available> & {
