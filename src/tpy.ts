@@ -353,6 +353,8 @@ export class Tpy {
       this.readyRequest(method, requestInit)
     );
 
+    if (response.ok) return (await response.json()) as unknown as T;
+
     cases = [
       ...cases,
       ...([
