@@ -23,5 +23,5 @@ export type Cases = Array<{
   /**
    * Function to run if `case` matches the response's HTTP status code or is true.
    */
-  fn: () => void | never;
+  fn: (r: Response) => Promise<void | never>;
 }>;

@@ -59,7 +59,7 @@ export class Tpy {
         "Missing or Unexpected Value in Response",
         parametersPrompt("missing", "token"),
         "token",
-        token,
+        token
       );
     }
     this.token = token;
@@ -69,7 +69,7 @@ export class Tpy {
       const fetch = (
         ...args: Parameters<typeof import("node-fetch")["default"]>
       ) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
-      (<unknown> globalThis.fetch) = fetch;
+      (<unknown>globalThis.fetch) = fetch;
     }
   }
 
@@ -77,7 +77,20 @@ export class Tpy {
    * Gets the user's account details associated with the included credentials.
    */
   async getUser() {
-    return await this.httpRaw<User.GET.User>(new Context({}), "/user");
+    return await this.httpRaw<User.GET.User>(new Context({}), "/user", [
+      // 500 indicates an authentication error (user not found, invalid, etc)
+      {
+        case: 500,
+        fn: (r) => {
+          throw new TpyError<Response>(
+            "Unauthorized",
+            JSON.stringify({ "r.status": r.status }),
+            r.status.toString(),
+            r
+          );
+        },
+      },
+    ]);
   }
 
   /**
@@ -86,7 +99,7 @@ export class Tpy {
   async getAvailableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Available>(
       new Context({}),
-      "/user/guilds/available",
+      "/user/guilds/available"
     );
   }
 
@@ -97,7 +110,7 @@ export class Tpy {
   async getGuildInfo(guildID: string) {
     const g = await this.httpRaw<Guild.GET.Guild>(
       new Context({ guildID }),
-      `/guilds/${guildID}`,
+      `/guilds/${guildID}`
     );
     g.deployments.forEach((v) => (v.config = JSON.parse(v.config)));
     return g as unknown as Guild.GET.Guild<false>;
@@ -110,7 +123,7 @@ export class Tpy {
   async getGuildStats(guildID: string) {
     return await this.httpRaw<Guild.GET.Stats>(
       new Context({ guildID }),
-      `/guilds/${guildID}/stats`,
+      `/guilds/${guildID}/stats`
     );
   }
 
@@ -121,7 +134,7 @@ export class Tpy {
   async getEditableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Allowed>(
       new Context({}),
-      `/user/guilds`,
+      `/user/guilds`
     );
   }
 
@@ -138,12 +151,12 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID,
+        dID
       );
     }
     const d = await this.httpRaw<Deployment.GET.Deployment>(
       new Context({ deploymentID: dID }),
-      `/deployments/${dID}`,
+      `/deployments/${dID}`
     );
     d.script.project = JSON.parse(d.script.project);
     d.config = JSON.parse(d.config);
@@ -160,7 +173,7 @@ export class Tpy {
    */
   async publishDeployment(
     body: Deployment.POST.Request<false>,
-    deploymentID?: string,
+    deploymentID?: string
   ) {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
@@ -168,17 +181,18 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID,
+        dID
       );
     }
 
     return (await this.httpRaw<Deployment.POST.Response>(
       new Context({ deploymentID: dID }),
       `/deployments/${dID}`,
+      undefined,
       "POST",
       {
         body: JSON.stringify(body),
-      },
+      }
     )) as unknown as Deployment.POST.Response<false>;
   }
 
@@ -220,7 +234,7 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID,
+        dID
       );
     }
     return new TpyWs(this, dID);
@@ -238,12 +252,12 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID,
+        dID
       );
     }
     return await this.httpRaw<KV.GET.Namespace>(
       new Context({ deploymentID: dID }),
-      `/deployments/${dID}/kv/namespaces`,
+      `/deployments/${dID}/kv/namespaces`
     );
   }
 
@@ -257,7 +271,7 @@ export class Tpy {
    */
   async getNamespaceItems<T>(
     namespace: string,
-    deploymentID?: string,
+    deploymentID?: string
   ): Promise<KV.GET.ItemsFlattened<T> | undefined> {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
@@ -265,12 +279,12 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID,
+        dID
       );
     }
     const response = await this.httpRaw<KV.GET.Items>(
       new Context({ deploymentID: dID }),
-      `/deployments/${dID}/kv/namespaces/${namespace}/items`,
+      `/deployments/${dID}/kv/namespaces/${namespace}/items`
     );
 
     const a: KV.GET.ItemsFlattened<T> = new Array(response.length);
@@ -281,7 +295,7 @@ export class Tpy {
           "Missing or Unexpected Value in Response",
           `response[${i}\].value.string is undefined`,
           `response[${i}\].value.string`,
-          response,
+          response
         );
       }
       a[i] = {
@@ -306,7 +320,7 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID,
+        dID
       );
     }
 
@@ -332,116 +346,135 @@ export class Tpy {
     resource: string,
     cases: Cases = [],
     method: HTTPVerbs = "GET",
-    requestInit: RequestInit = {},
+    requestInit: RequestInit = {}
   ): Promise<T> {
     const response = await fetch(
       "https://pylon.bot/api" + resource,
-      this.readyRequest(method, requestInit),
+      this.readyRequest(method, requestInit)
     );
+
+    cases = [
+      ...cases,
+      ...([
+        {
+          case: 404,
+          fn: async (r) => {
+            const body = await r.text();
+            if (body.startsWith("\u26A0\uFE0F")) {
+              throw new TpyError<Response>(
+                "URL Resource Not Found",
+                responseBody(body),
+                response.status.toString(),
+                response
+              );
+            }
+
+            if (body === "could not find deployment") {
+              if (Context.isNullish(ctx.deploymentID)) {
+                throw new TpyError<Context>(
+                  "Nullish Context",
+                  ctx.deploymentID,
+                  "ctx.deploymentID",
+                  ctx
+                );
+              }
+
+              throw new TpyError<Response>(
+                "Deployment Not Found",
+                responseBody(body),
+                ctx.deploymentID,
+                response
+              );
+            }
+
+            if (body === "could not find guild") {
+              if (Context.isNullish(ctx.guildID)) {
+                throw new TpyError<Context>(
+                  "Nullish Context",
+                  ctx.guildID,
+                  "ctx.guildID",
+                  ctx
+                );
+              }
+
+              throw new TpyError<Response>(
+                "Guild Not Found",
+                responseBody(body),
+                ctx.guildID,
+                response
+              );
+            }
+          },
+        },
+        {
+          case: 401,
+          fn: () => {
+            throw new TpyError<Response>(
+              "Unauthorized",
+              responseHTTP(response.status.toString()),
+              response.status.toString(),
+              response
+            );
+          },
+        },
+        {
+          case: 403,
+          fn: () => {
+            throw new TpyError<Response>(
+              "Forbidden",
+              responseHTTP(response.status.toString()),
+              response.status.toString(),
+              response
+            );
+          },
+        },
+        {
+          case: 405,
+          fn: () => {
+            throw new TpyError<Response>(
+              "HTTP Method Not Allowed",
+              responseHTTP(response.status.toString()),
+              response.status.toString(),
+              response
+            );
+          },
+        },
+        {
+          case: 400,
+          fn: async (r) => {
+            const res = await r.json();
+            if ("msg" in res && res["msg"] === "missing json body") {
+              throw new TpyError<Response>(
+                "Missing or Invalid JSON in Request Body",
+                responseHTTP(response.status.toString()),
+                JSON.stringify(res["msg"]),
+                response
+              );
+            }
+          },
+        },
+        {
+          case: 500,
+          fn: () => {
+            throw new TpyError<Response>(
+              "Internal Server Error",
+              responseHTTP(response.status.toString()),
+              response.status.toString(),
+              response
+            );
+          },
+        },
+      ] as Cases),
+    ];
 
     for (const i of cases) {
       if (
         (typeof i.case === "function" && (await i.case(response.clone()))) ||
         i.case === response.status
       ) {
-        i.fn();
+        i.fn(response.clone());
         break;
       }
-    }
-
-    switch (response.status) {
-      case 404: {
-        if (body.startsWith("\u26A0\uFE0F")) {
-          throw new TpyError<Response>(
-            "URL Resource Not Found",
-            responseBody(body),
-            response.status.toString(),
-            response,
-          );
-        }
-
-        if (body === "could not find deployment") {
-          if (Context.isNullish(ctx.deploymentID)) {
-            throw new TpyError<Context>(
-              "Nullish Context",
-              ctx.deploymentID,
-              "ctx.deploymentID",
-              ctx,
-            );
-          }
-
-          throw new TpyError<Response>(
-            "Deployment Not Found",
-            responseBody(body),
-            ctx.deploymentID,
-            response,
-          );
-        }
-
-        if (body === "could not find guild") {
-          if (Context.isNullish(ctx.guildID)) {
-            throw new TpyError<Context>(
-              "Nullish Context",
-              ctx.guildID,
-              "ctx.guildID",
-              ctx,
-            );
-          }
-
-          throw new TpyError<Response>(
-            "Guild Not Found",
-            responseBody(body),
-            ctx.guildID,
-            response,
-          );
-        }
-        break;
-      }
-
-      case 401:
-        throw new TpyError<Response>(
-          "Unauthorized",
-          responseHTTP(response.status.toString()),
-          response.status.toString(),
-          response,
-        );
-
-      case 403:
-        throw new TpyError<Response>(
-          "Forbidden",
-          responseHTTP(response.status.toString()),
-          response.status.toString(),
-          response,
-        );
-
-      case 405:
-        throw new TpyError<Response>(
-          "HTTP Method Not Allowed",
-          responseHTTP(response.status.toString()),
-          response.status.toString(),
-          response,
-        );
-
-      case 400: {
-        const res = JSON.parse(body);
-        if ("msg" in res && res["msg"] === "missing json body") {
-          throw new TpyError<Response>(
-            "Missing or Invalid JSON in Request Body",
-            responseHTTP(response.status.toString()),
-            JSON.stringify(res["msg"]),
-            response,
-          );
-        }
-        break;
-      }
-
-      case 500:
-        throw new TpyError<Response>(
-          "Internal Server Error",
-          responseHTTP(response.status.toString()),
-          response.status.toString(),
-          response,
-        );
     }
 
     throw new TpyError<Response>(
@@ -450,7 +483,7 @@ export class Tpy {
       JSON.stringify({
         "response.ok": response.ok,
       }),
-      response,
+      response
     );
   }
 }
