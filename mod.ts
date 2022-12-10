@@ -62,6 +62,7 @@
 // deno-lint-ignore no-unused-vars
 import { type Tpy } from "./src/tpy.ts";
 
+export { Tpy } from "./src/tpy.ts";
 export { Tpy as default } from "./src/tpy.ts";
 export { TpyWs } from "./src/ws.ts";
 export { TpyKV } from "./src/kv.ts";
