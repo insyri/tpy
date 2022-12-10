@@ -59,7 +59,7 @@ export class Tpy {
         "Missing or Unexpected Value in Response",
         parametersPrompt("missing", "token"),
         "token",
-        token
+        token,
       );
     }
     this.token = token;
@@ -69,7 +69,7 @@ export class Tpy {
       const fetch = (
         ...args: Parameters<typeof import("node-fetch")["default"]>
       ) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
-      (<unknown>globalThis.fetch) = fetch;
+      (<unknown> globalThis.fetch) = fetch;
     }
   }
 
@@ -86,7 +86,7 @@ export class Tpy {
             "Unauthorized",
             JSON.stringify({ "r.status": r.status }),
             r.status.toString(),
-            r
+            r,
           );
         },
       },
@@ -99,7 +99,7 @@ export class Tpy {
   async getAvailableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Available>(
       new Context({}),
-      "/user/guilds/available"
+      "/user/guilds/available",
     );
   }
 
@@ -110,7 +110,7 @@ export class Tpy {
   async getGuildInfo(guildID: string) {
     const g = await this.httpRaw<Guild.GET.Guild>(
       new Context({ guildID }),
-      `/guilds/${guildID}`
+      `/guilds/${guildID}`,
     );
     g.deployments.forEach((v) => (v.config = JSON.parse(v.config)));
     return g as unknown as Guild.GET.Guild<false>;
@@ -123,7 +123,7 @@ export class Tpy {
   async getGuildStats(guildID: string) {
     return await this.httpRaw<Guild.GET.Stats>(
       new Context({ guildID }),
-      `/guilds/${guildID}/stats`
+      `/guilds/${guildID}/stats`,
     );
   }
 
@@ -134,7 +134,7 @@ export class Tpy {
   async getEditableGuilds() {
     return await this.httpRaw<User.GET.Guilds.Allowed>(
       new Context({}),
-      `/user/guilds`
+      `/user/guilds`,
     );
   }
 
@@ -151,12 +151,12 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID
+        dID,
       );
     }
     const d = await this.httpRaw<Deployment.GET.Deployment>(
       new Context({ deploymentID: dID }),
-      `/deployments/${dID}`
+      `/deployments/${dID}`,
     );
     d.script.project = JSON.parse(d.script.project);
     d.config = JSON.parse(d.config);
@@ -173,7 +173,7 @@ export class Tpy {
    */
   async publishDeployment(
     body: Deployment.POST.Request<false>,
-    deploymentID?: string
+    deploymentID?: string,
   ) {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
@@ -181,7 +181,7 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID
+        dID,
       );
     }
 
@@ -192,7 +192,7 @@ export class Tpy {
       "POST",
       {
         body: JSON.stringify(body),
-      }
+      },
     )) as unknown as Deployment.POST.Response<false>;
   }
 
@@ -234,7 +234,7 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID
+        dID,
       );
     }
     return new TpyWs(this, dID);
@@ -252,12 +252,12 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID
+        dID,
       );
     }
     return await this.httpRaw<KV.GET.Namespace>(
       new Context({ deploymentID: dID }),
-      `/deployments/${dID}/kv/namespaces`
+      `/deployments/${dID}/kv/namespaces`,
     );
   }
 
@@ -271,7 +271,7 @@ export class Tpy {
    */
   async getNamespaceItems<T>(
     namespace: string,
-    deploymentID?: string
+    deploymentID?: string,
   ): Promise<KV.GET.ItemsFlattened<T> | undefined> {
     const dID = deploymentID || this.deploymentID;
     if (!dID) {
@@ -279,12 +279,12 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID
+        dID,
       );
     }
     const response = await this.httpRaw<KV.GET.Items>(
       new Context({ deploymentID: dID }),
-      `/deployments/${dID}/kv/namespaces/${namespace}/items`
+      `/deployments/${dID}/kv/namespaces/${namespace}/items`,
     );
 
     const a: KV.GET.ItemsFlattened<T> = new Array(response.length);
@@ -295,7 +295,7 @@ export class Tpy {
           "Missing or Unexpected Value in Response",
           `response[${i}\].value.string is undefined`,
           `response[${i}\].value.string`,
-          response
+          response,
         );
       }
       a[i] = {
@@ -320,7 +320,7 @@ export class Tpy {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", ["deploymentID", "this.deploymentID"]),
         ["deploymentID", "this.deploymentID"].join(", "),
-        dID
+        dID,
       );
     }
 
@@ -346,11 +346,11 @@ export class Tpy {
     resource: string,
     cases: Cases = [],
     method: HTTPVerbs = "GET",
-    requestInit: RequestInit = {}
+    requestInit: RequestInit = {},
   ): Promise<T> {
     const response = await fetch(
       "https://pylon.bot/api" + resource,
-      this.readyRequest(method, requestInit)
+      this.readyRequest(method, requestInit),
     );
 
     if (response.ok) return (await response.json()) as unknown as T;
@@ -367,7 +367,7 @@ export class Tpy {
                 "URL Resource Not Found",
                 responseBody(body),
                 response.status.toString(),
-                response
+                response,
               );
             }
 
@@ -377,7 +377,7 @@ export class Tpy {
                   "Nullish Context",
                   ctx.deploymentID,
                   "ctx.deploymentID",
-                  ctx
+                  ctx,
                 );
               }
 
@@ -385,7 +385,7 @@ export class Tpy {
                 "Deployment Not Found",
                 responseBody(body),
                 ctx.deploymentID,
-                response
+                response,
               );
             }
 
@@ -395,7 +395,7 @@ export class Tpy {
                   "Nullish Context",
                   ctx.guildID,
                   "ctx.guildID",
-                  ctx
+                  ctx,
                 );
               }
 
@@ -403,7 +403,7 @@ export class Tpy {
                 "Guild Not Found",
                 responseBody(body),
                 ctx.guildID,
-                response
+                response,
               );
             }
           },
@@ -415,7 +415,7 @@ export class Tpy {
               "Unauthorized",
               responseHTTP(response.status.toString()),
               response.status.toString(),
-              response
+              response,
             );
           },
         },
@@ -426,7 +426,7 @@ export class Tpy {
               "Forbidden",
               responseHTTP(response.status.toString()),
               response.status.toString(),
-              response
+              response,
             );
           },
         },
@@ -437,7 +437,7 @@ export class Tpy {
               "HTTP Method Not Allowed",
               responseHTTP(response.status.toString()),
               response.status.toString(),
-              response
+              response,
             );
           },
         },
@@ -450,7 +450,7 @@ export class Tpy {
                 "Missing or Invalid JSON in Request Body",
                 responseHTTP(response.status.toString()),
                 JSON.stringify(res["msg"]),
-                response
+                response,
               );
             }
           },
@@ -462,7 +462,7 @@ export class Tpy {
               "Internal Server Error",
               responseHTTP(response.status.toString()),
               response.status.toString(),
-              response
+              response,
             );
           },
         },
@@ -485,7 +485,7 @@ export class Tpy {
       JSON.stringify({
         "response.ok": response.ok,
       }),
-      response
+      response,
     );
   }
 }
