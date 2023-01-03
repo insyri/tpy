@@ -25,7 +25,7 @@ import { parametersPrompt, TpyError } from "./error.ts";
 type messageTypes = typeof TpyWs.prototype.messageTypes[number];
 
 /**
- * An {@linkcode EventEmitter} forwarder that keeps an emitter alive while a {@linkcode WebSocket}
+ * An EventEmitter forwarder that keeps an emitter alive while a {@linkcode WebSocket}
  * reconnects. Listens to a deployment's console output.
  *
  * This class creates a parent emitter over a child {@linkcode WebSocket} emitter, forwarding events and
@@ -156,21 +156,17 @@ export class TpyWs {
 
     this._websocket.onclose = ((event: CloseEvent) => {
       this.eventEmitter.emit("close", event);
-      this.timedReconnect();
-
-      // (async () => await this.timedReconnect())();
+      this.timedConnect();
     }).bind(this);
 
     this._websocket.onerror = ((event: Event | ErrorEvent) => {
       if (!this.websocket) return;
       this.eventEmitter.emit("error", event);
-
       try {
         this.websocket.close();
         // deno-lint-ignore no-empty
       } catch {}
-      this.timedReconnect();
-      // (async () => await this.timedReconnect())();
+      this.timedConnect();
     }).bind(this);
 
     this._websocket.onmessage = ((event: MessageEvent) => {
@@ -178,14 +174,12 @@ export class TpyWs {
     }).bind(this);
   }
 
-  timedReconnect() {
-    // Check once to spare resources
-    if (!this.tryToConnect) return;
-    setTimeout(() => {
-      (async () => {
-        // Check again to ensure it hasn't changed
-        if (this.tryToConnect) await this.connect();
-      })();
+  /**
+   * Runs the {@linkcode connect} method after the specified reconnection timeout.
+   */
+  timedConnect() {
+    setTimeout(async () => {
+      if (this.tryToConnect) await this.connect();
     }, this.reconnectionTimout);
   }
 

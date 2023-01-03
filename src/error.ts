@@ -33,19 +33,17 @@
  * shape it takes.
  */
 export interface ITpyErrors {
-  [name: string]: ITpyErrorsProperty;
-}
-
-export interface ITpyErrorsProperty {
-  /**
-   * A function that returns a string with an input regarding environment
-   * contextual details.
-   */
-  message: (s: string) => string;
-  /**
-   * An explanation of what might have happened.
-   */
-  description: string;
+  [name: string]: {
+    /**
+     * A function that returns a string with an input regarding environment
+     * contextual details.
+     */
+    message: (s: string) => string;
+    /**
+     * An explanation of what might have happened.
+     */
+    description: string;
+  };
 }
 
 /**
@@ -54,25 +52,22 @@ export interface ITpyErrorsProperty {
  *
  * @template T The type of {@linkcode rawInfo}.
  */
-export class TpyError<T> extends Error
-  implements Omit<ITpyErrorsProperty, "message"> {
+export class TpyError<T>
+  extends Error
+  implements Omit<ITpyErrors[string], "message">
+{
   /**
    * A short description of the Tpy error.
    */
   name: keyof typeof TpyErrors;
   /**
-   * An explanation of what might have happened.
+   * An explanation of what might have happened based on the error's name.
    */
   description: string;
   /**
    * The determining factor of throwing this error. The cause.
    */
   determination: string;
-  /**
-   * Context passed into the `.message()` method of the matching
-   * name index of {@linkcode TpyErrors}.
-   */
-  messageContext: string;
   /**
    * Raw information collected that was used to formulate the error.
    */
@@ -91,12 +86,11 @@ export class TpyError<T> extends Error
      * name index of {@linkcode TpyErrors}.
      */
     messageContext: string,
-    rawinfo: T,
+    rawinfo: T
   ) {
     super(TpyErrors[name].message(messageContext));
     this.name = name;
     this.description = TpyErrors[name].description;
-    this.messageContext = messageContext;
     this.determination = determination;
     this.rawInfo = rawinfo;
   }
@@ -111,8 +105,7 @@ export class TpyError<T> extends Error
 export const TpyErrors = {
   "Internal Server Error": {
     message: (s: string) => serverRespondedWith(s),
-    description:
-      `Sometimes thrown when a request's authorization header is invalid.`,
+    description: `Sometimes thrown when a request's authorization header is invalid.`,
   },
   "Missing or Unexpected Value in Response": {
     message: (s: string) => `Response structure validation failed: ${s}.`,
@@ -121,8 +114,7 @@ export const TpyErrors = {
   "Missing or Invalid JSON in Request Body": {
     message: (s: string) =>
       `With given field(s) ${s} were unsatisfactory; contains invalid JSON.`,
-    description:
-      `The fetch contents sent were did not have the required JSON body.`,
+    description: `The fetch contents sent were did not have the required JSON body.`,
   },
   "Guild Not Found": {
     message: (s: string) => couldNotBeFound("Guild ID", s),
@@ -165,7 +157,7 @@ export const TpyErrors = {
       `Context parameter ${s} is nullish, where access is necessary.`,
     description: "A context parameter was missing where it was needed.",
   },
-};
+} as const satisfies ITpyErrors;
 
 // Localized util template functions
 
@@ -195,7 +187,7 @@ export function responseBody(s: string) {
  */
 export function parametersPrompt(
   issue: "missing" | "incompatible",
-  params: string | string[],
+  params: string | string[]
 ) {
   return `Parameter(s) are ${issue}: ${
     Array.isArray(params) ? params.join(", ") : params

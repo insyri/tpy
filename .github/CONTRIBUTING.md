@@ -30,12 +30,12 @@ Gitpod, dismissing this step entirely.
 
 As Tpy is a Deno project, Tpy does not use Deno's built solution
 [`dnt`](https://deno.land/x/dnt), instead, Tpy uses a PowerShell Core script
-[`node-transform.ps1`](./../node-transform.ps1).
+[`build.ps1`](./../build.ps1).
 
 You can use it like this:
 
 ```ps1
-./node-transform.ps1 -Version vx.x.x
+./build.ps1 -Version vx.x.x
 ```
 
 Will generate an `npm` folder with contents formatted to ship on npm.
