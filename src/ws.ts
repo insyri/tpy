@@ -59,17 +59,17 @@ export class TpyWs {
   constructor(
     tpyInstance: Tpy,
     deploymentID: string,
-    reconnectionTimeout = 250
+    reconnectionTimeout = 250,
   ) {
     if (!tpyInstance || !(tpyInstance instanceof Tpy)) {
       throw new TpyError(
         "Missing or Invalid Required Parameter",
         parametersPrompt(
           !tpyInstance ? "missing" : "incompatible",
-          "tpyInstance"
+          "tpyInstance",
         ),
         "tpyInstance",
-        tpyInstance
+        tpyInstance,
       );
     }
     if (!deploymentID) {
@@ -77,7 +77,7 @@ export class TpyWs {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", "deploymentID"),
         "deploymentID",
-        deploymentID
+        deploymentID,
       );
     }
     this.tpyClient = tpyInstance;
@@ -124,7 +124,7 @@ export class TpyWs {
    */
   on<T extends unknown[]>(
     type: "message",
-    callback: (data: Unpacked<PylonWebSocket.Response<T>>) => void
+    callback: (data: Unpacked<PylonWebSocket.Response<T>>) => void,
   ): EventEmitter;
   on<T extends unknown[]>(type: messageTypes, callback: unknown) {
     if (typeof callback != "function") {
@@ -132,12 +132,12 @@ export class TpyWs {
         "Missing or Invalid Required Parameter",
         parametersPrompt("incompatible", "callback"),
         "callback",
-        typeof callback
+        typeof callback,
       );
     }
     return this.eventEmitter.on(
       type,
-      <(data: Unpacked<PylonWebSocket.Response<T>>) => void>callback
+      <(data: Unpacked<PylonWebSocket.Response<T>>) => void> callback,
     );
   }
 
@@ -147,7 +147,7 @@ export class TpyWs {
   async connect() {
     if (!this.tryToConnect) return;
     this._websocket = new WebSocket(
-      (await this.tpyClient.getDeployment(this.deploymentID)).workbench_url
+      (await this.tpyClient.getDeployment(this.deploymentID)).workbench_url,
     );
 
     this._websocket.onopen = ((event: Event) => {
