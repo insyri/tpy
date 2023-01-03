@@ -59,17 +59,17 @@ export class TpyWs {
   constructor(
     tpyInstance: Tpy,
     deploymentID: string,
-    reconnectionTimeout = 250,
+    reconnectionTimeout = 250
   ) {
     if (!tpyInstance || !(tpyInstance instanceof Tpy)) {
       throw new TpyError(
         "Missing or Invalid Required Parameter",
         parametersPrompt(
           !tpyInstance ? "missing" : "incompatible",
-          "tpyInstance",
+          "tpyInstance"
         ),
         "tpyInstance",
-        tpyInstance,
+        tpyInstance
       );
     }
     if (!deploymentID) {
@@ -77,7 +77,7 @@ export class TpyWs {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", "deploymentID"),
         "deploymentID",
-        deploymentID,
+        deploymentID
       );
     }
     this.tpyClient = tpyInstance;
@@ -124,7 +124,7 @@ export class TpyWs {
    */
   on<T extends unknown[]>(
     type: "message",
-    callback: (data: Unpacked<PylonWebSocket.Response<T>>) => void,
+    callback: (data: Unpacked<PylonWebSocket.Response<T>>) => void
   ): EventEmitter;
   on<T extends unknown[]>(type: messageTypes, callback: unknown) {
     if (typeof callback != "function") {
@@ -132,12 +132,12 @@ export class TpyWs {
         "Missing or Invalid Required Parameter",
         parametersPrompt("incompatible", "callback"),
         "callback",
-        typeof callback,
+        typeof callback
       );
     }
     return this.eventEmitter.on(
       type,
-      <(data: Unpacked<PylonWebSocket.Response<T>>) => void> callback,
+      <(data: Unpacked<PylonWebSocket.Response<T>>) => void>callback
     );
   }
 
@@ -147,38 +147,46 @@ export class TpyWs {
   async connect() {
     if (!this.tryToConnect) return;
     this._websocket = new WebSocket(
-      (await this.tpyClient.getDeployment(this.deploymentID)).workbench_url,
+      (await this.tpyClient.getDeployment(this.deploymentID)).workbench_url
     );
-    this._websocket.onopen = this.onOpen.bind(this);
-    this._websocket.onclose = this.onClose.bind(this);
-    this._websocket.onerror = this.onError.bind(this);
-    this._websocket.onmessage = this.onMessage.bind(this);
+
+    this._websocket.onopen = ((event: Event) => {
+      this.eventEmitter.emit("open", event);
+    }).bind(this);
+
+    this._websocket.onclose = ((event: CloseEvent) => {
+      this.eventEmitter.emit("close", event);
+      this.timedReconnect();
+
+      // (async () => await this.timedReconnect())();
+    }).bind(this);
+
+    this._websocket.onerror = ((event: Event | ErrorEvent) => {
+      if (!this.websocket) return;
+      this.eventEmitter.emit("error", event);
+
+      try {
+        this.websocket.close();
+        // deno-lint-ignore no-empty
+      } catch {}
+      this.timedReconnect();
+      // (async () => await this.timedReconnect())();
+    }).bind(this);
+
+    this._websocket.onmessage = ((event: MessageEvent) => {
+      this.eventEmitter.emit("message", JSON.parse(String(event.data))[0]);
+    }).bind(this);
   }
 
-  private onOpen(event: Event) {
-    this.eventEmitter.emit("open", event);
-  }
-
-  private onError(event: Event | ErrorEvent) {
-    if (!this.websocket) return;
-    this.eventEmitter.emit("error", event);
-
-    try {
-      this.websocket.close();
-      // deno-lint-ignore no-empty
-    } catch {}
-
+  timedReconnect() {
+    // Check once to spare resources
+    if (!this.tryToConnect) return;
     setTimeout(() => {
-      this.connect();
+      (async () => {
+        // Check again to ensure it hasn't changed
+        if (this.tryToConnect) await this.connect();
+      })();
     }, this.reconnectionTimout);
-  }
-
-  private onClose(event: CloseEvent) {
-    this.eventEmitter.emit("close", event);
-  }
-
-  private onMessage(event: MessageEvent) {
-    this.eventEmitter.emit("message", JSON.parse(String(event.data))[0]);
   }
 
   /**
