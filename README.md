@@ -48,16 +48,16 @@ console.log(`Logged in as ${displayName} (<@${id}>).`);
 #### Listen to a deployment's console output.
 
 ```ts
-const client = new Tpy({ token: 'PYLON_TOKEN' });
+const client = new Tpy({ token: "PYLON_TOKEN" });
 const ws = client.connectSocket(
-  await client.getDeploymentIDfromGuild('GUILD_ID')),
+  await client.getDeploymentIDfromGuild("GUILD_ID")),
 );
 
-ws.on('open', (_) => console.log('WebSocket Opened'));
-ws.on('error', (_) => _);
+ws.on("open", (_) => console.log("WebSocket Opened"));
+ws.on("error", (_) => _);
 // The array matches the console log parameter types.
 ws.on<[string, string, number]>(
-  'message',
+  "message",
   ({ data }) =>
     console.log(`${data[0]} said "${data[1]}" and sent ${data[2]} attachment(s).`),
 );
