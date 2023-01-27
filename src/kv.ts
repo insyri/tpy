@@ -35,10 +35,10 @@ export class TpyKV {
         "Missing or Invalid Required Parameter",
         parametersPrompt(
           !tpyInstance ? "missing" : "incompatible",
-          "tpyInstance"
+          "tpyInstance",
         ),
         "tpyInstance",
-        tpyInstance
+        tpyInstance,
       );
     }
     if (!deploymentID) {
@@ -46,7 +46,7 @@ export class TpyKV {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", "deploymentID"),
         "deploymentID",
-        deploymentID
+        deploymentID,
       );
     }
     this.tpyc = tpyInstance;
@@ -73,7 +73,7 @@ export class TpyKV {
         body: JSON.stringify({
           string: typeof value === "string" ? `"${value}"` : value,
         }),
-      }
+      },
     );
   }
 
@@ -86,7 +86,7 @@ export class TpyKV {
   async putArrayBuffer(
     key: string,
     value: ArrayBuffer,
-    options?: KV.OperationOptions.Put
+    options?: KV.OperationOptions.Put,
   ) {
     if (options?.ifNotExists && (await this.get(key))) return;
 
@@ -96,7 +96,7 @@ export class TpyKV {
       `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
       undefined,
       "PUT",
-      { body: JSON.stringify({ bytes: value }) }
+      { body: JSON.stringify({ bytes: value }) },
     );
   }
 
@@ -110,7 +110,7 @@ export class TpyKV {
     const { deploymentID, kvnamespace } = this;
     const response = await this.tpyc.httpRaw<KV.GET.Items<T>>(
       new Context({ deploymentID, kvnamespace }),
-      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
     let item: T | undefined;
     for (let i = 0; i < response.length; i++) {
@@ -121,7 +121,7 @@ export class TpyKV {
           "Missing or Unexpected Value in Response",
           `response[${i}].value.string is undefined`,
           `response[${i}].value.string`,
-          response
+          response,
         );
       }
       item = ["'", '"', "`"].includes(p.value.string[0])
@@ -141,7 +141,7 @@ export class TpyKV {
     const { deploymentID, kvnamespace } = this;
     const response = await this.tpyc.httpRaw<KV.GET.Items>(
       new Context({ deploymentID, kvnamespace }),
-      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
     let item: ArrayBuffer | undefined;
     for (const p of response) {
@@ -162,7 +162,7 @@ export class TpyKV {
     const { deploymentID, kvnamespace } = this;
     let response = await this.tpyc.httpRaw<KV.GET.Items>(
       new Context({ deploymentID, kvnamespace }),
-      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
 
     if (options?.limit) response = response.slice(0, options.limit);
@@ -170,7 +170,7 @@ export class TpyKV {
     if (options?.from) {
       response = response.slice(
         response.findIndex((i) => i.key === options.from) + 1,
-        response.length
+        response.length,
       );
     }
 
@@ -186,18 +186,18 @@ export class TpyKV {
    * @template T The type of the key's value.
    */
   async items<T>(
-    options?: KV.OperationOptions.Items
+    options?: KV.OperationOptions.Items,
   ): Promise<KV.GET.ItemsFlattened<T>> {
     const { deploymentID, kvnamespace } = this;
     let response = await this.tpyc.httpRaw<KV.GET.Items>(
       new Context({ deploymentID, kvnamespace }),
-      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`
+      `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items`,
     );
 
     if (options?.from) {
       response = response.slice(
         response.findIndex((i) => i.key === options.from) + 1,
-        response.length
+        response.length,
       );
     }
 
@@ -214,9 +214,9 @@ export class TpyKV {
           "Missing or Unexpected Value in Response",
           `response[${i}].value.string and/or response[${i}].value.bytes are undefined`,
           [`response[${i}].value.string`, `response[${i}].value.bytes`].join(
-            ", "
+            ", ",
           ),
-          response
+          response,
         );
       }
       return {
@@ -236,7 +236,7 @@ export class TpyKV {
       (
         await this.tpyc.httpRaw<KV.GET.Namespace>(
           new Context({ deploymentID, kvnamespace }),
-          `/deployments/${deploymentID}/kv/namespaces`
+          `/deployments/${deploymentID}/kv/namespaces`,
         )
       ).find((n) => n.namespace == kvnamespace)?.count || 0
     );
@@ -257,7 +257,7 @@ export class TpyKV {
         new Context({ deploymentID, kvnamespace }),
         `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}`,
         undefined,
-        "DELETE"
+        "DELETE",
       )
     ).keys_deleted;
   }
@@ -277,7 +277,7 @@ export class TpyKV {
         new Context({ deploymentID, kvnamespace }),
         `/deployments/${deploymentID}/kv/namespaces/${kvnamespace}/items/${key}`,
         undefined,
-        "DELETE"
+        "DELETE",
       );
 
     if (!options?.prevValue) await del();
@@ -298,7 +298,7 @@ export class TpyKV {
     key: string,
     compare: Json,
     set: Json,
-    ttl?: Date | number
+    ttl?: Date | number,
   ): Promise<void>;
   /**
    * Compare and set a key's value, setting the value only if the key does not already exist.
@@ -312,7 +312,7 @@ export class TpyKV {
     key: string,
     compare: undefined,
     set: Json,
-    ttl?: Date | number
+    ttl?: Date | number,
   ): Promise<void>;
   /**
    * Compare and delete a key's value. This is functionally equivalent to {@linkcode delete}, if the `prevValue` option is provided.
@@ -325,13 +325,13 @@ export class TpyKV {
     key: string,
     compare: Json,
     set: undefined,
-    ttl?: Date | number
+    ttl?: Date | number,
   ): Promise<void>;
   async cas(
     key: string,
     compare: Json | undefined,
     set: Json | undefined,
-    ttl?: Date | number
+    ttl?: Date | number,
   ): Promise<void> {
     const k = await this.get(key);
     if (ttl && ttl instanceof Date) ttl = ttl.getTime();
@@ -356,7 +356,7 @@ export class TpyKV {
    */
   async transact<T extends Json>(
     key: string,
-    transaction: (prev: T | undefined) => T | undefined
+    transaction: (prev: T | undefined) => T | undefined,
   ): Promise<T | undefined> {
     const k = await this.get<T>(key);
     const result = transaction(k);
