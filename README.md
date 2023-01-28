@@ -158,6 +158,28 @@ await kv.delete(key);
 console.log(`Value of key "${key}":`, await kv.get(key));
 ```
 
+#### Increment a key in a KV namespace.
+
+```ts
+// This is NOT an atomic mutation.
+
+const client = new Tpy({ token: "PYLON_TOKEN" });
+const kvnamespace = "NAMESPACE";
+const kv = client.KV(
+  kvnamespace,
+  await client.getDeploymentIDfromGuild("GUILD_ID"),
+);
+const upto = 10;
+
+for (let i = 0; i < upto; i++) {
+  await kv.transact("counter", (p) => {
+    p ||= 0;
+    p++;
+    return p;
+  });
+}
+```
+
 ## Contributing
 
 If you'd like to contribute, please read the

@@ -352,8 +352,11 @@ export class Tpy {
       "https://pylon.bot/api" + resource,
       this.readyRequest(method, requestInit),
     );
-
-    if (response.ok) return (await response.json()) as unknown as T;
+    const body = await response.text();
+    if (response.ok) {
+      // This is bad, I know. You fix it. Please.
+      return (body.length === 0 ? {} : JSON.parse(body)) as unknown as T;
+    }
 
     cases = [
       ...cases,
