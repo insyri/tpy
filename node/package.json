@@ -47,7 +47,7 @@
     "@types/node-fetch": "^2.6.2",
     "@types/ws": "^8.5.4",
     "node-fetch": "^2.6.8",
-    "typescript": "4.9.4"
+    "typescript": "4.9.5"
   },
   "dependencies": {
     "lodash": "^4.17.21",
