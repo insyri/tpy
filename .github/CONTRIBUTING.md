@@ -43,7 +43,7 @@ Gitpod, dismissing the first two steps entirely.
    via CI through remote pushes.
 6. Send in a pull request with a summarized explanation of your changes.
 
-## Node.js
+## Node.js // `build.ps1`
 
 Even though Tpy is a Deno project, Tpy does not use Deno's common bridge builder
 program [`dnt`](https://deno.land/x/dnt), instead, Tpy uses a PowerShell Core
@@ -52,8 +52,20 @@ script [`build.ps1`](./../build.ps1).
 You can use it like this:
 
 ```ps1
-./build.ps1 -Version vx.x.x # Version parameter is not required.
+./build.ps1 `
+   -Version string ` # Takes a version string to be applied to the `version`
+                   ` # field in `package.json`.
+                   `
+   -Quiet          ` # Disables logging information.
+                   `
+   -Esm            ` # Prepares the project for ESModule emission; changes the
+                   ` # TS config target via `-m` and `type` field in `package.json`.
+                   `
+   -Reset          ` # Reset project back to CommonJS configuration, used with -Esm.
 ```
+
+*Note: backticks on each line indicate line escaping; synonymous to `\` on
+Bash/Linux.
 
 This will generate a `node` folder with contents structured to ship on npm.
 

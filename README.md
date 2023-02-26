@@ -22,6 +22,16 @@ following qualities:
 The API documentation can be viewed on the
 [Deno website](https://deno.land/x/tpy/mod.ts/).
 
+## CommonJS/ESModule Support
+
+It was considered for Tpy to become an ESModule project for Node.js, however,
+many projects are still built on CommonJS, a module system specific to Node.
+
+To combat this, Tpy now ships an `*-esm` version of the package, allowing users
+to install the desired module system without downloading the other that will not
+be used. For example: `1.0.0-RC-2` ships CommonJS, `1.0.0-RC-2-esm` ships
+ESModules.
+
 ## Installation
 
 ```bash
