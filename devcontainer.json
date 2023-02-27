@@ -1,0 +1,12 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/deno:1": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      // 18 has native fetch, 16 does not. If 16 is used, node-fetch shim will be used.
+      "version": "18"
+    },
+    "ghcr.io/devcontainers/features/powershell:1": {}
+  },
+  "postCreateCommand": "deno run --allow-env --allow-net mod.ts"
+}
