@@ -3,16 +3,17 @@
 # Also to avoid environment conflicts
 
 Param(
-  [Parameter(Mandatory = $false, Position = 0)]
+  [Parameter()]
   [string] $Version,
 
-  [Parameter(Mandatory = $false, Position = 1)]
-  [switch] $Esm,
+  [Parameter()]
+  [ValidateSet("ESModule", "CommonJS")]
+  [string] $Module,
 
-  [Parameter(Mandatory = $false, Position = 2)]
+  [Parameter()]
   [switch] $Reset,
 
-  [Parameter(Mandatory = $false, Position = 3)]
+  [Parameter()]
   [switch] $Quiet
 )
 
@@ -21,22 +22,45 @@ If ((Get-Location).Path -notlike '*tpy') {
   Exit
 }
 
-# Injection
+$IsESM = $Module -eq "ESModule"
 
 $ItemList = "src", "README.md", "LICENSE", "mod.ts"
 $DeleteList = "lib", "node_modules", "mod.js", "mod.d.ts"
 $Destination = "node"
 $NodePackageLocation = "$Destination/package.json"
+# Matches the file extention in ESM import/export statements.
+# (Text in brackets represent [matched] text in this example.)
+#
+#   import { responseBody, responseHTTP, } from "./error[.ts]";
+#
 $ImportRegex = "(?<=(?<=\n|^)(im|ex)port(?:(?!(\.d)?\.ts).|\n)*)(\.d)?\.ts"
 $NodeOnlyRegex = "\/\/ build:node-only "
 $DiscordAPIRegex = "(?<=discord-api-types\/[a-z]+\/v8)\/guild"
+
+# Developing Regex
+# ((ex|im)port {[\S\s]+?} from "\.[\S\s]*?(?="))(";)
+# Should match ./file and not ./file.js
+
+# if esm
+#   if .d.ts
+#     ext -> ""
+#   else (.ts)
+#     ext -> ".js"
+# else (cjs)
+#   ext -> ""
+
+# if esm 
+#   if .d.ts
+#     ext -> ""
+#   else (.js)
+#     ext -> ".js"
+
 
 Function Log {
   Param(
     [string] $str
   )
   If (-not $Quiet) {
-    ""
     Write-Host "Tpy Build: " -ForegroundColor DarkBlue -NoNewline
     $str
   }
@@ -80,25 +104,21 @@ ForEach ($Item in $ItemList) {
 }
 
 Log "Setting up package.json for build"
-If ($Version -or $Esm) {
-  $NodePackage = (Get-Content "$NodePackageLocation" -Raw | ConvertFrom-Json)
-  If ($Esm) {
-    $NodePackage.type = "module"
+$NodePackage = (Get-Content "$NodePackageLocation" -Raw | ConvertFrom-Json)
+$NodePackage.type = $IsESM ? "module" : "commonjs"
+If ($Version) {
+  $v = $Version
+  If ($IsESM) {
+    $v += "-esm"
   }
-  If ($Version) {
-    $v = $Version
-    If ($Esm) {
-      $v += "-esm"
-    }
-    $NodePackage.version = $v
-  }
-  $NodePackage | ConvertTo-Json > $NodePackageLocation
+  $NodePackage.version = $v
 }
+$NodePackage | ConvertTo-Json > $NodePackageLocation
 
 Log "Correcting import syntax"
 # Node Import Syntax Fix
 Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
-  $Regexes = $Esm -and $_.FullName.EndsWith("d.ts") ? "($NodeOnlyRegex|$DiscordAPIRegex)" : "($ImportRegex|$NodeOnlyRegex|$DiscordAPIRegex)"
+  $Regexes = $IsESM -and $_.FullName.EndsWith("d.ts") ? "($NodeOnlyRegex|$DiscordAPIRegex)" : "($ImportRegex|$NodeOnlyRegex|$DiscordAPIRegex)"
   $Content = Get-Content $_.FullName -Raw
   $Content = $Content -replace $Regexes, ""
   If (-not $_.FullName.EndsWith(".d.ts")) {
@@ -111,28 +131,27 @@ Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
 
 Set-Location "$Destination"
 
-$Module = $Esm ? "esm" : "cjs"
+$ShorthandModule = $IsESM ? "esm" : "cjs"
 
 Log "Running NPM scripts"
 
 npm install -Wait
-npm run "build:$Module" -Wait
+npm run "build:$ShorthandModule" -Wait
 
 Log "Copying .d.ts files and verifying integrity"
 Copy-Item -Recurse "src/types" "lib/src"
 
-npm run "build:${Module}_noemit" -Wait
+npm run "build:${ShorthandModule}_noemit" -Wait
 
-# If ($Esm) {
-#   Get-ChildItem "lib" -Recurse -Filter *.js | ForEach-Object {
-#     Rename-Item $_ ($_ -replace ".js", ".mjs")
-#   }
-# }
+Get-ChildItem $Destination -Recurse -Filter *.js | ForEach-Object {
+  $Content = Get-Content $_.FullName -Raw
+  $Content = $Content -replace $Regexes, ""
+}
 
 Set-Location ".."
 
 # Reset
-If ($Esm -and $Reset) {
+If ($IsESM -and $Reset) {
   Log "Reseting package.json for future use"
   Invoke-Command -FilePath "./reset.ps1"
 }

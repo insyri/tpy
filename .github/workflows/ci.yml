@@ -8,12 +8,15 @@ on:
 
 jobs:
   Node-Transformation:
+    strategy:
+      matrix:
+        module: ["ESModule", "CommonJS"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
       - uses: denoland/setup-deno@v1.1.1
-      - run: ./build.ps1
+      - run: ./build.ps1 -Module ${{ matrix.module }}
         shell: pwsh
 
   Cleaning:

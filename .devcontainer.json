@@ -8,5 +8,5 @@
     },
     "ghcr.io/devcontainers/features/powershell:1": {}
   },
-  "postCreateCommand": "deno run --allow-env --allow-net mod.ts"
+  "postCreateCommand": "deno upgrade && deno run --allow-env --allow-net mod.ts"
 }
