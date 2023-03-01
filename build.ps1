@@ -114,10 +114,10 @@ $NodePackage = (Get-Content "$NodePackageLocation" -Raw | ConvertFrom-Json)
 $NodePackage.type = $IsESM ? "module" : "commonjs"
 If ($Version) {
   $v = $Version
-  If ($IsESM) {
-    $v += "-esm"
-  }
   $NodePackage.version = $v
+}
+If ($IsESM) {
+  $NodePackage.version += "-esm"
 }
 $NodePackage | ConvertTo-Json > $NodePackageLocation
 
