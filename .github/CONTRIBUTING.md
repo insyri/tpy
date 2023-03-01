@@ -45,6 +45,11 @@ Gitpod, dismissing the first two steps entirely.
 
 ## Node.js // `build.ps1`
 
+This script is an automated process that structures the project into a Node.js
+compatible project that can be shipped onto npm. Tpy is available in both ESM
+and CJS module formats. ESModule formats can be found on versions ending with
+`-esm`. See [CommonJS/ESModule Support](../README.md#CommonJS/ESModule-Support).
+
 Even though Tpy is a Deno project, Tpy does not use Deno's common bridge builder
 program [`dnt`](https://deno.land/x/dnt), instead, Tpy uses a PowerShell Core
 script [`build.ps1`](./../build.ps1).
@@ -58,16 +63,18 @@ You can use it like this:
                    `
    -Quiet          ` # Disables logging information.
                    `
-   -Esm            ` # Prepares the project for ESModule emission; changes the
-                   ` # TS config target via `-m` and `type` field in `package.json`.
+   -Module string  ` # Prepares the project for which module type; if `ESModule`,
+                   ` # the script changes the TS config target and `type` field
+                   ` # in the `package.json` file, otherwise— `CommonJS` is implied
+                   ` # if this flag isn't called, but can be explicitly set here—
+                   ` # building will go as per usual with the given configurations.
                    `
-   -Reset          ` # Reset project back to CommonJS configuration, used with -Esm.
+   -NoReset        ` # Does not reset the project back to the CommonJS configuration,
+                   ` # used with ESModule building for publication or usage.
+                   `
+   -CleanInstall   ` # Invokes npm with `npm ci` instead of `npm install`; performs a
+                   ` # clean installation of dependencies.
 ```
-
-*Note: backticks on each line indicate line escaping; synonymous to `\` on
-Bash/Linux.
-
-This will generate a `node` folder with contents structured to ship on npm.
 
 ## Documenting Conventions
 

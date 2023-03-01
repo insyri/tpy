@@ -11,10 +11,13 @@ Param(
   [string] $Module,
 
   [Parameter()]
-  [switch] $Reset,
+  [switch] $NoReset,
 
   [Parameter()]
-  [switch] $Quiet
+  [switch] $Quiet,
+
+  [Parameter()]
+  [switch] $CleanInstall
 )
 
 If ((Get-Location).Path -notlike '*tpy') {
@@ -32,14 +35,20 @@ $NodePackageLocation = "$Destination/package.json"
 # (Text in brackets represent [matched] text in this example.)
 #
 #   import { responseBody, responseHTTP, } from "./error[.ts]";
+#   import { DeploymentStructures } from "./deployment[.d.ts]";
 #
 $ImportRegex = "(?<=(?<=\n|^)(im|ex)port(?:(?!(\.d)?\.ts).|\n)*)(\.d)?\.ts"
 $NodeOnlyRegex = "\/\/ build:node-only "
 $DiscordAPIRegex = "(?<=discord-api-types\/[a-z]+\/v8)\/guild"
-
-# Developing Regex
-# ((ex|im)port {[\S\s]+?} from "\.[\S\s]*?(?="))(";)
-# Should match ./file and not ./file.js
+# Matches ESM import/export statements without extensions, allowing for insertion.
+#
+#   SHOULD MATCH
+#   import { TpyWs } from "./ws";
+#
+#   SHOULD NOT MATCH
+#   export { Tpy as default } from "./src/tpy.js";
+#
+$NoExtensionRegex = '((ex|im)port {[\S\s]+?} from "\.\/[\S\s]+?(?<!\.js)(?="))(";)'
 
 # if esm
 #   if .d.ts
@@ -87,9 +96,6 @@ If ($PresentFiles.Length -ne 0) {
     Log "Deleting previous build artifacts"
     $PresentFiles | Remove-Item -Recurse -Force
   }
-  Else {
-    Exit
-  }
 }
 
 Log "Copying Deno project files to $Destination"
@@ -131,11 +137,20 @@ Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {
 
 Set-Location "$Destination"
 
+If ($IsESM) {
+  Log "Fixing ex/import extensions"
+  Get-ChildItem "src/types" -Recurse | ForEach-Object {
+    $Content = Get-Content $_.FullName -Raw
+    $Content = $Content -replace $ImportRegex, ""
+    $Content > $_.FullName
+  }
+}
+
 $ShorthandModule = $IsESM ? "esm" : "cjs"
 
 Log "Running NPM scripts"
 
-npm install -Wait
+npm ($CleanInstall ? "ci" : "install") -Wait
 npm run "build:$ShorthandModule" -Wait
 
 Log "Copying .d.ts files and verifying integrity"
@@ -143,15 +158,22 @@ Copy-Item -Recurse "src/types" "lib/src"
 
 npm run "build:${ShorthandModule}_noemit" -Wait
 
-Get-ChildItem $Destination -Recurse -Filter *.js | ForEach-Object {
-  $Content = Get-Content $_.FullName -Raw
-  $Content = $Content -replace $Regexes, ""
+If ($IsESM) {
+  Log "Fixing ex/import extensions (TS emission)"
+  Get-ChildItem "lib" -Recurse -Filter *.js | ForEach-Object {
+    $Content = Get-Content $_.FullName -Raw
+    $Content = $Content -replace $NoExtensionRegex, '$1.js$3'
+    $Content > $_.FullName
+  }
 }
+
+Remove-Item "./src" -Recurse
 
 Set-Location ".."
 
 # Reset
-If ($IsESM -and $Reset) {
+If ($IsESM -and (-not $NoReset)) {
   Log "Reseting package.json for future use"
-  Invoke-Command -FilePath "./reset.ps1"
+  Log "Use the `-NoReset` flag to disable this behavior"
+  & "$PSScriptRoot/reset.ps1"
 }
