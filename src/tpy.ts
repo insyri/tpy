@@ -18,6 +18,7 @@ import { TpyWs } from "./ws.ts";
 import { TpyKV } from "./kv.ts";
 import { Context } from "./context.ts";
 import { Cases } from "./types/util.d.ts";
+// build:node-only import fetch, { Response, type RequestInit } from "node-fetch";
 
 /**
  * The central entity for interacting with the Pylon API; the entrypoint.
@@ -28,6 +29,7 @@ export class Tpy {
    */
   readonly deploymentID?: string;
   private readonly token: string;
+  private readonly useNodeFetch: boolean;
 
   /**
    * @param options Instantiation options.
@@ -49,10 +51,8 @@ export class Tpy {
      */
     token: string;
   }) {
-    let { token, deploymentID, useNodeFetch } = options;
-    if (useNodeFetch === undefined) {
-      useNodeFetch = true;
-    }
+    const { token, deploymentID, useNodeFetch } = options;
+    this.useNodeFetch = !(useNodeFetch === undefined);
 
     if (!token) {
       throw new TpyError(
@@ -62,15 +62,9 @@ export class Tpy {
         token,
       );
     }
+
     this.token = token;
     if (deploymentID) this.deploymentID = deploymentID;
-    // If this is Node.js
-    if ("process" in globalThis && useNodeFetch) {
-      const fetch = (
-        ...args: Parameters<typeof import("node-fetch")["default"]>
-      ) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
-      (<unknown> globalThis.fetch) = fetch;
-    }
   }
 
   /**
@@ -352,6 +346,7 @@ export class Tpy {
       "https://pylon.bot/api" + resource,
       this.readyRequest(method, requestInit),
     );
+    const copiedResponse = response.clone();
     const body = await response.text();
     if (response.ok) {
       // This is bad, I know. You fix it. Please.
@@ -447,8 +442,8 @@ export class Tpy {
         {
           case: 400,
           fn: async (r) => {
-            const res = await r.json();
-            if ("msg" in res && res["msg"] === "missing json body") {
+            const res = await r.json() as { msg?: string } | undefined; // node-fetch has this as `unknown` and not `any`.
+            if (res && "msg" in res && res["msg"] === "missing json body") {
               throw new TpyError<Response>(
                 "Missing or Invalid JSON in Request Body",
                 responseHTTP(response.status.toString()),
@@ -474,10 +469,10 @@ export class Tpy {
 
     for (const i of cases) {
       if (
-        (typeof i.case === "function" && (await i.case(response.clone()))) ||
+        (typeof i.case === "function" && (await i.case(copiedResponse))) ||
         i.case === response.status
       ) {
-        i.fn(response.clone());
+        i.fn(copiedResponse);
         break;
       }
     }

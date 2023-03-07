@@ -34,10 +34,9 @@
     "url": "https://github.com/insyri/tpy/issues"
   },
   "peerDependencies": {
-    "@types/node": "^18.11.7",
     "@types/node-fetch": "^2.6.2",
-    "discord-api-types": "^0.37.14",
-    "node-fetch": "^2.6.7"
+    "discord-api-types": "^0.37.35",
+    "node-fetch": "^2.6.9"
   },
   "peerDependenciesMeta": {
     "node-fetch": {

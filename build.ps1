@@ -121,6 +121,14 @@ If ($IsESM) {
 }
 $NodePackage | ConvertTo-Json > $NodePackageLocation
 
+Log "Bumping node-fetch to ESModule version"
+If ($IsESM) {
+  Set-Location node
+  npm install "node-fetch@^3.*"
+  npm uninstall "@types/node"
+  Set-Location ..
+}
+
 Log "Correcting import syntax"
 # Node Import Syntax Fix
 Get-ChildItem $Destination -Recurse -Filter *.ts | ForEach-Object {

@@ -4,6 +4,8 @@
  * @module
  */
 
+// build:node-only import { type Response } from "node-fetch";
+
 /**
  * Extracts objects inside an array (if it is one) and forms a union for each of
  * those elements.
