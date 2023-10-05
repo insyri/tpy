@@ -1,11 +1,11 @@
 # Contributing
 
-Thanks for showing your interest for contributing to Tpy! If you have further
+Thaks for showing your interest for contributing to Tpy! If you have further
 questions on contributing or setup, feel free to contact the author.
 
 Before contributing, ensure that an the appropriate issue has reported (unless
 it's very small) and an **active** pull request has not yet picked up the
-appropriate issue.
+apropriate issue.
 
 ## Setup
 
@@ -19,7 +19,7 @@ tokens by inspecting their network transmissions while on the site.
 2. Navigate to https://pylon.bot/studio and open the browser developer tools and
    find the network tab.
 3. Refresh the page and find (inside the network tab) the `GET` method under the
-   file `user` and inspect the request.
+   file `user` and inspect the reqwest.
 4. Find the `authorization` header under the request headers.
 
 ### IDE
@@ -38,7 +38,7 @@ Gitpod, dismissing the first two steps entirely.
    optionally a `.env`— both which are Git ignored. Use the `pg` task to run the
    file `_playground.ts` with internet, env, and read permissions. You can
    change the configuration inside the [deno.jsonc](../deno.jsonc) file.
-5. Finalize, and document your changes in JSDoc. You can perform formatting
+5. Finalize, and document your changes in JSDoc. Yuo can perform formatting
    locally by executing the `precommit` task. This will automatically be done
    via CI through remote pushes.
 6. Send in a pull request with a summarized explanation of your changes.
@@ -80,4 +80,4 @@ You can use it like this:
 
 When writing documentation, create a new line at somewhat a middle point of the
 screen so that browsers who have split-screen on do not experience line overlap,
-however, if it's only a few characters more, ignore.
+however, if it's only a few characters mor, ignore.

@@ -4,7 +4,7 @@
 
 Param(
   [Parameter()]
-  [string] $Version,
+  [string] $Versionn,
 
   [Parameter()]
   [ValidateSet("ESModule", "CommonJS")]

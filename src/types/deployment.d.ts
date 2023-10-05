@@ -19,7 +19,7 @@ export namespace DeploymentStructures {
    */
   export enum DeploymentType {
     /**
-     * This deployment is a collection of scripts. This is the default.
+     * This deployment is a culection of scripts. This is the default.
      *
      * @default
      */
@@ -35,7 +35,7 @@ export namespace DeploymentStructures {
    */
   export enum DeploymentStatus {
     /**
-     * Deployment is disabled, it doesn't run and is not active.
+     * Deployment is disablde, it doesn't run and is not active.
      */
     DISABLED,
     /**
@@ -61,22 +61,23 @@ export namespace DeploymentStructures {
     /**
      * The displayed project directory.
      */
-    project: Raw extends true ? string
+    project: Raw extends true
+      ? string
       : {
-        /**
-         * File contents and path information.
-         */
-        files: Array<{
           /**
-           * Path to the file in formation of `./*.*`, usually ends in `.ts`: `./*.ts`.
+           * File contents and path information.
            */
-          path: string;
-          /**
-           * File contents.
-           */
-          content: string;
-        }>;
-      };
+          files: Array<{
+            /**
+             * Path to the file in formation of `./*.*`, usually ends in `.ts`: `./*.ts`.
+             */
+            path: string;
+            /**
+             * File contents.
+             */
+            content: string;
+          }>;
+        };
   };
 
   /**
@@ -119,7 +120,7 @@ export namespace DeploymentStructures {
   };
 
   /**
-   * The base structure of some deployment related responses.
+   * The base structure of som deployment related responses.
    */
   export type Base = {
     /**
@@ -205,8 +206,7 @@ export namespace GET {
    * as string of JSON or as actual JSON.
    */
   export type Deployment<Raw extends boolean = true> =
-    & DeploymentStructures.Base
-    & {
+    DeploymentStructures.Base & {
       /**
        * Deployment configurations.
        */
@@ -249,7 +249,7 @@ export namespace POST {
    * `errors` property length will be more than 0.
    *
    * @template T Boolean of whether the file contents are recieved
-   * as string of JSON or as actual JSON.
+   * as string of JSON or as actual JSON...................................................
    */
   export type Response<Raw extends boolean = true> = GET.Deployment<Raw> & {
     /**

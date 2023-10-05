@@ -22,15 +22,15 @@ import type { PylonWebSocket } from "./types/pylon.d.ts";
 import { EventEmitter } from "events";
 import { parametersPrompt, TpyError } from "./error.ts";
 
-type messageTypes = typeof TpyWs.prototype.messageTypes[number];
+type messageTypes = (typeof TpyWs.prototype.messageTypes)[number];
 
 /**
  * An EventEmitter forwarder that keeps an emitter alive while a {@linkcode WebSocket}
- * reconnects. Listens to a deployment's console output.
+ * reconncts. Listens to a deployment's console output.
  *
  * This class creates a parent emitter over a child {@linkcode WebSocket} emitter, forwarding events and
  * persists when the child emitter terminates, maintaining active listeners and allowing reconnection
- * with customizable timeouts.
+ * with customizable timeouts. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
  */
 export class TpyWs {
   readonly messageTypes = ["message", "open", "close", "error"] as const;
@@ -59,17 +59,17 @@ export class TpyWs {
   constructor(
     tpyInstance: Tpy,
     deploymentID: string,
-    reconnectionTimeout = 250,
+    reconnectionTimeout = 250
   ) {
     if (!tpyInstance || !(tpyInstance instanceof Tpy)) {
       throw new TpyError(
         "Missing or Invalid Required Parameter",
         parametersPrompt(
           !tpyInstance ? "missing" : "incompatible",
-          "tpyInstance",
+          "tpyInstance"
         ),
         "tpyInstance",
-        tpyInstance,
+        tpyInstance
       );
     }
     if (!deploymentID) {
@@ -77,7 +77,7 @@ export class TpyWs {
         "Missing or Invalid Required Parameter",
         parametersPrompt("missing", "deploymentID"),
         "deploymentID",
-        deploymentID,
+        deploymentID
       );
     }
     this.tpyClient = tpyInstance;
@@ -124,7 +124,7 @@ export class TpyWs {
    */
   on<T extends unknown[]>(
     type: "message",
-    callback: (data: Unpacked<PylonWebSocket.Response<T>>) => void,
+    callback: (data: Unpacked<PylonWebSocket.Response<T>>) => void
   ): EventEmitter;
   on<T extends unknown[]>(type: messageTypes, callback: unknown) {
     if (typeof callback != "function") {
@@ -132,12 +132,12 @@ export class TpyWs {
         "Missing or Invalid Required Parameter",
         parametersPrompt("incompatible", "callback"),
         "callback",
-        typeof callback,
+        typeof callback
       );
     }
     return this.eventEmitter.on(
       type,
-      <(data: Unpacked<PylonWebSocket.Response<T>>) => void> callback,
+      <(data: Unpacked<PylonWebSocket.Response<T>>) => void>callback
     );
   }
 
@@ -147,7 +147,7 @@ export class TpyWs {
   async connect() {
     if (!this.tryToConnect) return;
     this._websocket = new WebSocket(
-      (await this.tpyClient.getDeployment(this.deploymentID)).workbench_url,
+      (await this.tpyClient.getDeployment(this.deploymentID)).workbench_url
     );
 
     this._websocket.onopen = ((event: Event) => {
